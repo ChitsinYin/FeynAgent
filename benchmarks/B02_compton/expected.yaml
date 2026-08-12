@@ -1,0 +1,31 @@
+﻿schema_version: "0.1.0"
+benchmark_id: B02_compton
+process_id: process:b02_compton
+expected_topology:
+  diagram_count: 2
+  connected_tree_diagrams: true
+  loop_order: 0
+  channels:
+    - s
+    - u
+  internal_species:
+    s: e-
+    u: e-
+  internal_momenta:
+    s: p1+k1
+    u: p1-k2
+  required_rule_ids:
+    vertex: rule:qed_tree_v1:e_e_gamma_vertex
+    propagator: rule:qed_tree_v1:electron_propagator
+  coupling_order:
+    coupling: e
+    power: 2
+  symmetry_factor: "1"
+forbidden_today:
+  - final_compton_amplitude
+  - squared_amplitude
+  - dirac_traces
+  - polarization_sums
+  - ward_identity
+metadata:
+  notes: Expected topology only. This file is a benchmark oracle for representation tests, not a physics derivation.

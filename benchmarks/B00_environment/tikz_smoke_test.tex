@@ -1,0 +1,22 @@
+﻿\documentclass[tikz,border=4pt]{standalone}
+\usepackage[compat=1.1.0]{tikz-feynman}
+
+\begin{document}
+\begin{tikzpicture}
+  \begin{feynman}
+    \vertex (g1) at (0,1.2) {\(\gamma\)};
+    \vertex (e1) at (0,-1.2) {\(e^-\)};
+    \vertex (v1) at (1.7,0);
+    \vertex (v2) at (3.4,0);
+    \vertex (g2) at (5.1,1.2) {\(\gamma\)};
+    \vertex (e2) at (5.1,-1.2) {\(e^-\)};
+    \diagram* {
+      (g1) -- [photon] (v1),
+      (e1) -- [fermion] (v1),
+      (v1) -- [fermion] (v2),
+      (v2) -- [photon] (g2),
+      (v2) -- [fermion] (e2),
+    };
+  \end{feynman}
+\end{tikzpicture}
+\end{document}

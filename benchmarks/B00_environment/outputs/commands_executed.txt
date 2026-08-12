@@ -1,0 +1,11 @@
+﻿# Commands executed for B00 environment smoke test
+Get-CimInstance Win32_OperatingSystem | Select-Object Caption,Version,BuildNumber,OSArchitecture
+python -c import sys,platform; print(sys.executable); print(sys.version); print(platform.platform())
+Get-Command wolframscript
+wolframscript -version
+wolframscript -file benchmarks\B00_environment\smoke_test.wl
+Get-Command pdflatex
+pdflatex --version
+Get-Command lualatex
+lualatex --version
+lualatex -interaction=nonstopmode -halt-on-error -output-directory benchmarks\B00_environment\outputs\tikz_compile benchmarks\B00_environment\tikz_smoke_test.tex

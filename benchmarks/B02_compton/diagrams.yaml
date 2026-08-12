@@ -1,0 +1,147 @@
+﻿schema_version: "0.1.0"
+object_id: diagram_ir:b02_compton_tree_topologies
+status: approved
+process_id: process:b02_compton
+diagrams:
+  - diagram_id: diagram:b02_compton:s_channel
+    process_id: process:b02_compton
+    status: approved
+    loop_order: 0
+    channel: s
+    external_legs:
+      - leg_id: leg:b02:s:1
+        slot: 1
+        particle_id: e-
+        state_role: incoming
+        momentum_label: p1
+      - leg_id: leg:b02:s:2
+        slot: 2
+        particle_id: gamma
+        state_role: incoming
+        momentum_label: k1
+      - leg_id: leg:b02:s:3
+        slot: 3
+        particle_id: e-
+        state_role: outgoing
+        momentum_label: p2
+      - leg_id: leg:b02:s:4
+        slot: 4
+        particle_id: gamma
+        state_role: outgoing
+        momentum_label: k2
+    vertex_instances:
+      - vertex_id: vertex:b02:s:1
+        rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+        attached_endpoint_ids:
+          - leg:b02:s:1
+          - leg:b02:s:2
+          - line:b02:s:electron
+      - vertex_id: vertex:b02:s:2
+        rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+        attached_endpoint_ids:
+          - line:b02:s:electron
+          - leg:b02:s:3
+          - leg:b02:s:4
+    internal_lines:
+      - line_id: line:b02:s:electron
+        particle_id: e-
+        propagator_rule_id: rule:qed_tree_v1:electron_propagator
+        from:
+          kind: vertex
+          id: vertex:b02:s:1
+          slot: 3
+        to:
+          kind: vertex
+          id: vertex:b02:s:2
+          slot: 1
+        momentum:
+          label: q_s
+          expression: p1+k1
+          external_convention: physical_external_momenta
+    momentum_routing:
+      - target_id: line:b02:s:electron
+        momentum_label: q_s
+        definition: p1+k1
+    rule_references:
+      - rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+        rule_type: vertex
+      - rule_id: rule:qed_tree_v1:electron_propagator
+        rule_type: propagator
+    coupling_order:
+      - coupling: e
+        power: 2
+    symmetry_factor: "1"
+    metadata:
+      notes: S-channel electron exchange topology only; no amplitude expression is encoded.
+  - diagram_id: diagram:b02_compton:u_channel
+    process_id: process:b02_compton
+    status: approved
+    loop_order: 0
+    channel: u
+    external_legs:
+      - leg_id: leg:b02:u:1
+        slot: 1
+        particle_id: e-
+        state_role: incoming
+        momentum_label: p1
+      - leg_id: leg:b02:u:2
+        slot: 2
+        particle_id: gamma
+        state_role: incoming
+        momentum_label: k1
+      - leg_id: leg:b02:u:3
+        slot: 3
+        particle_id: e-
+        state_role: outgoing
+        momentum_label: p2
+      - leg_id: leg:b02:u:4
+        slot: 4
+        particle_id: gamma
+        state_role: outgoing
+        momentum_label: k2
+    vertex_instances:
+      - vertex_id: vertex:b02:u:1
+        rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+        attached_endpoint_ids:
+          - leg:b02:u:1
+          - leg:b02:u:4
+          - line:b02:u:electron
+      - vertex_id: vertex:b02:u:2
+        rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+        attached_endpoint_ids:
+          - line:b02:u:electron
+          - leg:b02:u:3
+          - leg:b02:u:2
+    internal_lines:
+      - line_id: line:b02:u:electron
+        particle_id: e-
+        propagator_rule_id: rule:qed_tree_v1:electron_propagator
+        from:
+          kind: vertex
+          id: vertex:b02:u:1
+          slot: 3
+        to:
+          kind: vertex
+          id: vertex:b02:u:2
+          slot: 1
+        momentum:
+          label: q_u
+          expression: p1-k2
+          external_convention: physical_external_momenta
+    momentum_routing:
+      - target_id: line:b02:u:electron
+        momentum_label: q_u
+        definition: p1-k2
+    rule_references:
+      - rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+        rule_type: vertex
+      - rule_id: rule:qed_tree_v1:electron_propagator
+        rule_type: propagator
+    coupling_order:
+      - coupling: e
+        power: 2
+    symmetry_factor: "1"
+    metadata:
+      notes: U-channel electron exchange topology only; no amplitude expression is encoded.
+metadata:
+  notes: Gold tree topology representation for e- gamma -> e- gamma in QED. This is not an amplitude file.

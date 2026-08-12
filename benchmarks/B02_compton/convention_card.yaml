@@ -1,0 +1,23 @@
+﻿schema_version: "0.1.0"
+object_id: convention_card:b02_compton_qed_plusminus
+status: approved
+spacetime_dimension:
+  symbol: D
+  value: 4
+metric_signature: +---
+momentum_convention:
+  fourier_phase: exp_minus_i_p_x
+  propagator_momentum_flow: explicit_per_line
+all_momenta_incoming_vertex_convention: true
+external_state_momentum_convention:
+  incoming_particles: physical_incoming_momenta
+  outgoing_particles: physical_outgoing_momenta
+natural_units:
+  hbar: "1"
+  c: "1"
+spin_polarization_policy:
+  spin_sum: do_not_sum
+  polarization_sum: do_not_sum
+  initial_state_average: do_not_average
+metadata:
+  notes: External momenta p1,k1 are incoming and p2,k2 are outgoing. Vertex rules still use all momenta incoming, so outgoing external legs are crossed only at the vertex-rule binding stage, not by changing the external process convention.

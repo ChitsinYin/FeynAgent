@@ -1,0 +1,33 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local config
+.venv/
+venv/
+.env
+.env.*
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# FeynAgent generated outputs
+runs/*
+reports/*
+!runs/.gitkeep
+!reports/.gitkeep
+!reports/*.md
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,55 @@
+﻿schema_version: "0.1.0"
+object_id: physics_card:b02_compton
+status: approved
+process_id: process:b02_compton
+process_type: scattering_2_to_2
+perturbative_order:
+  loop_order: 0
+  restriction: tree_level_only
+coupling_order:
+  mode: explicit
+  orders:
+    - coupling: e
+      power: 2
+particles:
+  incoming:
+    - slot: 1
+      particle_id: e-
+      display_name: electron
+      state_role: incoming
+      momentum_label: p1
+    - slot: 2
+      particle_id: gamma
+      display_name: photon
+      state_role: incoming
+      momentum_label: k1
+  outgoing:
+    - slot: 3
+      particle_id: e-
+      display_name: electron
+      state_role: outgoing
+      momentum_label: p2
+    - slot: 4
+      particle_id: gamma
+      display_name: photon
+      state_role: outgoing
+      momentum_label: k2
+selected_rule_set:
+  registry_id: registry:qed_tree_v1
+  rule_set_ids:
+    - ruleset:qed_tree_v1
+internal_species_policy:
+  allowed_particle_ids:
+    - e-
+requested_outputs:
+  - diagram_ir
+  - tikz_feynman
+  - latex_amplitude
+  - feyncalc_code
+  - validation_report
+approval:
+  status: approved
+  approved_by: user
+  approved_at: "2026-08-12T13:00:00+08:00"
+metadata:
+  notes: B02 Compton scattering specification benchmark only; amplitudes, traces, polarization sums, and Ward identity checks are out of scope for Day 1.

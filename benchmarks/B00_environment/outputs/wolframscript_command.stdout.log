@@ -1,0 +1,35 @@
+﻿
+
+HelpUri            : 
+FileVersionInfo    : File:             C:\Program Files\Wolfram Research\WolframScript\wolframscript.exe
+                     InternalName:     
+                     OriginalFilename: 
+                     FileVersion:      
+                     FileDescription:  
+                     Product:          
+                     ProductVersion:   
+                     Debug:            False
+                     Patched:          False
+                     PreRelease:       False
+                     PrivateBuild:     False
+                     SpecialBuild:     False
+                     Language:         English (United States)
+                     
+Path               : C:\Program Files\Wolfram Research\WolframScript\wolframscript.exe
+Extension          : .exe
+Definition         : C:\Program Files\Wolfram Research\WolframScript\wolframscript.exe
+Source             : C:\Program Files\Wolfram Research\WolframScript\wolframscript.exe
+Version            : 1.4.0.0
+Visibility         : Public
+OutputType         : {System.String}
+Name               : wolframscript.exe
+CommandType        : Application
+ModuleName         : 
+Module             : 
+RemotingCapability : PowerShell
+Parameters         : 
+ParameterSets      : 
+
+
+
+

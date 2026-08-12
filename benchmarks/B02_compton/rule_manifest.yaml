@@ -1,0 +1,113 @@
+﻿schema_version: "0.1.0"
+object_id: rule_registry:qed_tree_v1
+status: draft
+registry_id: registry:qed_tree_v1
+rule_sets:
+  - rule_set_id: ruleset:qed_tree_v1
+    display_name: QED tree v1 minimal rules
+    status: draft
+    convention_card_id: convention_card:b02_compton_qed_plusminus
+vertices:
+  - rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    rule_type: vertex
+    rule_set_id: ruleset:qed_tree_v1
+    participating_fields:
+      - slot: 1
+        particle_id: e-
+        field_role: dirac_fermion
+        arrow_flow: with_momentum
+        index_label: i
+      - slot: 2
+        particle_id: e+
+        field_role: dirac_fermion
+        arrow_flow: against_momentum
+        index_label: j
+      - slot: 3
+        particle_id: gamma
+        field_role: vector
+        arrow_flow: none
+        index_label: mu
+    momentum_labels_order:
+      - p_in
+      - p_out
+      - k
+    lorentz_index_structure:
+      form: template
+      expression: gamma(mu) with Dirac indices i,j
+      indices:
+        - label: mu
+          index_type: lorentz
+        - label: i
+          index_type: dirac
+        - label: j
+          index_type: dirac
+    latex: "-i e \\gamma^{\\mu}_{ij}"
+    feyncalc:
+      template: "-I e GA[mu]"
+      required_symbols:
+        - e
+        - mu
+    coupling_order:
+      - coupling: e
+        power: 1
+    mass_dimension: 0
+    symmetries:
+      - charge_conjugate_related
+    provenance:
+      - source_type: standard_convention
+        citation: Standard QED electron-electron-photon vertex under the explicitly stated FeynAgent Day 1 convention card.
+        section: QED tree-level Feynman rules
+        page: not_applicable
+        notes: Uses metric signature +---, natural units, all momenta incoming at vertices, and vertex factor -i e gamma^mu. Marked pending convention review because no independent source check was performed during Day 1.
+        checked_by: codex
+        checked_at: "2026-08-12T13:00:00+08:00"
+    trust_status: validated_pending_convention_review
+propagators:
+  - rule_id: rule:qed_tree_v1:electron_propagator
+    rule_type: propagator
+    rule_set_id: ruleset:qed_tree_v1
+    participating_fields:
+      - slot: 1
+        particle_id: e-
+        field_role: dirac_fermion
+        arrow_flow: with_momentum
+        index_label: i
+      - slot: 2
+        particle_id: e-
+        field_role: dirac_fermion
+        arrow_flow: with_momentum
+        index_label: j
+    momentum_labels_order:
+      - q
+    lorentz_index_structure:
+      form: template
+      expression: Dirac numerator slash(q)+m over q^2-m^2+i epsilon
+      indices:
+        - label: i
+          index_type: dirac
+        - label: j
+          index_type: dirac
+    latex: "i(\\slashed{q}+m)/(q^2-m^2+i\\epsilon)"
+    feyncalc:
+      template: "I (GS[q] + m)/(SP[q, q] - m^2 + I epsilon)"
+      required_symbols:
+        - q
+        - m
+        - epsilon
+    coupling_order:
+      - coupling: e
+        power: 0
+    mass_dimension: -1
+    symmetries:
+      - none
+    provenance:
+      - source_type: standard_convention
+        citation: Standard QED electron propagator under the explicitly stated FeynAgent Day 1 convention card.
+        section: QED tree-level Feynman rules
+        page: not_applicable
+        notes: Uses metric signature +--- and propagator factor i(slash(q)+m)/(q^2-m^2+i epsilon). Marked pending convention review because no independent source check was performed during Day 1.
+        checked_by: codex
+        checked_at: "2026-08-12T13:00:00+08:00"
+    trust_status: validated_pending_convention_review
+metadata:
+  notes: Minimal QED tree-level rule registry sufficient for the B02 Compton topology benchmark only; not a full QED model file.
