@@ -4,18 +4,54 @@
   "title": "DiagramIR",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "object_id", "status", "process_id", "diagrams"],
+  "required": [
+    "schema_version",
+    "object_id",
+    "status",
+    "process_id",
+    "diagrams"
+  ],
   "properties": {
-    "schema_version": {"type": "string", "const": "0.1.0"},
-    "object_id": {"$ref": "#/$defs/object_id"},
-    "status": {"type": "string", "enum": ["draft", "candidate", "approved", "rejected", "incomplete_placeholder"]},
-    "process_id": {"$ref": "#/$defs/object_id"},
-    "diagrams": {"type": "array", "items": {"$ref": "#/$defs/diagram"}, "minItems": 1},
-    "metadata": {"$ref": "#/$defs/metadata"}
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.1"
+    },
+    "object_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "candidate",
+        "approved",
+        "rejected",
+        "incomplete_placeholder"
+      ]
+    },
+    "process_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "diagrams": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/diagram"
+      },
+      "minItems": 1
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
   },
   "$defs": {
-    "object_id": {"type": "string", "pattern": "^[a-z][a-z0-9_./:-]*$"},
-    "particle_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_./:+-]*$"},
+    "object_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "particle_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_./:+-]*$"
+    },
     "diagram": {
       "type": "object",
       "additionalProperties": false,
@@ -34,111 +70,403 @@
         "symmetry_factor"
       ],
       "properties": {
-        "diagram_id": {"$ref": "#/$defs/object_id"},
-        "process_id": {"$ref": "#/$defs/object_id"},
-        "status": {"type": "string", "enum": ["draft", "candidate", "approved", "rejected", "incomplete_placeholder"]},
-        "loop_order": {"type": "integer", "const": 0},
-        "channel": {"type": "string", "enum": ["s", "t", "u", "contact", "not_assigned"]},
-        "external_legs": {"type": "array", "items": {"$ref": "#/$defs/external_leg"}, "minItems": 1},
-        "vertex_instances": {"type": "array", "items": {"$ref": "#/$defs/vertex_instance"}},
-        "internal_lines": {"type": "array", "items": {"$ref": "#/$defs/internal_line"}},
-        "momentum_routing": {"type": "array", "items": {"$ref": "#/$defs/momentum_assignment"}},
-        "rule_references": {"type": "array", "items": {"$ref": "#/$defs/rule_ref"}, "uniqueItems": true},
-        "coupling_order": {"type": "array", "items": {"$ref": "#/$defs/coupling_power"}},
-        "symmetry_factor": {"type": "string", "pattern": "^[0-9]+(/[1-9][0-9]*)?$"},
-        "metadata": {"$ref": "#/$defs/metadata"}
-      }
-    },
-    "endpoint_ref": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["kind", "id"],
-      "properties": {
-        "kind": {"type": "string", "enum": ["external_leg", "vertex"]},
-        "id": {"$ref": "#/$defs/object_id"},
-        "slot": {"type": "integer", "minimum": 1}
+        "diagram_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "process_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "candidate",
+            "approved",
+            "rejected",
+            "incomplete_placeholder"
+          ]
+        },
+        "loop_order": {
+          "type": "integer",
+          "const": 0
+        },
+        "channel": {
+          "type": "string",
+          "enum": [
+            "s",
+            "t",
+            "u",
+            "contact",
+            "not_assigned"
+          ]
+        },
+        "external_legs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/external_leg"
+          },
+          "minItems": 1
+        },
+        "vertex_instances": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/vertex_instance"
+          }
+        },
+        "internal_lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/internal_line"
+          }
+        },
+        "momentum_routing": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/momentum_assignment"
+          }
+        },
+        "rule_references": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rule_ref"
+          },
+          "uniqueItems": true
+        },
+        "coupling_order": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coupling_power"
+          }
+        },
+        "symmetry_factor": {
+          "type": "string",
+          "pattern": "^[0-9]+(/[1-9][0-9]*)?$"
+        },
+        "metadata": {
+          "$ref": "#/$defs/metadata"
+        }
       }
     },
     "external_leg": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["leg_id", "slot", "particle_id", "state_role", "momentum_label"],
+      "required": [
+        "leg_id",
+        "slot",
+        "particle_id",
+        "state_role",
+        "momentum_label"
+      ],
       "properties": {
-        "leg_id": {"$ref": "#/$defs/object_id"},
-        "slot": {"type": "integer", "minimum": 1},
-        "particle_id": {"$ref": "#/$defs/particle_id"},
-        "state_role": {"type": "string", "enum": ["incoming", "outgoing"]},
-        "momentum_label": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$"}
+        "leg_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "slot": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "state_role": {
+          "type": "string",
+          "enum": [
+            "incoming",
+            "outgoing"
+          ]
+        },
+        "momentum_label": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        }
+      }
+    },
+    "endpoint_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "external_leg",
+            "vertex"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "slot": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     },
     "vertex_instance": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["vertex_id", "rule_id", "attached_endpoint_ids"],
+      "required": [
+        "vertex_id",
+        "rule_id",
+        "slot_bindings"
+      ],
       "properties": {
-        "vertex_id": {"$ref": "#/$defs/object_id"},
-        "rule_id": {"$ref": "#/$defs/object_id"},
-        "attached_endpoint_ids": {"type": "array", "items": {"$ref": "#/$defs/object_id"}, "minItems": 1}
+        "vertex_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "slot_bindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/rule_slot_binding"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "rule_slot_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_slot",
+        "endpoint_id",
+        "endpoint_kind",
+        "expected_particle_id",
+        "expected_field_id",
+        "endpoint_particle_id",
+        "momentum_label",
+        "momentum_substitution",
+        "crossing_treatment",
+        "convention_conversion",
+        "fermion_flow"
+      ],
+      "properties": {
+        "rule_slot": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "endpoint_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "endpoint_kind": {
+          "type": "string",
+          "enum": [
+            "external_leg",
+            "internal_line"
+          ]
+        },
+        "expected_particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "expected_field_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "endpoint_particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "momentum_label": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "momentum_substitution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "crossing_treatment": {
+          "type": "string",
+          "enum": [
+            "none",
+            "external_incoming_as_rule_incoming",
+            "external_outgoing_crossed_to_rule_incoming",
+            "internal_line_orientation"
+          ]
+        },
+        "convention_conversion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "target"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "enum": [
+                "physical_external_momenta",
+                "internal_routing"
+              ]
+            },
+            "target": {
+              "type": "string",
+              "const": "all_momenta_incoming_vertex"
+            }
+          }
+        },
+        "fermion_flow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "field_orientation",
+            "flow_direction"
+          ],
+          "properties": {
+            "field_orientation": {
+              "type": "string",
+              "enum": [
+                "psi",
+                "psi_bar",
+                "not_applicable"
+              ]
+            },
+            "flow_direction": {
+              "type": "string",
+              "enum": [
+                "into_vertex",
+                "out_of_vertex",
+                "through_internal_line",
+                "not_applicable"
+              ]
+            }
+          }
+        }
       }
     },
     "internal_line": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["line_id", "particle_id", "propagator_rule_id", "from", "to", "momentum"],
+      "required": [
+        "line_id",
+        "particle_id",
+        "propagator_rule_id",
+        "from",
+        "to",
+        "momentum"
+      ],
       "properties": {
-        "line_id": {"$ref": "#/$defs/object_id"},
-        "particle_id": {"$ref": "#/$defs/particle_id"},
-        "propagator_rule_id": {"$ref": "#/$defs/object_id"},
-        "from": {"$ref": "#/$defs/endpoint_ref"},
-        "to": {"$ref": "#/$defs/endpoint_ref"},
-        "momentum": {"$ref": "#/$defs/momentum_expression"}
+        "line_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "propagator_rule_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "from": {
+          "$ref": "#/$defs/endpoint_ref"
+        },
+        "to": {
+          "$ref": "#/$defs/endpoint_ref"
+        },
+        "momentum": {
+          "$ref": "#/$defs/momentum_expression"
+        }
       }
     },
     "momentum_assignment": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["target_id", "momentum_label", "definition"],
+      "required": [
+        "target_id",
+        "momentum_label",
+        "definition"
+      ],
       "properties": {
-        "target_id": {"$ref": "#/$defs/object_id"},
-        "momentum_label": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$"},
-        "definition": {"type": "string", "minLength": 1}
+        "target_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "momentum_label": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "definition": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "momentum_expression": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["label", "expression", "external_convention"],
+      "required": [
+        "label",
+        "expression",
+        "external_convention"
+      ],
       "properties": {
-        "label": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$"},
-        "expression": {"type": "string", "minLength": 1},
-        "external_convention": {"type": "string", "enum": ["physical_external_momenta"]}
+        "label": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "expression": {
+          "type": "string",
+          "minLength": 1
+        },
+        "external_convention": {
+          "type": "string",
+          "enum": [
+            "physical_external_momenta"
+          ]
+        }
       }
     },
     "rule_ref": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rule_id", "rule_type"],
+      "required": [
+        "rule_id",
+        "rule_type"
+      ],
       "properties": {
-        "rule_id": {"$ref": "#/$defs/object_id"},
-        "rule_type": {"type": "string", "enum": ["vertex", "propagator"]}
+        "rule_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "rule_type": {
+          "type": "string",
+          "enum": [
+            "vertex",
+            "propagator"
+          ]
+        }
       }
     },
     "coupling_power": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["coupling", "power"],
+      "required": [
+        "coupling",
+        "power"
+      ],
       "properties": {
-        "coupling": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$"},
-        "power": {"type": "integer", "minimum": 0}
+        "coupling": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "power": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
     "metadata": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "notes": {"type": "string"},
-        "created_by": {"type": "string"},
-        "created_at": {"type": "string", "format": "date-time"}
+        "notes": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     }
   }

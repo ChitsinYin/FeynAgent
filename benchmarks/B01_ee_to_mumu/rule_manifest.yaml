@@ -1,5 +1,5 @@
 schema_version: 0.1.1
-object_id: rule_selection_manifest:b02_compton
+object_id: rule_selection_manifest:b01_ee_to_mumu
 status: derived_non_canonical
 canonical_registry:
   relative_path: ../../rules/qed/qed_tree_v1.yaml
@@ -10,8 +10,9 @@ selected_rule_set_ids:
 selected_rule_ids:
   vertices:
   - rule:qed_tree_v1:e_e_gamma_vertex
+  - rule:qed_tree_v1:mu_mu_gamma_vertex
   propagators:
-  - rule:qed_tree_v1:electron_propagator
+  - rule:qed_tree_v1:photon_propagator
 metadata:
-  notes: Lightweight B02 rule-selection manifest. The canonical editable QED RuleRegistry
-    is rules/qed/qed_tree_v1.yaml; this file must not duplicate full rule records.
+  notes: Lightweight B01 rule-selection manifest. Canonical editable rules live in
+    rules/qed/qed_tree_v1.yaml.

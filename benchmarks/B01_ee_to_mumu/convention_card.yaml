@@ -1,5 +1,5 @@
-schema_version: "0.1.1"
-object_id: convention_card:b02_compton_qed_plusminus
+schema_version: 0.1.1
+object_id: convention_card:b01_qed_plusminus
 status: approved
 spacetime_dimension:
   symbol: D
@@ -13,11 +13,12 @@ external_state_momentum_convention:
   incoming_particles: physical_incoming_momenta
   outgoing_particles: physical_outgoing_momenta
 natural_units:
-  hbar: "1"
-  c: "1"
+  hbar: '1'
+  c: '1'
 spin_polarization_policy:
   spin_sum: do_not_sum
   polarization_sum: do_not_sum
   initial_state_average: do_not_average
 metadata:
-  notes: External momenta p1,k1 are incoming and p2,k2 are outgoing. Vertex rules use all momenta incoming, so each DiagramIR vertex slot binding explicitly records crossing/convention conversion.
+  notes: Physical external momenta p1,p2 incoming and p3,p4 outgoing; vertex bindings
+    cross outgoing states into all-momenta-incoming convention.

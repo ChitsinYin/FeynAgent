@@ -1,4 +1,4 @@
-﻿"""Validate benchmark YAML examples against the FeynAgent JSON Schemas."""
+"""Validate canonical Day 2 YAML examples against FeynAgent JSON Schemas."""
 
 from __future__ import annotations
 
@@ -10,9 +10,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 EXAMPLES = [
+    ("benchmarks/B01_ee_to_mumu/physics_card.yaml", "schemas/physics_card.schema.json"),
+    ("benchmarks/B01_ee_to_mumu/convention_card.yaml", "schemas/convention_card.schema.json"),
+    ("benchmarks/B01_ee_to_mumu/diagrams.yaml", "schemas/diagram_ir.schema.json"),
     ("benchmarks/B02_compton/physics_card.yaml", "schemas/physics_card.schema.json"),
     ("benchmarks/B02_compton/convention_card.yaml", "schemas/convention_card.schema.json"),
-    ("benchmarks/B02_compton/rule_manifest.yaml", "schemas/rule_registry.schema.json"),
     ("benchmarks/B02_compton/diagrams.yaml", "schemas/diagram_ir.schema.json"),
     ("rules/qed/qed_tree_v1.yaml", "schemas/rule_registry.schema.json"),
 ]

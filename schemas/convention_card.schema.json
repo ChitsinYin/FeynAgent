@@ -19,23 +19,34 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.1.0"
+      "const": "0.1.1"
     },
     "object_id": {
       "$ref": "#/$defs/object_id"
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "approved", "rejected", "superseded"]
+      "enum": [
+        "draft",
+        "approved",
+        "rejected",
+        "superseded"
+      ]
     },
     "spacetime_dimension": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["symbol", "value"],
+      "required": [
+        "symbol",
+        "value"
+      ],
       "properties": {
         "symbol": {
           "type": "string",
-          "enum": ["D", "d"]
+          "enum": [
+            "D",
+            "d"
+          ]
         },
         "value": {
           "oneOf": [
@@ -45,7 +56,9 @@
             },
             {
               "type": "string",
-              "enum": ["symbolic"]
+              "enum": [
+                "symbolic"
+              ]
             }
           ]
         }
@@ -53,20 +66,32 @@
     },
     "metric_signature": {
       "type": "string",
-      "enum": ["+---", "-+++"]
+      "enum": [
+        "+---",
+        "-+++"
+      ]
     },
     "momentum_convention": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fourier_phase", "propagator_momentum_flow"],
+      "required": [
+        "fourier_phase",
+        "propagator_momentum_flow"
+      ],
       "properties": {
         "fourier_phase": {
           "type": "string",
-          "enum": ["exp_minus_i_p_x", "exp_plus_i_p_x"]
+          "enum": [
+            "exp_minus_i_p_x",
+            "exp_plus_i_p_x"
+          ]
         },
         "propagator_momentum_flow": {
           "type": "string",
-          "enum": ["along_arrow_or_line", "explicit_per_line"]
+          "enum": [
+            "along_arrow_or_line",
+            "explicit_per_line"
+          ]
         }
       }
     },
@@ -76,22 +101,34 @@
     "external_state_momentum_convention": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["incoming_particles", "outgoing_particles"],
+      "required": [
+        "incoming_particles",
+        "outgoing_particles"
+      ],
       "properties": {
         "incoming_particles": {
           "type": "string",
-          "enum": ["physical_incoming_momenta", "crossed_to_all_incoming"]
+          "enum": [
+            "physical_incoming_momenta",
+            "crossed_to_all_incoming"
+          ]
         },
         "outgoing_particles": {
           "type": "string",
-          "enum": ["physical_outgoing_momenta", "crossed_to_all_incoming"]
+          "enum": [
+            "physical_outgoing_momenta",
+            "crossed_to_all_incoming"
+          ]
         }
       }
     },
     "natural_units": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["hbar", "c"],
+      "required": [
+        "hbar",
+        "c"
+      ],
       "properties": {
         "hbar": {
           "type": "string",
@@ -106,19 +143,36 @@
     "spin_polarization_policy": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["spin_sum", "polarization_sum", "initial_state_average"],
+      "required": [
+        "spin_sum",
+        "polarization_sum",
+        "initial_state_average"
+      ],
       "properties": {
         "spin_sum": {
           "type": "string",
-          "enum": ["do_not_sum", "sum_external_spins", "defer_to_feyncalc"]
+          "enum": [
+            "do_not_sum",
+            "sum_external_spins",
+            "defer_to_feyncalc"
+          ]
         },
         "polarization_sum": {
           "type": "string",
-          "enum": ["do_not_sum", "sum_physical_polarizations", "sum_covariant", "defer_to_feyncalc"]
+          "enum": [
+            "do_not_sum",
+            "sum_physical_polarizations",
+            "sum_covariant",
+            "defer_to_feyncalc"
+          ]
         },
         "initial_state_average": {
           "type": "string",
-          "enum": ["do_not_average", "average_over_initial_degrees", "defer_to_human"]
+          "enum": [
+            "do_not_average",
+            "average_over_initial_degrees",
+            "defer_to_human"
+          ]
         }
       }
     },
@@ -128,11 +182,20 @@
       "properties": {
         "metric_expansion": {
           "type": "string",
-          "enum": ["g_munu_equals_eta_plus_kappa_h", "g_munu_equals_eta_plus_2_h_over_mplanck", "unspecified"]
+          "enum": [
+            "g_munu_equals_eta_plus_kappa_h",
+            "g_munu_equals_eta_plus_2_h_over_mplanck",
+            "unspecified"
+          ]
         },
         "planck_mass_convention": {
           "type": "string",
-          "enum": ["reduced_planck_mass", "planck_mass", "kappa_explicit", "unspecified"]
+          "enum": [
+            "reduced_planck_mass",
+            "planck_mass",
+            "kappa_explicit",
+            "unspecified"
+          ]
         }
       }
     },
@@ -163,4 +226,3 @@
     }
   }
 }
-

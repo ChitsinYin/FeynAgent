@@ -1,0 +1,60 @@
+schema_version: 0.1.1
+object_id: physics_card:b01_ee_to_mumu
+status: approved
+process_id: process:b01_ee_to_mumu
+process_type: scattering_2_to_2
+perturbative_order:
+  loop_order: 0
+  restriction: tree_level_only
+coupling_order:
+  mode: explicit
+  orders:
+  - coupling: e
+    power: 2
+particles:
+  incoming:
+  - slot: 1
+    particle_id: e-
+    display_name: electron
+    state_role: incoming
+    momentum_label: p1
+  - slot: 2
+    particle_id: e+
+    display_name: positron
+    state_role: incoming
+    momentum_label: p2
+  outgoing:
+  - slot: 3
+    particle_id: mu-
+    display_name: muon
+    state_role: outgoing
+    momentum_label: p3
+  - slot: 4
+    particle_id: mu+
+    display_name: antimuon
+    state_role: outgoing
+    momentum_label: p4
+selected_rule_set:
+  registry_id: registry:qed_tree_v1
+  rule_set_ids:
+  - ruleset:qed_tree_v1
+internal_species_policy:
+  allowed_particle_ids:
+  - gamma
+requested_outputs:
+- diagram_ir
+- validation_report
+approval:
+  topology:
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-12T14:17:36+08:00'
+    notes: Approved only for B01 tree topology representation.
+  amplitude_generation:
+    status: not_requested
+    notes: No amplitude generation in this benchmark phase.
+  heavy_calculation:
+    status: not_requested
+    notes: No heavy calculation in this benchmark phase.
+metadata:
+  notes: B01 e- e+ -> mu- mu+ topology benchmark only; no amplitudes are calculated.

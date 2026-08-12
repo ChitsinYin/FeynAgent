@@ -1,0 +1,29 @@
+schema_version: 0.1.1
+benchmark_id: B01_ee_to_mumu
+process_id: process:b01_ee_to_mumu
+expected_topology:
+  diagram_count: 1
+  connected_tree_diagrams: true
+  loop_order: 0
+  channels:
+  - s
+  internal_species:
+    s: gamma
+  internal_momenta:
+    s: p1+p2
+  required_rule_ids:
+    vertices:
+    - rule:qed_tree_v1:e_e_gamma_vertex
+    - rule:qed_tree_v1:mu_mu_gamma_vertex
+    propagator: rule:qed_tree_v1:photon_propagator
+  coupling_order:
+    coupling: e
+    power: 2
+  symmetry_factor: '1'
+forbidden_today:
+- final_amplitude
+- squared_amplitude
+- dirac_traces
+- polarization_sums
+metadata:
+  notes: Expected topology only; not a physics derivation.

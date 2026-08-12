@@ -1,4 +1,4 @@
-﻿# FeynAgent Architecture
+# FeynAgent Architecture
 
 ## Conceptual Pipeline
 
@@ -25,7 +25,7 @@ Natural language input is a convenience interface only. It may suggest particles
 
 `PhysicsCard` records the requested process and physics model information in structured form. It should capture external states, allowed internal fields, model name, rule-set references, and unsupported features requested by the user.
 
-For v0.1, it is the source of truth for the process identity, incoming and outgoing particle identifiers, process type, tree-level restriction, requested coupling order or named order assumption, selected rule set, optional internal-species policy, requested output artifacts, and process approval state.
+For v0.1, it is the source of truth for the process identity, incoming and outgoing particle identifiers, process type, tree-level restriction, requested coupling order or named order assumption, selected rule set, optional internal-species policy, requested output artifacts, and approval state. As of schema 0.1.1, approval is split into topology, amplitude-generation, and heavy-calculation gates.
 
 ### ConventionCard
 
@@ -37,7 +37,7 @@ For v0.1, it records spacetime dimension, metric signature, Fourier and momentum
 
 `RuleRegistry` loads and resolves Feynman rules from built-in and custom sources. Every rule must carry provenance, trust status, applicable fields, Lorentz structure metadata, coupling symbols, and convention compatibility notes.
 
-For v0.1, the registry represents vertices and propagators. Each rule records participating particle identifiers, field roles, momentum order, Lorentz/index structure, LaTeX representation, FeynCalc template, coupling order, mass dimension, symmetries, provenance entries, and trust status. Untrusted or conflicting rules may be stored for review, but they cannot silently become trusted inputs.
+For v0.1, the registry represents vertices and propagators. Each rule records participating particle identifiers, field identifiers, field roles, quantum-field roles such as `psi` and `psi_bar`, momentum order, Lorentz/index structure, LaTeX representation, FeynCalc template, coupling order, mass dimension, symmetries, provenance entries, and trust status. As of schema 0.1.1, the registry also carries a minimal particle catalog for conjugation/crossing checks. Untrusted or conflicting rules may be stored for review, but they cannot silently become trusted inputs.
 
 ### Candidate and Approved Process
 
@@ -49,7 +49,7 @@ Approval requires a compatible `PhysicsCard`, `ConventionCard`, and `RuleRegistr
 
 `DiagramIR` is the canonical representation of generated diagrams. It should represent graph topology, external and internal lines, vertices, rule bindings, momentum labels, field identities, and diagram-level metadata.
 
-For v0.1, each diagram records a diagram identifier, process identifier, loop order fixed to zero, channel, external legs, vertex instances, internal lines, momentum routing, referenced rule identifiers, coupling order, symmetry factor, and diagram status. It does not encode TikZ layout or Mathematica formatting as physics truth.
+For v0.1, each diagram records a diagram identifier, process identifier, loop order fixed to zero, channel, external legs, vertex instances, internal lines, momentum routing, referenced rule identifiers, coupling order, symmetry factor, and diagram status. As of schema 0.1.1, each vertex instance must bind every Feynman-rule field slot explicitly through `slot_bindings`; endpoint order is not physics truth. It does not encode TikZ layout or Mathematica formatting as physics truth.
 
 ### Renderers and Builders
 

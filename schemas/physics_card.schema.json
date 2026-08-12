@@ -19,26 +19,38 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.1.0"
+      "const": "0.1.1"
     },
     "object_id": {
       "$ref": "#/$defs/object_id"
     },
     "status": {
       "type": "string",
-      "enum": ["draft", "candidate", "approved", "rejected", "superseded"]
+      "enum": [
+        "draft",
+        "candidate",
+        "approved",
+        "rejected",
+        "superseded"
+      ]
     },
     "process_id": {
       "$ref": "#/$defs/object_id"
     },
     "process_type": {
       "type": "string",
-      "enum": ["decay_1_to_n", "scattering_2_to_2"]
+      "enum": [
+        "decay_1_to_n",
+        "scattering_2_to_2"
+      ]
     },
     "perturbative_order": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["loop_order", "restriction"],
+      "required": [
+        "loop_order",
+        "restriction"
+      ],
       "properties": {
         "loop_order": {
           "type": "integer",
@@ -53,11 +65,16 @@
     "coupling_order": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["mode"],
+      "required": [
+        "mode"
+      ],
       "properties": {
         "mode": {
           "type": "string",
-          "enum": ["explicit", "named_assumption"]
+          "enum": [
+            "explicit",
+            "named_assumption"
+          ]
         },
         "orders": {
           "type": "array",
@@ -74,25 +91,33 @@
       },
       "oneOf": [
         {
-          "required": ["orders"],
+          "required": [
+            "orders"
+          ],
           "properties": {
             "mode": {
               "const": "explicit"
             }
           },
           "not": {
-            "required": ["named_assumption"]
+            "required": [
+              "named_assumption"
+            ]
           }
         },
         {
-          "required": ["named_assumption"],
+          "required": [
+            "named_assumption"
+          ],
           "properties": {
             "mode": {
               "const": "named_assumption"
             }
           },
           "not": {
-            "required": ["orders"]
+            "required": [
+              "orders"
+            ]
           }
         }
       ]
@@ -100,7 +125,10 @@
     "particles": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["incoming", "outgoing"],
+      "required": [
+        "incoming",
+        "outgoing"
+      ],
       "properties": {
         "incoming": {
           "type": "array",
@@ -121,7 +149,10 @@
     "selected_rule_set": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["registry_id", "rule_set_ids"],
+      "required": [
+        "registry_id",
+        "rule_set_ids"
+      ],
       "properties": {
         "registry_id": {
           "$ref": "#/$defs/object_id"
@@ -157,10 +188,14 @@
       },
       "anyOf": [
         {
-          "required": ["allowed_particle_ids"]
+          "required": [
+            "allowed_particle_ids"
+          ]
         },
         {
-          "required": ["forbidden_particle_ids"]
+          "required": [
+            "forbidden_particle_ids"
+          ]
         }
       ]
     },
@@ -168,7 +203,13 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["diagram_ir", "tikz_feynman", "latex_amplitude", "feyncalc_code", "validation_report"]
+        "enum": [
+          "diagram_ir",
+          "tikz_feynman",
+          "latex_amplitude",
+          "feyncalc_code",
+          "validation_report"
+        ]
       },
       "minItems": 1,
       "uniqueItems": true
@@ -176,19 +217,20 @@
     "approval": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status"],
+      "required": [
+        "topology",
+        "amplitude_generation",
+        "heavy_calculation"
+      ],
       "properties": {
-        "status": {
-          "type": "string",
-          "enum": ["not_requested", "pending", "approved", "rejected"]
+        "topology": {
+          "$ref": "#/$defs/approval_gate"
         },
-        "approved_by": {
-          "type": "string",
-          "minLength": 1
+        "amplitude_generation": {
+          "$ref": "#/$defs/approval_gate"
         },
-        "approved_at": {
-          "type": "string",
-          "format": "date-time"
+        "heavy_calculation": {
+          "$ref": "#/$defs/approval_gate"
         }
       }
     },
@@ -208,7 +250,12 @@
     "process_particle": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["slot", "particle_id", "state_role", "momentum_label"],
+      "required": [
+        "slot",
+        "particle_id",
+        "state_role",
+        "momentum_label"
+      ],
       "properties": {
         "slot": {
           "type": "integer",
@@ -223,7 +270,10 @@
         },
         "state_role": {
           "type": "string",
-          "enum": ["incoming", "outgoing"]
+          "enum": [
+            "incoming",
+            "outgoing"
+          ]
         },
         "momentum_label": {
           "type": "string",
@@ -234,7 +284,10 @@
     "coupling_power": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["coupling", "power"],
+      "required": [
+        "coupling",
+        "power"
+      ],
       "properties": {
         "coupling": {
           "type": "string",
@@ -243,6 +296,36 @@
         "power": {
           "type": "integer",
           "minimum": 0
+        }
+      }
+    },
+    "approval_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_requested",
+            "pending",
+            "approved",
+            "rejected",
+            "blocked"
+          ]
+        },
+        "approved_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approved_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
         }
       }
     },
@@ -264,4 +347,3 @@
     }
   }
 }
-
