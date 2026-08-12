@@ -1,4 +1,4 @@
-schema_version: "0.1.1"
+schema_version: 0.1.2
 benchmark_id: B02_compton
 process_id: process:b02_compton
 expected_topology:
@@ -6,8 +6,8 @@ expected_topology:
   connected_tree_diagrams: true
   loop_order: 0
   channels:
-    - s
-    - u
+  - s
+  - u
   internal_species:
     s: e-
     u: e-
@@ -20,12 +20,13 @@ expected_topology:
   coupling_order:
     coupling: e
     power: 2
-  symmetry_factor: "1"
+  symmetry_factor: '1'
 forbidden_today:
-  - final_compton_amplitude
-  - squared_amplitude
-  - dirac_traces
-  - polarization_sums
-  - ward_identity
+- final_compton_amplitude
+- squared_amplitude
+- dirac_traces
+- polarization_sums
+- ward_identity
 metadata:
-  notes: Expected topology only. This file is a benchmark oracle for representation tests, not a physics derivation.
+  notes: Expected topology only. This file is a benchmark oracle for representation
+    tests, not a physics derivation.

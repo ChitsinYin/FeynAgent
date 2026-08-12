@@ -104,7 +104,16 @@ vertices:
       independent source check was performed during Day 1.
     checked_by: codex
     checked_at: '2026-08-12T13:00:00+08:00'
-  trust_status: validated_pending_convention_review
+  - source_type: local_file
+    local_source_path: docs/QED_CONVENTION_AUDIT.md
+    section: Rule Audit Table
+    notes: User reviewed and approved the bounded QED convention audit for B01/B02.
+      The rule is promoted to validated for B01/B02 amplitude-generation preparation;
+      backend convention maps remain documented in the audit. This does not promote
+      the rule to fully trusted.
+    checked_by: user
+    checked_at: '2026-08-12T19:48:05.9409820+08:00'
+  trust_status: validated
 - rule_id: rule:qed_tree_v1:mu_mu_gamma_vertex
   rule_type: vertex
   rule_set_id: ruleset:qed_tree_v1
@@ -169,7 +178,16 @@ vertices:
       electron QED vertex. Pending independent convention review.
     checked_by: codex
     checked_at: '2026-08-12T14:17:36+08:00'
-  trust_status: validated_pending_convention_review
+  - source_type: local_file
+    local_source_path: docs/QED_CONVENTION_AUDIT.md
+    section: Rule Audit Table
+    notes: User reviewed and approved the bounded QED convention audit for B01/B02.
+      The rule is promoted to validated for B01/B02 amplitude-generation preparation;
+      backend convention maps remain documented in the audit. This does not promote
+      the rule to fully trusted.
+    checked_by: user
+    checked_at: '2026-08-12T19:48:05.9409820+08:00'
+  trust_status: validated
 propagators:
 - rule_id: rule:qed_tree_v1:electron_propagator
   rule_type: propagator
@@ -225,7 +243,16 @@ propagators:
       was performed during Day 1.
     checked_by: codex
     checked_at: '2026-08-12T13:00:00+08:00'
-  trust_status: validated_pending_convention_review
+  - source_type: local_file
+    local_source_path: docs/QED_CONVENTION_AUDIT.md
+    section: Rule Audit Table
+    notes: User reviewed and approved the bounded QED convention audit for B01/B02.
+      The rule is promoted to validated for B01/B02 amplitude-generation preparation;
+      backend convention maps remain documented in the audit. This does not promote
+      the rule to fully trusted.
+    checked_by: user
+    checked_at: '2026-08-12T19:48:05.9409820+08:00'
+  trust_status: validated
 - rule_id: rule:qed_tree_v1:photon_propagator
   rule_type: propagator
   rule_set_id: ruleset:qed_tree_v1
@@ -280,7 +307,17 @@ propagators:
       template. Pending independent convention review.
     checked_by: codex
     checked_at: '2026-08-12T14:17:36+08:00'
-  trust_status: validated_pending_convention_review
+  - source_type: local_file
+    local_source_path: docs/QED_CONVENTION_AUDIT.md
+    section: Rule Audit Table
+    notes: User reviewed and approved the bounded QED convention audit for B01/B02.
+      The rule is promoted to validated for B01/B02 amplitude-generation preparation;
+      backend convention maps remain documented in the audit. This does not promote
+      the rule to fully trusted.
+    checked_by: user
+    checked_at: '2026-08-12T19:48:05.9409820+08:00'
+  trust_status: validated
 metadata:
   notes: Minimal canonical QED tree-level RuleRegistry for Day 2 B01/B02 topology
-    benchmarks; not a full QED model file.
+    benchmarks; audited for B01/B02 amplitude-generation preparation only, not a
+    full QED model file.

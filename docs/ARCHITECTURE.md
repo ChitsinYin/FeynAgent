@@ -49,7 +49,7 @@ Approval requires a compatible `PhysicsCard`, `ConventionCard`, and `RuleRegistr
 
 `DiagramIR` is the canonical representation of generated diagrams. It should represent graph topology, external and internal lines, vertices, rule bindings, momentum labels, field identities, and diagram-level metadata.
 
-For v0.1, each diagram records a diagram identifier, process identifier, loop order fixed to zero, channel, external legs, vertex instances, internal lines, momentum routing, referenced rule identifiers, coupling order, symmetry factor, and diagram status. As of schema 0.1.1, each vertex instance must bind every Feynman-rule field slot explicitly through `slot_bindings`; endpoint order is not physics truth. It does not encode TikZ layout or Mathematica formatting as physics truth.
+For v0.1, each diagram records a diagram identifier, process identifier, loop order fixed to zero, channel, external legs, vertex instances, internal lines, momentum routing, referenced rule identifiers, coupling order, symmetry factor, and diagram status. As of schema 0.1.1, each vertex instance must bind every Feynman-rule field slot explicitly through `slot_bindings`; endpoint order is not physics truth. As of DiagramIR 0.1.2, Dirac fermion flow is bound-field driven: `psi` means flow into the vertex and `psi_bar` means flow out of the vertex. It does not encode TikZ layout or Mathematica formatting as physics truth.
 
 ### Renderers and Builders
 

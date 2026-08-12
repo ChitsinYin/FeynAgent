@@ -19,7 +19,7 @@
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.1.1"
+      "const": "0.1.2"
     },
     "object_id": {
       "$ref": "#/$defs/object_id"
@@ -236,6 +236,19 @@
     },
     "metadata": {
       "$ref": "#/$defs/metadata"
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "particle_latex_labels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/particle_latex_label"
+          },
+          "uniqueItems": true
+        }
+      }
     }
   },
   "$defs": {
@@ -278,6 +291,10 @@
         "momentum_label": {
           "type": "string",
           "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "latex_label": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -342,6 +359,23 @@
         "created_at": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "particle_latex_label": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "particle_id",
+        "latex_label"
+      ],
+      "properties": {
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "latex_label": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }

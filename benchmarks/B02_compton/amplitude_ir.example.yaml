@@ -1,0 +1,328 @@
+schema_version: 0.1.0
+object_id: amplitude_ir:b02_compton:example
+ir_type: derived_amplitude_ir
+status: derived_candidate
+process_id: process:b02_compton
+source:
+  physics_card_id: physics_card:b02_compton
+  convention_card_id: convention_card:b02_compton_qed_plusminus
+  rule_registry_id: registry:qed_tree_v1
+  rule_registry_sha256: e55c688d3343c43099ca25c0c7ceab13685fe1a94e9f2e9f46e36108babb7399
+  diagram_ir_id: diagram_ir:b02_compton_tree_topologies
+  diagram_ir_sha256: b8c14329aadf03078061ed8284e70dded2d15ffdccf84e8580ee5cec9a50b2b4
+audit_metadata:
+  convention_audit_path: docs/QED_CONVENTION_AUDIT.md
+  approved_for_amplitude_generation: true
+  heavy_calculation_approved: false
+  notes: Hand-readable schema fixture only; not emitted by an amplitude builder.
+total_amplitude:
+  term_amplitude_ids:
+  - amplitude:b02:s:e
+  - amplitude:b02:u:e
+  sum_kind: ordered_symbolic_sum
+  notes: Symbolic sum only; no simplification was performed.
+amplitudes:
+- amplitude_id: amplitude:b02:s:e
+  diagram_id: diagram:generated:b02-compton:s:e-
+  process_id: process:b02_compton
+  source_rule_ids:
+  - rule:qed_tree_v1:e_e_gamma_vertex
+  - rule:qed_tree_v1:electron_propagator
+  external_state_factors:
+  - factor_id: factor:b02:s:ext:em_in:u
+    leg_id: leg:generated:b02-compton:s:1
+    particle_id: e-
+    state_role: incoming
+    momentum_label: p1
+    factor_kind: spinor_wavefunction
+    spinor_type: u
+    index_ids:
+    - idx:b02:s:d_u
+  - factor_id: factor:b02:s:ext:em_out:ubar
+    leg_id: leg:generated:b02-compton:s:3
+    particle_id: e-
+    state_role: outgoing
+    momentum_label: p2
+    factor_kind: spinor_wavefunction
+    spinor_type: ubar
+    index_ids:
+    - idx:b02:s:d_ubar
+  vertex_factors:
+  - factor_id: factor:b02:s:vertex:absorb
+    vertex_id: vertex:generated:b02-compton:s:1
+    rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    coefficient: -I e
+    lorentz_index_ids:
+    - idx:b02:s:mu_v1
+    dirac_index_ids:
+    - idx:b02:s:d_v1_l
+    - idx:b02:s:d_v1_r
+    slot_factors:
+    - rule_slot: 1
+      endpoint_id: line:generated:b02-compton:s:e-
+      field_id: field:qed:e:psi_bar
+      momentum_substitution: -q_s
+      index_ids:
+      - idx:b02:s:d_v1_l
+    - rule_slot: 2
+      endpoint_id: leg:generated:b02-compton:s:1
+      field_id: field:qed:e:psi
+      momentum_substitution: p1
+      index_ids:
+      - idx:b02:s:d_v1_r
+    - rule_slot: 3
+      endpoint_id: leg:generated:b02-compton:s:2
+      field_id: field:qed:gamma:a
+      momentum_substitution: k1
+      index_ids:
+      - idx:b02:s:mu_v1
+  - factor_id: factor:b02:s:vertex:emit
+    vertex_id: vertex:generated:b02-compton:s:2
+    rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    coefficient: -I e
+    lorentz_index_ids:
+    - idx:b02:s:nu_v2
+    dirac_index_ids:
+    - idx:b02:s:d_v2_l
+    - idx:b02:s:d_v2_r
+    slot_factors:
+    - rule_slot: 1
+      endpoint_id: leg:generated:b02-compton:s:3
+      field_id: field:qed:e:psi_bar
+      momentum_substitution: -p2
+      index_ids:
+      - idx:b02:s:d_v2_l
+    - rule_slot: 2
+      endpoint_id: line:generated:b02-compton:s:e-
+      field_id: field:qed:e:psi
+      momentum_substitution: q_s
+      index_ids:
+      - idx:b02:s:d_v2_r
+    - rule_slot: 3
+      endpoint_id: leg:generated:b02-compton:s:4
+      field_id: field:qed:gamma:a
+      momentum_substitution: -k2
+      index_ids:
+      - idx:b02:s:nu_v2
+  propagator_factors:
+  - factor_id: factor:b02:s:prop:electron
+    line_id: line:generated:b02-compton:s:e-
+    rule_id: rule:qed_tree_v1:electron_propagator
+    particle_id: e-
+    momentum_label: q_s
+    momentum_expression: p1+k1
+    numerator: I (GS[q_s] + m)
+    denominator: SP[q_s, q_s] - m^2 + I epsilon
+    index_ids:
+    - idx:b02:s:d_prop_l
+    - idx:b02:s:d_prop_r
+  local_indices:
+    lorentz:
+    - {index_id: idx:b02:s:mu_v1, label: mu_v1, index_type: lorentz, owner_id: factor:b02:s:vertex:absorb}
+    - {index_id: idx:b02:s:mu_pol_in, label: mu_pol_in, index_type: lorentz, owner_id: factor:b02:s:pol:gamma_in}
+    - {index_id: idx:b02:s:nu_v2, label: nu_v2, index_type: lorentz, owner_id: factor:b02:s:vertex:emit}
+    - {index_id: idx:b02:s:nu_pol_out, label: nu_pol_out, index_type: lorentz, owner_id: factor:b02:s:pol:gamma_out}
+    dirac:
+    - {index_id: idx:b02:s:d_ubar, label: d_ubar, index_type: dirac, owner_id: factor:b02:s:ext:em_out:ubar}
+    - {index_id: idx:b02:s:d_v2_l, label: d_v2_l, index_type: dirac, owner_id: factor:b02:s:vertex:emit}
+    - {index_id: idx:b02:s:d_v2_r, label: d_v2_r, index_type: dirac, owner_id: factor:b02:s:vertex:emit}
+    - {index_id: idx:b02:s:d_prop_l, label: d_prop_l, index_type: dirac, owner_id: factor:b02:s:prop:electron}
+    - {index_id: idx:b02:s:d_prop_r, label: d_prop_r, index_type: dirac, owner_id: factor:b02:s:prop:electron}
+    - {index_id: idx:b02:s:d_v1_l, label: d_v1_l, index_type: dirac, owner_id: factor:b02:s:vertex:absorb}
+    - {index_id: idx:b02:s:d_v1_r, label: d_v1_r, index_type: dirac, owner_id: factor:b02:s:vertex:absorb}
+    - {index_id: idx:b02:s:d_u, label: d_u, index_type: dirac, owner_id: factor:b02:s:ext:em_in:u}
+  momentum_substitutions:
+  - {substitution_id: subst:b02:s:v1:slot1, source_factor_id: factor:b02:s:vertex:absorb, rule_slot: 1, symbol: p_bar, expression: -q_s, convention_conversion: {source: internal_routing, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:s:v1:slot2, source_factor_id: factor:b02:s:vertex:absorb, rule_slot: 2, symbol: p_psi, expression: p1, convention_conversion: {source: physical_external_momenta, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:s:v1:slot3, source_factor_id: factor:b02:s:vertex:absorb, rule_slot: 3, symbol: k, expression: k1, convention_conversion: {source: physical_external_momenta, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:s:v2:slot1, source_factor_id: factor:b02:s:vertex:emit, rule_slot: 1, symbol: p_bar, expression: -p2, convention_conversion: {source: physical_external_momenta, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:s:v2:slot2, source_factor_id: factor:b02:s:vertex:emit, rule_slot: 2, symbol: p_psi, expression: q_s, convention_conversion: {source: internal_routing, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:s:v2:slot3, source_factor_id: factor:b02:s:vertex:emit, rule_slot: 3, symbol: k, expression: -k2, convention_conversion: {source: physical_external_momenta, target: all_momenta_incoming_vertex}}
+  fermion_chains:
+  - chain_id: chain:b02:s:electron
+    ordered_factor_ids:
+    - factor:b02:s:ext:em_out:ubar
+    - factor:b02:s:vertex:emit
+    - factor:b02:s:prop:electron
+    - factor:b02:s:vertex:absorb
+    - factor:b02:s:ext:em_in:u
+    external_start_factor_id: factor:b02:s:ext:em_out:ubar
+    external_end_factor_id: factor:b02:s:ext:em_in:u
+    attached_bosonic_factor_ids:
+    - factor:b02:s:pol:gamma_out
+    - factor:b02:s:pol:gamma_in
+  bosonic_external_polarization_factors:
+  - factor_id: factor:b02:s:pol:gamma_in
+    leg_id: leg:generated:b02-compton:s:2
+    particle_id: gamma
+    state_role: incoming
+    momentum_label: k1
+    lorentz_index_id: idx:b02:s:mu_pol_in
+    conjugation: none
+    transversality_status: not_applied
+  - factor_id: factor:b02:s:pol:gamma_out
+    leg_id: leg:generated:b02-compton:s:4
+    particle_id: gamma
+    state_role: outgoing
+    momentum_label: k2
+    lorentz_index_id: idx:b02:s:nu_pol_out
+    conjugation: complex_conjugate
+    transversality_status: not_applied
+  non_chain_factors: []
+  index_contractions:
+  - {contraction_id: contract:b02:s:lorentz:in, index_type: lorentz, factor_indices: [{factor_id: factor:b02:s:vertex:absorb, index_id: idx:b02:s:mu_v1, index_role: lorentz}, {factor_id: factor:b02:s:pol:gamma_in, index_id: idx:b02:s:mu_pol_in, index_role: lorentz}]}
+  - {contraction_id: contract:b02:s:lorentz:out, index_type: lorentz, factor_indices: [{factor_id: factor:b02:s:vertex:emit, index_id: idx:b02:s:nu_v2, index_role: lorentz}, {factor_id: factor:b02:s:pol:gamma_out, index_id: idx:b02:s:nu_pol_out, index_role: lorentz}]}
+  - {contraction_id: contract:b02:s:dirac:out, index_type: dirac, factor_indices: [{factor_id: factor:b02:s:ext:em_out:ubar, index_id: idx:b02:s:d_ubar, index_role: right}, {factor_id: factor:b02:s:vertex:emit, index_id: idx:b02:s:d_v2_l, index_role: left}]}
+  - {contraction_id: contract:b02:s:dirac:v2prop, index_type: dirac, factor_indices: [{factor_id: factor:b02:s:vertex:emit, index_id: idx:b02:s:d_v2_r, index_role: right}, {factor_id: factor:b02:s:prop:electron, index_id: idx:b02:s:d_prop_l, index_role: left}]}
+  - {contraction_id: contract:b02:s:dirac:propv1, index_type: dirac, factor_indices: [{factor_id: factor:b02:s:prop:electron, index_id: idx:b02:s:d_prop_r, index_role: right}, {factor_id: factor:b02:s:vertex:absorb, index_id: idx:b02:s:d_v1_l, index_role: left}]}
+  - {contraction_id: contract:b02:s:dirac:in, index_type: dirac, factor_indices: [{factor_id: factor:b02:s:vertex:absorb, index_id: idx:b02:s:d_v1_r, index_role: right}, {factor_id: factor:b02:s:ext:em_in:u, index_id: idx:b02:s:d_u, index_role: left}]}
+  overall_factor:
+    scalar_prefactor: '1'
+    relative_sign: '+1'
+    sign_source: manual_fixture
+  generation_status:
+    status: hand_written_fixture
+    generated_by: codex
+    notes: Minimal s-channel fixture; no builder executed.
+  audit_metadata:
+    convention_audit_path: docs/QED_CONVENTION_AUDIT.md
+    approved_for_amplitude_generation: true
+    heavy_calculation_approved: false
+- amplitude_id: amplitude:b02:u:e
+  diagram_id: diagram:generated:b02-compton:u:e-
+  process_id: process:b02_compton
+  source_rule_ids:
+  - rule:qed_tree_v1:e_e_gamma_vertex
+  - rule:qed_tree_v1:electron_propagator
+  external_state_factors:
+  - factor_id: factor:b02:u:ext:em_in:u
+    leg_id: leg:generated:b02-compton:u:1
+    particle_id: e-
+    state_role: incoming
+    momentum_label: p1
+    factor_kind: spinor_wavefunction
+    spinor_type: u
+    index_ids:
+    - idx:b02:u:d_u
+  - factor_id: factor:b02:u:ext:em_out:ubar
+    leg_id: leg:generated:b02-compton:u:3
+    particle_id: e-
+    state_role: outgoing
+    momentum_label: p2
+    factor_kind: spinor_wavefunction
+    spinor_type: ubar
+    index_ids:
+    - idx:b02:u:d_ubar
+  vertex_factors:
+  - factor_id: factor:b02:u:vertex:emit
+    vertex_id: vertex:generated:b02-compton:u:1
+    rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    coefficient: -I e
+    lorentz_index_ids:
+    - idx:b02:u:nu_v1
+    dirac_index_ids:
+    - idx:b02:u:d_v1_l
+    - idx:b02:u:d_v1_r
+    slot_factors:
+    - {rule_slot: 1, endpoint_id: line:generated:b02-compton:u:e-, field_id: field:qed:e:psi_bar, momentum_substitution: -q_u, index_ids: [idx:b02:u:d_v1_l]}
+    - {rule_slot: 2, endpoint_id: leg:generated:b02-compton:u:1, field_id: field:qed:e:psi, momentum_substitution: p1, index_ids: [idx:b02:u:d_v1_r]}
+    - {rule_slot: 3, endpoint_id: leg:generated:b02-compton:u:4, field_id: field:qed:gamma:a, momentum_substitution: -k2, index_ids: [idx:b02:u:nu_v1]}
+  - factor_id: factor:b02:u:vertex:absorb
+    vertex_id: vertex:generated:b02-compton:u:2
+    rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    coefficient: -I e
+    lorentz_index_ids:
+    - idx:b02:u:mu_v2
+    dirac_index_ids:
+    - idx:b02:u:d_v2_l
+    - idx:b02:u:d_v2_r
+    slot_factors:
+    - {rule_slot: 1, endpoint_id: leg:generated:b02-compton:u:3, field_id: field:qed:e:psi_bar, momentum_substitution: -p2, index_ids: [idx:b02:u:d_v2_l]}
+    - {rule_slot: 2, endpoint_id: line:generated:b02-compton:u:e-, field_id: field:qed:e:psi, momentum_substitution: q_u, index_ids: [idx:b02:u:d_v2_r]}
+    - {rule_slot: 3, endpoint_id: leg:generated:b02-compton:u:2, field_id: field:qed:gamma:a, momentum_substitution: k1, index_ids: [idx:b02:u:mu_v2]}
+  propagator_factors:
+  - factor_id: factor:b02:u:prop:electron
+    line_id: line:generated:b02-compton:u:e-
+    rule_id: rule:qed_tree_v1:electron_propagator
+    particle_id: e-
+    momentum_label: q_u
+    momentum_expression: p1-k2
+    numerator: I (GS[q_u] + m)
+    denominator: SP[q_u, q_u] - m^2 + I epsilon
+    index_ids:
+    - idx:b02:u:d_prop_l
+    - idx:b02:u:d_prop_r
+  local_indices:
+    lorentz:
+    - {index_id: idx:b02:u:nu_v1, label: nu_v1, index_type: lorentz, owner_id: factor:b02:u:vertex:emit}
+    - {index_id: idx:b02:u:nu_pol_out, label: nu_pol_out, index_type: lorentz, owner_id: factor:b02:u:pol:gamma_out}
+    - {index_id: idx:b02:u:mu_v2, label: mu_v2, index_type: lorentz, owner_id: factor:b02:u:vertex:absorb}
+    - {index_id: idx:b02:u:mu_pol_in, label: mu_pol_in, index_type: lorentz, owner_id: factor:b02:u:pol:gamma_in}
+    dirac:
+    - {index_id: idx:b02:u:d_ubar, label: d_ubar, index_type: dirac, owner_id: factor:b02:u:ext:em_out:ubar}
+    - {index_id: idx:b02:u:d_v2_l, label: d_v2_l, index_type: dirac, owner_id: factor:b02:u:vertex:absorb}
+    - {index_id: idx:b02:u:d_v2_r, label: d_v2_r, index_type: dirac, owner_id: factor:b02:u:vertex:absorb}
+    - {index_id: idx:b02:u:d_prop_l, label: d_prop_l, index_type: dirac, owner_id: factor:b02:u:prop:electron}
+    - {index_id: idx:b02:u:d_prop_r, label: d_prop_r, index_type: dirac, owner_id: factor:b02:u:prop:electron}
+    - {index_id: idx:b02:u:d_v1_l, label: d_v1_l, index_type: dirac, owner_id: factor:b02:u:vertex:emit}
+    - {index_id: idx:b02:u:d_v1_r, label: d_v1_r, index_type: dirac, owner_id: factor:b02:u:vertex:emit}
+    - {index_id: idx:b02:u:d_u, label: d_u, index_type: dirac, owner_id: factor:b02:u:ext:em_in:u}
+  momentum_substitutions:
+  - {substitution_id: subst:b02:u:v1:slot1, source_factor_id: factor:b02:u:vertex:emit, rule_slot: 1, symbol: p_bar, expression: -q_u, convention_conversion: {source: internal_routing, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:u:v1:slot2, source_factor_id: factor:b02:u:vertex:emit, rule_slot: 2, symbol: p_psi, expression: p1, convention_conversion: {source: physical_external_momenta, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:u:v1:slot3, source_factor_id: factor:b02:u:vertex:emit, rule_slot: 3, symbol: k, expression: -k2, convention_conversion: {source: physical_external_momenta, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:u:v2:slot1, source_factor_id: factor:b02:u:vertex:absorb, rule_slot: 1, symbol: p_bar, expression: -p2, convention_conversion: {source: physical_external_momenta, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:u:v2:slot2, source_factor_id: factor:b02:u:vertex:absorb, rule_slot: 2, symbol: p_psi, expression: q_u, convention_conversion: {source: internal_routing, target: all_momenta_incoming_vertex}}
+  - {substitution_id: subst:b02:u:v2:slot3, source_factor_id: factor:b02:u:vertex:absorb, rule_slot: 3, symbol: k, expression: k1, convention_conversion: {source: physical_external_momenta, target: all_momenta_incoming_vertex}}
+  fermion_chains:
+  - chain_id: chain:b02:u:electron
+    ordered_factor_ids:
+    - factor:b02:u:ext:em_out:ubar
+    - factor:b02:u:vertex:absorb
+    - factor:b02:u:prop:electron
+    - factor:b02:u:vertex:emit
+    - factor:b02:u:ext:em_in:u
+    external_start_factor_id: factor:b02:u:ext:em_out:ubar
+    external_end_factor_id: factor:b02:u:ext:em_in:u
+    attached_bosonic_factor_ids:
+    - factor:b02:u:pol:gamma_in
+    - factor:b02:u:pol:gamma_out
+  bosonic_external_polarization_factors:
+  - factor_id: factor:b02:u:pol:gamma_in
+    leg_id: leg:generated:b02-compton:u:2
+    particle_id: gamma
+    state_role: incoming
+    momentum_label: k1
+    lorentz_index_id: idx:b02:u:mu_pol_in
+    conjugation: none
+    transversality_status: not_applied
+  - factor_id: factor:b02:u:pol:gamma_out
+    leg_id: leg:generated:b02-compton:u:4
+    particle_id: gamma
+    state_role: outgoing
+    momentum_label: k2
+    lorentz_index_id: idx:b02:u:nu_pol_out
+    conjugation: complex_conjugate
+    transversality_status: not_applied
+  non_chain_factors: []
+  index_contractions:
+  - {contraction_id: contract:b02:u:lorentz:out, index_type: lorentz, factor_indices: [{factor_id: factor:b02:u:vertex:emit, index_id: idx:b02:u:nu_v1, index_role: lorentz}, {factor_id: factor:b02:u:pol:gamma_out, index_id: idx:b02:u:nu_pol_out, index_role: lorentz}]}
+  - {contraction_id: contract:b02:u:lorentz:in, index_type: lorentz, factor_indices: [{factor_id: factor:b02:u:vertex:absorb, index_id: idx:b02:u:mu_v2, index_role: lorentz}, {factor_id: factor:b02:u:pol:gamma_in, index_id: idx:b02:u:mu_pol_in, index_role: lorentz}]}
+  - {contraction_id: contract:b02:u:dirac:out, index_type: dirac, factor_indices: [{factor_id: factor:b02:u:ext:em_out:ubar, index_id: idx:b02:u:d_ubar, index_role: right}, {factor_id: factor:b02:u:vertex:absorb, index_id: idx:b02:u:d_v2_l, index_role: left}]}
+  - {contraction_id: contract:b02:u:dirac:v2prop, index_type: dirac, factor_indices: [{factor_id: factor:b02:u:vertex:absorb, index_id: idx:b02:u:d_v2_r, index_role: right}, {factor_id: factor:b02:u:prop:electron, index_id: idx:b02:u:d_prop_l, index_role: left}]}
+  - {contraction_id: contract:b02:u:dirac:propv1, index_type: dirac, factor_indices: [{factor_id: factor:b02:u:prop:electron, index_id: idx:b02:u:d_prop_r, index_role: right}, {factor_id: factor:b02:u:vertex:emit, index_id: idx:b02:u:d_v1_l, index_role: left}]}
+  - {contraction_id: contract:b02:u:dirac:in, index_type: dirac, factor_indices: [{factor_id: factor:b02:u:vertex:emit, index_id: idx:b02:u:d_v1_r, index_role: right}, {factor_id: factor:b02:u:ext:em_in:u, index_id: idx:b02:u:d_u, index_role: left}]}
+  overall_factor:
+    scalar_prefactor: '1'
+    relative_sign: '+1'
+    sign_source: manual_fixture
+  generation_status:
+    status: hand_written_fixture
+    generated_by: codex
+    notes: Minimal u-channel fixture; no builder executed.
+  audit_metadata:
+    convention_audit_path: docs/QED_CONVENTION_AUDIT.md
+    approved_for_amplitude_generation: true
+    heavy_calculation_approved: false
+metadata:
+  notes: Minimal hand-readable AmplitudeIR fixture for B02; not a canonical physics input.

@@ -41,11 +41,30 @@ class TikzRendererTests(unittest.TestCase):
         tex_again = build_tikz_document(physics, diagram_ir)
         self.assertEqual(tex, tex_again)
         self.assertLess(tex.index(r"\mathrm{s}-channel"), tex.index(r"\mathrm{u}-channel"))
-        self.assertIn(r"electron\;(p1)", tex)
-        self.assertIn(r"photon\;(k2)", tex)
-        self.assertIn(r"e-\;(q\_s=p1+k1)", tex)
+        self.assertIn(r"e^{-}(p_{1})", tex)
+        self.assertIn(r"\gamma(k_{2})", tex)
+        self.assertIn(r"e^{-}(q_{s}=p_{1}+k_{1})", tex)
         self.assertIn("[fermion", tex)
         self.assertIn("[photon", tex)
+
+
+    def test_internal_fermion_arrow_can_reverse_relative_to_vertex_order(self):
+        physics, _, diagram_ir = self.b02_inputs()
+        reversed_ir = copy.deepcopy(diagram_ir)
+        s_diagram = reversed_ir["diagrams"][0]
+        s_diagram["vertex_instances"] = list(reversed(s_diagram["vertex_instances"]))
+        tex = build_tikz_document(physics, reversed_ir)
+        self.assertIn(r"(v2) -- [fermion", tex)
+
+
+    def test_internal_particle_labels_use_structured_presentation_metadata(self):
+        physics = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "physics_card.yaml")
+        convention = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "convention_card.yaml")
+        registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
+        diagram_ir = generate_tree_2_to_2(physics, convention, registry)
+        tex = build_tikz_document(physics, diagram_ir)
+        self.assertIn(r"\gamma(q_{s}=p_{1}+p_{2})", tex)
+        self.assertNotIn(r"\mathrm{gamma}", tex)
 
     def test_missing_flow_data_fails_instead_of_guessing(self):
         physics, _, diagram_ir = self.b02_inputs()

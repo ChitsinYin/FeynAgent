@@ -1,4 +1,4 @@
-﻿"""Deterministic TikZ-Feynman rendering for DiagramIR 0.1.1."""
+﻿"""Deterministic TikZ-Feynman rendering for DiagramIR 0.1.2."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ def render_tikz_feynman(
 
     pdf_path = output_dir / "diagrams.pdf"
     manifest = {
-        "schema_version": "0.1.0",
+        "schema_version": "0.1.2",
         "renderer": "tikz-feynman",
         "renderer_role": "derived_artifact_backend",
         "physics_source": {
@@ -101,8 +101,8 @@ def render_tikz_feynman(
 def build_tikz_document(physics_card: dict[str, Any], diagram_ir: dict[str, Any]) -> str:
     """Return deterministic TeX for all diagrams in a DiagramIR object."""
 
-    display_labels = _display_labels(physics_card)
-    diagrams = [_render_diagram(diagram, display_labels) for diagram in _ordered_diagrams(diagram_ir)]
+    label_maps = _display_label_maps(physics_card)
+    diagrams = [_render_diagram(diagram, label_maps) for diagram in _ordered_diagrams(diagram_ir)]
     body = "\n\n\\bigskip\n\n".join(diagrams)
     return "\n".join(
         [
@@ -116,7 +116,7 @@ def build_tikz_document(physics_card: dict[str, Any], diagram_ir: dict[str, Any]
     )
 
 
-def _render_diagram(diagram: dict[str, Any], display_labels: dict[int, str]) -> str:
+def _render_diagram(diagram: dict[str, Any], label_maps: dict[str, dict[Any, str]]) -> str:
     _require_renderable(diagram)
     channel = diagram["channel"]
     vertices = diagram["vertex_instances"]
@@ -131,8 +131,8 @@ def _render_diagram(diagram: dict[str, Any], display_labels: dict[int, str]) -> 
     for leg in sorted(diagram["external_legs"], key=lambda item: item["slot"]):
         name = _leg_node(leg["slot"])
         x, y = _leg_position(leg["slot"])
-        label = _external_label(leg, display_labels)
-        lines.append(rf"    \vertex ({name}) at ({x},{y}) {{\({_tex_escape(label)}\)}};")
+        label = _external_label(leg, label_maps["by_slot"])
+        lines.append(rf"    \vertex ({name}) at ({x},{y}) {{\({label}\)}};")
 
     if channel == "contact":
         lines.append(r"    \vertex (v1) at (2.6,0);")
@@ -158,9 +158,7 @@ def _render_diagram(diagram: dict[str, Any], display_labels: dict[int, str]) -> 
                 if binding["endpoint_kind"] == "external_leg":
                     leg = _external_leg_by_id(diagram, binding["endpoint_id"])
                     edges.append(_edge_for_binding(_leg_node(leg["slot"]), vertex_name, binding, None))
-        internal_label = _internal_label(internal)
-        internal_style = _internal_edge_style(diagram, internal, vertex_names)
-        edges.append(rf"      (v1) -- [{internal_style}, edge label={{\({_tex_escape(internal_label)}\)}}] (v2)")
+        edges.append(_internal_edge(diagram, internal, vertex_names, label_maps["by_particle"]))
 
     lines.append(r"    \diagram* {")
     for index, edge in enumerate(edges):
@@ -218,8 +216,12 @@ def _edge_for_binding(
     style = _external_edge_style(binding)
     label_part = "" if label is None else rf", edge label={{\({_tex_escape(label)}\)}}"
     flow = binding["fermion_flow"]["flow_direction"]
-    if _is_fermion_binding(binding) and flow == "out_of_vertex":
-        return rf"      ({vertex_node}) -- [{style}{label_part}] ({leg_node})"
+    if _is_fermion_binding(binding):
+        if flow == "out_of_vertex":
+            return rf"      ({vertex_node}) -- [{style}{label_part}] ({leg_node})"
+        if flow == "into_vertex":
+            return rf"      ({leg_node}) -- [{style}{label_part}] ({vertex_node})"
+        raise RenderError("fermion external line requires into_vertex or out_of_vertex flow")
     return rf"      ({leg_node}) -- [{style}{label_part}] ({vertex_node})"
 
 
@@ -231,27 +233,48 @@ def _external_edge_style(binding: dict[str, Any]) -> str:
     return _boson_style(binding["endpoint_particle_id"])
 
 
-def _internal_edge_style(
+def _internal_edge(
     diagram: dict[str, Any],
     internal: dict[str, Any],
     vertex_names: dict[str, str],
+    particle_labels: dict[str, str],
 ) -> str:
     from_vertex = internal["from"]["id"]
     to_vertex = internal["to"]["id"]
     from_binding = _internal_binding_for_vertex(diagram, from_vertex, internal["line_id"])
     to_binding = _internal_binding_for_vertex(diagram, to_vertex, internal["line_id"])
+    label = _internal_label(internal, particle_labels)
+    label_key = "edge label'" if diagram["channel"] == "u" else "edge label"
+    label_part = rf"{label_key}={{\({label}\)}}"
     fermion_bindings = [binding for binding in (from_binding, to_binding) if _is_fermion_binding(binding)]
     if not fermion_bindings:
-        return _boson_style(internal["particle_id"])
+        style = _boson_style(internal["particle_id"])
+        return rf"      (v1) -- [{style}, {label_part}] (v2)"
     if len(fermion_bindings) != 2:
         raise RenderError("fermion internal line requires flow data at both vertices")
-    orientations = {binding["fermion_flow"]["field_orientation"] for binding in fermion_bindings}
-    if orientations != {"psi", "psi_bar"}:
+    by_orientation = {
+        binding["fermion_flow"]["field_orientation"]: binding
+        for binding in fermion_bindings
+    }
+    if set(by_orientation) != {"psi", "psi_bar"}:
         raise RenderError("fermion internal line requires psi and psi_bar endpoint orientations")
-    if vertex_names[from_vertex] != "v1" or vertex_names[to_vertex] != "v2":
-        raise RenderError("unexpected internal vertex ordering")
-    return "fermion"
+    psi_bar_binding = by_orientation["psi_bar"]
+    psi_binding = by_orientation["psi"]
+    if psi_bar_binding["fermion_flow"]["flow_direction"] != "out_of_vertex":
+        raise RenderError("psi_bar internal endpoint must have out_of_vertex fermion flow")
+    if psi_binding["fermion_flow"]["flow_direction"] != "into_vertex":
+        raise RenderError("psi internal endpoint must have into_vertex fermion flow")
+    start_vertex = _vertex_for_internal_binding(diagram, psi_bar_binding["endpoint_id"], psi_bar_binding["rule_slot"])
+    end_vertex = _vertex_for_internal_binding(diagram, psi_binding["endpoint_id"], psi_binding["rule_slot"])
+    return rf"      ({vertex_names[start_vertex]}) -- [fermion, {label_part}] ({vertex_names[end_vertex]})"
 
+
+def _vertex_for_internal_binding(diagram: dict[str, Any], line_id: str, rule_slot: int) -> str:
+    for vertex in diagram["vertex_instances"]:
+        for binding in vertex["slot_bindings"]:
+            if binding["endpoint_id"] == line_id and binding["rule_slot"] == rule_slot:
+                return vertex["vertex_id"]
+    raise RenderError(f"missing vertex for internal binding {line_id} slot {rule_slot}")
 
 def _internal_binding_for_vertex(
     diagram: dict[str, Any],
@@ -284,23 +307,58 @@ def _ordered_diagrams(diagram_ir: dict[str, Any]) -> list[dict[str, Any]]:
     )
 
 
-def _display_labels(physics_card: dict[str, Any]) -> dict[int, str]:
-    labels = {}
+def _display_label_maps(physics_card: dict[str, Any]) -> dict[str, dict[Any, str]]:
+    by_slot: dict[int, str] = {}
+    by_particle: dict[str, str] = {
+        item["particle_id"]: item["latex_label"]
+        for item in physics_card.get("presentation", {}).get("particle_latex_labels", [])
+    }
     for role in ("incoming", "outgoing"):
         for particle in physics_card["particles"][role]:
-            labels[particle["slot"]] = particle.get("display_name") or particle["particle_id"]
-    return labels
+            label = particle.get("latex_label") or by_particle.get(particle["particle_id"]) or _plain_text_label(particle.get("display_name") or particle["particle_id"])
+            by_slot[particle["slot"]] = label
+            by_particle.setdefault(particle["particle_id"], label)
+    return {"by_slot": by_slot, "by_particle": by_particle}
 
 
 def _external_label(leg: dict[str, Any], display_labels: dict[int, str]) -> str:
-    particle = display_labels.get(leg["slot"], leg["particle_id"])
-    return f"{particle}\\;({leg['momentum_label']})"
+    particle = display_labels.get(leg["slot"], _plain_text_label(leg["particle_id"]))
+    return f"{particle}({_latex_momentum_label(leg['momentum_label'])})"
 
 
-def _internal_label(internal: dict[str, Any]) -> str:
+def _internal_label(internal: dict[str, Any], particle_labels: dict[str, str]) -> str:
     momentum = internal["momentum"]
-    return f"{internal['particle_id']}\\;({momentum['label']}={momentum['expression']})"
+    particle = particle_labels.get(internal["particle_id"], _plain_text_label(internal["particle_id"]))
+    return f"{particle}({_latex_momentum_label(momentum['label'])}={_latex_momentum_expression(momentum['expression'])})"
 
+
+def _latex_momentum_label(label: str) -> str:
+    if len(label) >= 2 and label[-1].isdigit():
+        return f"{_tex_escape(label[:-1])}_{{{label[-1]}}}"
+    if "_" in label:
+        head, tail = label.split("_", 1)
+        return f"{_tex_escape(head)}_{{{_tex_escape(tail)}}}"
+    return _tex_escape(label)
+
+
+def _latex_momentum_expression(expression: str) -> str:
+    result = []
+    token = ""
+    for char in expression:
+        if char in "+-":
+            if token:
+                result.append(_latex_momentum_label(token))
+                token = ""
+            result.append(char)
+        else:
+            token += char
+    if token:
+        result.append(_latex_momentum_label(token))
+    return "".join(result)
+
+
+def _plain_text_label(label: str) -> str:
+    return r"\mathrm{" + _tex_escape(label) + "}"
 
 def _external_leg_by_id(diagram: dict[str, Any], leg_id: str) -> dict[str, Any]:
     for leg in diagram["external_legs"]:
@@ -340,12 +398,12 @@ def _validate_inputs(
     convention_card: dict[str, Any],
     diagram_ir: dict[str, Any],
 ) -> None:
-    if physics_card.get("schema_version") != "0.1.1":
-        raise RenderError("PhysicsCard schema_version must be 0.1.1")
+    if physics_card.get("schema_version") != "0.1.2":
+        raise RenderError("PhysicsCard schema_version must be 0.1.2")
     if convention_card.get("schema_version") != "0.1.1":
         raise RenderError("ConventionCard schema_version must be 0.1.1")
-    if diagram_ir.get("schema_version") != "0.1.1":
-        raise RenderError("DiagramIR schema_version must be 0.1.1")
+    if diagram_ir.get("schema_version") != "0.1.2":
+        raise RenderError("DiagramIR schema_version must be 0.1.2")
     if physics_card.get("process_id") != diagram_ir.get("process_id"):
         raise RenderError("PhysicsCard process_id does not match DiagramIR")
     if not convention_card.get("all_momenta_incoming_vertex_convention"):

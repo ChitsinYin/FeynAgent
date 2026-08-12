@@ -1,4 +1,4 @@
-schema_version: 0.1.1
+schema_version: 0.1.2
 benchmark_id: B01_ee_to_mumu
 process_id: process:b01_ee_to_mumu
 expected_topology:

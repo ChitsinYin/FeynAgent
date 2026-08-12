@@ -1,4 +1,4 @@
-schema_version: 0.1.1
+schema_version: 0.1.2
 object_id: physics_card:b01_ee_to_mumu
 status: approved
 process_id: process:b01_ee_to_mumu
@@ -18,22 +18,26 @@ particles:
     display_name: electron
     state_role: incoming
     momentum_label: p1
+    latex_label: e^{-}
   - slot: 2
     particle_id: e+
     display_name: positron
     state_role: incoming
     momentum_label: p2
+    latex_label: e^{+}
   outgoing:
   - slot: 3
     particle_id: mu-
     display_name: muon
     state_role: outgoing
     momentum_label: p3
+    latex_label: \mu^{-}
   - slot: 4
     particle_id: mu+
     display_name: antimuon
     state_role: outgoing
     momentum_label: p4
+    latex_label: \mu^{+}
 selected_rule_set:
   registry_id: registry:qed_tree_v1
   rule_set_ids:
@@ -51,10 +55,24 @@ approval:
     approved_at: '2026-08-12T14:17:36+08:00'
     notes: Approved only for B01 tree topology representation.
   amplitude_generation:
-    status: not_requested
-    notes: No amplitude generation in this benchmark phase.
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-12T19:48:05.9409820+08:00'
+    notes: Approved for B01 only after QED convention audit; no amplitude was generated in this approval step.
   heavy_calculation:
     status: not_requested
-    notes: No heavy calculation in this benchmark phase.
+    notes: Heavy calculation remains explicitly unapproved.
 metadata:
-  notes: B01 e- e+ -> mu- mu+ topology benchmark only; no amplitudes are calculated.
+  notes: B01 e- e+ -> mu- mu+ benchmark; amplitude generation is approved after the QED convention audit, but no amplitudes were generated in the approval step.
+presentation:
+  particle_latex_labels:
+  - particle_id: e+
+    latex_label: e^{+}
+  - particle_id: e-
+    latex_label: e^{-}
+  - particle_id: gamma
+    latex_label: \gamma
+  - particle_id: mu+
+    latex_label: \mu^{+}
+  - particle_id: mu-
+    latex_label: \mu^{-}

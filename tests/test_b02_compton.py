@@ -59,9 +59,12 @@ class B02ComptonBenchmarkTests(unittest.TestCase):
         self.assert_validates(self.rules, "rule_registry.schema.json")
         self.assert_validates(self.diagrams_doc, "diagram_ir.schema.json")
 
-    def test_schema_versions_migrated_to_0_1_1(self):
-        for obj in [self.physics, self.convention, self.rules, self.diagrams_doc, self.expected]:
-            self.assertEqual(obj["schema_version"], "0.1.1")
+    def test_schema_versions_migrated_to_0_1_2_where_semantics_changed(self):
+        self.assertEqual(self.physics["schema_version"], "0.1.2")
+        self.assertEqual(self.diagrams_doc["schema_version"], "0.1.2")
+        self.assertEqual(self.expected["schema_version"], "0.1.2")
+        self.assertEqual(self.convention["schema_version"], "0.1.1")
+        self.assertEqual(self.rules["schema_version"], "0.1.1")
 
     def test_rule_manifest_is_lightweight_and_points_to_canonical_registry(self):
         self.assertNotIn("vertices", self.manifest)
@@ -74,11 +77,13 @@ class B02ComptonBenchmarkTests(unittest.TestCase):
         actual_hash = hashlib.sha256(normalized_rules.encode("utf-8")).hexdigest()
         self.assertEqual(self.manifest["canonical_registry"]["source_sha256"], actual_hash)
 
-    def test_approval_is_topology_only(self):
+    def test_approval_allows_amplitudes_but_not_heavy_calculation(self):
         approval = self.physics["approval"]
         self.assertEqual(approval["topology"]["status"], "approved")
         self.assertIn("approved_at", approval["topology"])
-        self.assertEqual(approval["amplitude_generation"]["status"], "not_requested")
+        self.assertEqual(approval["amplitude_generation"]["status"], "approved")
+        self.assertEqual(approval["amplitude_generation"].get("approved_by"), "user")
+        self.assertIn("approved_at", approval["amplitude_generation"])
         self.assertEqual(approval["heavy_calculation"]["status"], "not_requested")
 
     def test_exactly_two_tree_diagrams_with_s_and_u_channels(self):
@@ -117,13 +122,20 @@ class B02ComptonBenchmarkTests(unittest.TestCase):
 
     def test_every_required_provenance_field_is_present(self):
         for rule in self.rules["vertices"] + self.rules["propagators"]:
-            self.assertEqual(rule["trust_status"], "validated_pending_convention_review")
-            self.assertGreaterEqual(len(rule["provenance"]), 1)
+            self.assertEqual(rule["trust_status"], "validated")
+            self.assertGreaterEqual(len(rule["provenance"]), 2)
+            self.assertTrue(
+                any(
+                    entry.get("local_source_path") == "docs/QED_CONVENTION_AUDIT.md"
+                    for entry in rule["provenance"]
+                )
+            )
             for entry in rule["provenance"]:
-                for field in ["source_type", "citation", "section", "page", "notes", "checked_by", "checked_at"]:
+                for field in ["source_type", "notes", "checked_by", "checked_at"]:
                     self.assertIn(field, entry)
                     self.assertIsNotNone(entry[field])
                     self.assertNotEqual(str(entry[field]).strip(), "")
+                self.assertTrue(entry.get("citation") or entry.get("local_source_path"))
 
     def test_rule_slot_bindings_are_complete_unique_and_existing(self):
         for diagram in self.diagrams:
@@ -158,6 +170,12 @@ class B02ComptonBenchmarkTests(unittest.TestCase):
                     self.assertTrue(compatible)
                     expected_orientation = field["quantum_field_role"] if field["field_role"] == "dirac_fermion" else "not_applicable"
                     self.assertEqual(binding["fermion_flow"]["field_orientation"], expected_orientation)
+                    expected_flow = "not_applicable"
+                    if expected_orientation == "psi":
+                        expected_flow = "into_vertex"
+                    elif expected_orientation == "psi_bar":
+                        expected_flow = "out_of_vertex"
+                    self.assertEqual(binding["fermion_flow"]["flow_direction"], expected_flow)
 
     def test_crossing_and_convention_conversion_are_explicit(self):
         for diagram in self.diagrams:

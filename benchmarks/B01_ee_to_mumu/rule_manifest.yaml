@@ -4,7 +4,7 @@ status: derived_non_canonical
 canonical_registry:
   relative_path: ../../rules/qed/qed_tree_v1.yaml
   registry_id: registry:qed_tree_v1
-  source_sha256: 684584820fe4f6073146d29e2ae3aa5a7a398ee85caefb36f476ee2feed7b428
+  source_sha256: e55c688d3343c43099ca25c0c7ceab13685fe1a94e9f2e9f46e36108babb7399
 selected_rule_set_ids:
 - ruleset:qed_tree_v1
 selected_rule_ids:

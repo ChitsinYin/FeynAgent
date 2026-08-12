@@ -9,6 +9,7 @@ SCHEMA_NAMES = [
     "convention_card.schema.json",
     "rule_registry.schema.json",
     "diagram_ir.schema.json",
+    "amplitude_ir.schema.json",
 ]
 
 

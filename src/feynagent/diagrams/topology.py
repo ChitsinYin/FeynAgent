@@ -1,4 +1,4 @@
-"""Deterministic v0.1.1 tree-level 2->2 topology enumeration."""
+"""Deterministic v0.1.2 tree-level 2->2 topology enumeration."""
 
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ def generate_tree_2_to_2(
             diagrams.append(diagram)
 
     return {
-        "schema_version": "0.1.1",
+        "schema_version": "0.1.2",
         "object_id": f"diagram_ir:generated:{_id_tail(physics_card['process_id'])}",
         "status": "candidate",
         "process_id": physics_card["process_id"],
@@ -145,6 +145,7 @@ def diagram_signature(diagram: dict[str, Any]) -> tuple[Any, ...]:
                     binding["crossing_treatment"],
                     binding["momentum_substitution"],
                     binding["fermion_flow"]["field_orientation"],
+                    binding["fermion_flow"]["flow_direction"],
                 )
                 for binding in vertex["slot_bindings"]
             )
@@ -168,8 +169,8 @@ def _validate_supported_inputs(
     convention_card: dict[str, Any],
     rule_registry: dict[str, Any],
 ) -> None:
-    if physics_card.get("schema_version") != "0.1.1":
-        raise DiagramGenerationError("PhysicsCard schema_version must be 0.1.1")
+    if physics_card.get("schema_version") != "0.1.2":
+        raise DiagramGenerationError("PhysicsCard schema_version must be 0.1.2")
     if convention_card.get("schema_version") != "0.1.1":
         raise DiagramGenerationError("ConventionCard schema_version must be 0.1.1")
     if rule_registry.get("schema_version") != "0.1.1":
@@ -503,9 +504,7 @@ def _build_slot_bindings(
             },
             "fermion_flow": {
                 "field_orientation": _field_orientation(internal_field),
-                "flow_direction": "through_internal_line"
-                if internal_field["field_role"] == "dirac_fermion"
-                else "not_applicable",
+                "flow_direction": _fermion_flow_direction(internal_field),
             },
         }
     )
@@ -538,15 +537,20 @@ def _external_binding(
         },
         "fermion_flow": {
             "field_orientation": _field_orientation(field),
-            "flow_direction": _external_flow_direction(field, endpoint),
+            "flow_direction": _fermion_flow_direction(field),
         },
     }
 
 
-def _external_flow_direction(field: dict[str, Any], endpoint: dict[str, Any]) -> str:
+def _fermion_flow_direction(field: dict[str, Any]) -> str:
     if field["field_role"] != "dirac_fermion":
         return "not_applicable"
-    return "into_vertex" if endpoint["state_role"] == "incoming" else "out_of_vertex"
+    orientation = field["quantum_field_role"]
+    if orientation == "psi":
+        return "into_vertex"
+    if orientation == "psi_bar":
+        return "out_of_vertex"
+    raise DiagramGenerationError(f"unsupported Dirac quantum_field_role: {orientation}")
 
 
 def _field_orientation(field: dict[str, Any]) -> str:

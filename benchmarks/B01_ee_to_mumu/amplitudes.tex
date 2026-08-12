@@ -1,0 +1,52 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,longtable}
+\begin{document}
+\section*{Day-3 Amplitudes: \texttt{B01\_ee\_to\_mumu}}
+Generated at \texttt{2026-08-12T22:06:31.565733+08:00} from AmplitudeIR \texttt{amplitude\_ir:b01\_ee\_to\_mumu:generated}.
+
+\subsection*{Momentum Definitions}
+\[q_{s} = p_{1}+p_{2}\]
+
+\subsection*{Diagram Amplitudes}
+% amplitude-id: amplitude:b01_ee_to_mumu:amp_s
+% factor-id: factor:b01_ee_to_mumu:s:ext:1:u
+% factor-id: factor:b01_ee_to_mumu:s:ext:2:vbar
+% factor-id: factor:b01_ee_to_mumu:s:ext:3:ubar
+% factor-id: factor:b01_ee_to_mumu:s:ext:4:v
+% factor-id: factor:b01_ee_to_mumu:s:vertex:1
+% factor-id: factor:b01_ee_to_mumu:s:vertex:2
+% factor-id: factor:b01_ee_to_mumu:s:prop:1
+% factor-id: factor:b01_ee_to_mumu:s:nonchain:1
+% index-map: idx:b01_ee_to_mumu:s:x_1:l_v1_mu => \mu_{1}
+% index-map: idx:b01_ee_to_mumu:s:x_2:l_v2_mu => \mu_{2}
+% index-map: idx:b01_ee_to_mumu:s:x_1:l_p1_l => \mu_{3}
+% index-map: idx:b01_ee_to_mumu:s:x_1:l_p1_r => \mu_{4}
+% index-map: idx:b01_ee_to_mumu:s:u:d_ext_1 => a_{1}
+% index-map: idx:b01_ee_to_mumu:s:vbar:d_ext_2 => a_{2}
+% index-map: idx:b01_ee_to_mumu:s:ubar:d_ext_3 => a_{3}
+% index-map: idx:b01_ee_to_mumu:s:v:d_ext_4 => a_{4}
+% index-map: idx:b01_ee_to_mumu:s:x_1:d_v1_bar => a_{5}
+% index-map: idx:b01_ee_to_mumu:s:x_1:d_v1_psi => a_{6}
+% index-map: idx:b01_ee_to_mumu:s:x_2:d_v2_bar => a_{7}
+% index-map: idx:b01_ee_to_mumu:s:x_2:d_v2_psi => a_{8}
+\begin{equation}
+\mathcal{M}_{s} = \bar v(p_{2})_{a_{2}}\left(-i e \gamma^{\mu_{1}}\right)u(p_{1})_{a_{1}} \, \frac{-i g^{\mu_{1}\mu_{2}}}{q_{s}^2+i\epsilon} \, \bar u(p_{3})_{a_{3}}\left(-i e \gamma^{\mu_{2}}\right)v(p_{4})_{a_{4}}
+\end{equation}
+
+\subsection*{Total Amplitude}
+\begin{equation}
+\mathcal{M} = \mathcal{M}_{s}
+\end{equation}
+
+\subsection*{Rule/Source Audit}
+\begin{longtable}{p{0.24\linewidth}p{0.22\linewidth}p{0.38\linewidth}}
+\toprule
+amplitude & rule id & source \\
+\midrule
+\texttt{amplitude:b01\_ee\_to\_mumu:amp\_s} & \texttt{rule:qed\_tree\_v1:e\_e\_gamma\_vertex} & \texttt{docs/QED\_CONVENTION\_AUDIT.md} \\
+\texttt{amplitude:b01\_ee\_to\_mumu:amp\_s} & \texttt{rule:qed\_tree\_v1:mu\_mu\_gamma\_vertex} & \texttt{docs/QED\_CONVENTION\_AUDIT.md} \\
+\texttt{amplitude:b01\_ee\_to\_mumu:amp\_s} & \texttt{rule:qed\_tree\_v1:photon\_propagator} & \texttt{docs/QED\_CONVENTION\_AUDIT.md} \\
+\bottomrule
+\end{longtable}
+\end{document}

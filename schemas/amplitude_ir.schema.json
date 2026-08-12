@@ -1,0 +1,737 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://feynagent.local/schemas/amplitude_ir.schema.json",
+  "title": "AmplitudeIR",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "object_id",
+    "ir_type",
+    "status",
+    "process_id",
+    "source",
+    "amplitudes",
+    "total_amplitude",
+    "audit_metadata"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "object_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "ir_type": {
+      "type": "string",
+      "const": "derived_amplitude_ir"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "derived_candidate",
+        "derived_validated",
+        "blocked",
+        "incomplete_placeholder"
+      ]
+    },
+    "process_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "source": {
+      "$ref": "#/$defs/source_bundle"
+    },
+    "amplitudes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/amplitude"
+      },
+      "minItems": 1
+    },
+    "total_amplitude": {
+      "$ref": "#/$defs/total_amplitude"
+    },
+    "audit_metadata": {
+      "$ref": "#/$defs/audit_metadata"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "object_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "particle_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_./:+-]*$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "index_id_array": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/object_id"
+      },
+      "uniqueItems": true
+    },
+    "source_bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "physics_card_id",
+        "convention_card_id",
+        "rule_registry_id",
+        "rule_registry_sha256",
+        "diagram_ir_id",
+        "diagram_ir_sha256"
+      ],
+      "properties": {
+        "physics_card_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "convention_card_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "rule_registry_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "rule_registry_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "diagram_ir_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "diagram_ir_sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "amplitude": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "amplitude_id",
+        "diagram_id",
+        "process_id",
+        "source_rule_ids",
+        "external_state_factors",
+        "vertex_factors",
+        "propagator_factors",
+        "local_indices",
+        "momentum_substitutions",
+        "fermion_chains",
+        "bosonic_external_polarization_factors",
+        "non_chain_factors",
+        "index_contractions",
+        "overall_factor",
+        "generation_status",
+        "audit_metadata"
+      ],
+      "properties": {
+        "amplitude_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "diagram_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "process_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "source_rule_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/object_id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "external_state_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/external_state_factor"
+          }
+        },
+        "vertex_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/vertex_factor"
+          }
+        },
+        "propagator_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/propagator_factor"
+          }
+        },
+        "local_indices": {
+          "$ref": "#/$defs/local_indices"
+        },
+        "momentum_substitutions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/momentum_substitution"
+          }
+        },
+        "fermion_chains": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/fermion_chain"
+          }
+        },
+        "bosonic_external_polarization_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/polarization_factor"
+          }
+        },
+        "non_chain_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/non_chain_factor"
+          }
+        },
+        "index_contractions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/index_contraction"
+          }
+        },
+        "overall_factor": {
+          "$ref": "#/$defs/overall_factor"
+        },
+        "generation_status": {
+          "$ref": "#/$defs/generation_status"
+        },
+        "audit_metadata": {
+          "$ref": "#/$defs/audit_metadata"
+        },
+        "metadata": {
+          "$ref": "#/$defs/metadata"
+        }
+      }
+    },
+    "external_state_factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factor_id",
+        "leg_id",
+        "particle_id",
+        "state_role",
+        "momentum_label",
+        "factor_kind",
+        "index_ids"
+      ],
+      "properties": {
+        "factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "leg_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "state_role": {
+          "type": "string",
+          "enum": ["incoming", "outgoing"]
+        },
+        "momentum_label": {
+          "$ref": "#/$defs/momentum_label"
+        },
+        "factor_kind": {
+          "type": "string",
+          "enum": ["spinor_wavefunction"]
+        },
+        "spinor_type": {
+          "type": "string",
+          "enum": ["u", "ubar", "v", "vbar"]
+        },
+        "index_ids": {
+          "$ref": "#/$defs/index_id_array"
+        }
+      }
+    },
+    "vertex_factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factor_id",
+        "vertex_id",
+        "rule_id",
+        "coefficient",
+        "lorentz_index_ids",
+        "dirac_index_ids",
+        "slot_factors"
+      ],
+      "properties": {
+        "factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "vertex_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "coefficient": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lorentz_index_ids": {
+          "$ref": "#/$defs/index_id_array"
+        },
+        "dirac_index_ids": {
+          "$ref": "#/$defs/index_id_array"
+        },
+        "slot_factors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slot_factor"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "slot_factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_slot",
+        "endpoint_id",
+        "field_id",
+        "momentum_substitution",
+        "index_ids"
+      ],
+      "properties": {
+        "rule_slot": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "endpoint_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "field_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "momentum_substitution": {
+          "type": "string",
+          "minLength": 1
+        },
+        "index_ids": {
+          "$ref": "#/$defs/index_id_array"
+        }
+      }
+    },
+    "propagator_factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factor_id",
+        "line_id",
+        "rule_id",
+        "particle_id",
+        "momentum_label",
+        "momentum_expression",
+        "numerator",
+        "denominator",
+        "index_ids"
+      ],
+      "properties": {
+        "factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "line_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "rule_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "momentum_label": {
+          "$ref": "#/$defs/momentum_label"
+        },
+        "momentum_expression": {
+          "type": "string",
+          "minLength": 1
+        },
+        "numerator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "denominator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "index_ids": {
+          "$ref": "#/$defs/index_id_array"
+        }
+      }
+    },
+    "local_indices": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lorentz", "dirac"],
+      "properties": {
+        "lorentz": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/local_index"
+          },
+          "uniqueItems": true
+        },
+        "dirac": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/local_index"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "local_index": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["index_id", "label", "index_type", "owner_id"],
+      "properties": {
+        "index_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "label": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "index_type": {
+          "type": "string",
+          "enum": ["lorentz", "dirac"]
+        },
+        "owner_id": {
+          "$ref": "#/$defs/object_id"
+        }
+      }
+    },
+    "momentum_substitution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "substitution_id",
+        "source_factor_id",
+        "rule_slot",
+        "symbol",
+        "expression",
+        "convention_conversion"
+      ],
+      "properties": {
+        "substitution_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "source_factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "rule_slot": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "symbol": {
+          "$ref": "#/$defs/momentum_label"
+        },
+        "expression": {
+          "type": "string",
+          "minLength": 1
+        },
+        "convention_conversion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "target"],
+          "properties": {
+            "source": {
+              "type": "string",
+              "enum": ["physical_external_momenta", "internal_routing"]
+            },
+            "target": {
+              "type": "string",
+              "const": "all_momenta_incoming_vertex"
+            }
+          }
+        }
+      }
+    },
+    "fermion_chain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "chain_id",
+        "ordered_factor_ids",
+        "external_start_factor_id",
+        "external_end_factor_id"
+      ],
+      "properties": {
+        "chain_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "ordered_factor_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/object_id"
+          },
+          "minItems": 2
+        },
+        "external_start_factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "external_end_factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "attached_bosonic_factor_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/object_id"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "polarization_factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "factor_id",
+        "leg_id",
+        "particle_id",
+        "state_role",
+        "momentum_label",
+        "lorentz_index_id",
+        "conjugation"
+      ],
+      "properties": {
+        "factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "leg_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "state_role": {
+          "type": "string",
+          "enum": ["incoming", "outgoing"]
+        },
+        "momentum_label": {
+          "$ref": "#/$defs/momentum_label"
+        },
+        "lorentz_index_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "conjugation": {
+          "type": "string",
+          "enum": ["none", "complex_conjugate"]
+        },
+        "transversality_status": {
+          "type": "string",
+          "enum": ["not_applied", "declared_transverse"]
+        }
+      }
+    },
+    "non_chain_factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["factor_id", "factor_kind", "source_factor_ids"],
+      "properties": {
+        "factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "factor_kind": {
+          "type": "string",
+          "enum": ["boson_propagator_between_currents", "scalar_factor", "contact_tensor"]
+        },
+        "source_factor_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/object_id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "connects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/chain_connection"
+          }
+        }
+      }
+    },
+    "chain_connection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["chain_id", "index_id"],
+      "properties": {
+        "chain_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "index_id": {
+          "$ref": "#/$defs/object_id"
+        }
+      }
+    },
+    "index_contraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contraction_id", "index_type", "factor_indices"],
+      "properties": {
+        "contraction_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "index_type": {
+          "type": "string",
+          "enum": ["lorentz", "dirac"]
+        },
+        "factor_indices": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/factor_index_ref"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "factor_index_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["factor_id", "index_id", "index_role"],
+      "properties": {
+        "factor_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "index_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "index_role": {
+          "type": "string",
+          "enum": ["left", "right", "lorentz", "open"]
+        }
+      }
+    },
+    "overall_factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scalar_prefactor", "relative_sign", "sign_source"],
+      "properties": {
+        "scalar_prefactor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relative_sign": {
+          "type": "string",
+          "enum": ["+1", "-1"]
+        },
+        "sign_source": {
+          "type": "string",
+          "enum": [
+            "diagram_ir_symmetry_and_fermion_ordering",
+            "backend_convention_map_required",
+            "manual_fixture"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "generation_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["hand_written_fixture", "derived_candidate", "derived_validated", "blocked"]
+        },
+        "generated_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "total_amplitude": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["term_amplitude_ids", "sum_kind"],
+      "properties": {
+        "term_amplitude_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/object_id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "sum_kind": {
+          "type": "string",
+          "const": "ordered_symbolic_sum"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },    "audit_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "convention_audit_path",
+        "approved_for_amplitude_generation",
+        "heavy_calculation_approved"
+      ],
+      "properties": {
+        "convention_audit_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approved_for_amplitude_generation": {
+          "type": "boolean"
+        },
+        "heavy_calculation_approved": {
+          "type": "boolean"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "momentum_label": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    }
+  }
+}

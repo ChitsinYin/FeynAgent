@@ -42,14 +42,14 @@ There is no independent four-point electron-electron-photon-photon contact verte
 
 ## Rule Trust Status
 
-The minimal QED rules in `rules/qed/qed_tree_v1.yaml` are marked `validated_pending_convention_review`. Their signs and conventions are explicitly stated, but Day 1/Day 2 semantic closure did not perform an independent convention audit. They must not be silently upgraded to trusted.
+The minimal QED rules in `rules/qed/qed_tree_v1.yaml` used by B01/B02 are marked `validated` after the bounded QED convention audit in `docs/QED_CONVENTION_AUDIT.md`, approved by the user at `2026-08-12T19:48:05.9409820+08:00`. They are not promoted to fully trusted, and the documented FeynArts backend convention maps must remain explicit.
 
 ## Approval Scope
 
-B02 is approved for topology representation only. Amplitude generation and heavy calculation approval gates remain `not_requested`.
+B02 is approved for topology representation and amplitude generation only. Heavy calculation remains `not_requested`. No amplitude was generated in the approval step.
 
 ## Day 2/3 Work
 
 Later phases should implement diagram generation, DiagramIR slot-binding assembly, LaTeX amplitude generation, and FeynCalc code generation from the same structured artifacts. Human-controlled algebra checks can follow later.
 
-Those calculations are intentionally not performed in this benchmark today.
+Amplitude generation may now be performed for B02 under the audited convention. Heavy algebra, squared amplitudes, traces, polarization sums, and Ward-identity checks remain outside this approval.

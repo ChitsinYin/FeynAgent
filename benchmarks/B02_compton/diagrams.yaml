@@ -1,315 +1,316 @@
-schema_version: "0.1.1"
+schema_version: 0.1.2
 object_id: diagram_ir:b02_compton_tree_topologies
 status: approved
 process_id: process:b02_compton
 diagrams:
-  - diagram_id: diagram:b02_compton:s_channel
-    process_id: process:b02_compton
-    status: approved
-    loop_order: 0
-    channel: s
-    external_legs:
-      - leg_id: leg:b02:s:1
-        slot: 1
-        particle_id: e-
-        state_role: incoming
-        momentum_label: p1
-      - leg_id: leg:b02:s:2
-        slot: 2
-        particle_id: gamma
-        state_role: incoming
-        momentum_label: k1
-      - leg_id: leg:b02:s:3
-        slot: 3
-        particle_id: e-
-        state_role: outgoing
-        momentum_label: p2
-      - leg_id: leg:b02:s:4
-        slot: 4
-        particle_id: gamma
-        state_role: outgoing
-        momentum_label: k2
-    vertex_instances:
-      - vertex_id: vertex:b02:s:1
-        rule_id: rule:qed_tree_v1:e_e_gamma_vertex
-        slot_bindings:
-        - rule_slot: 1
-          endpoint_id: line:b02:s:electron
-          endpoint_kind: internal_line
-          expected_particle_id: e-
-          expected_field_id: field:qed:e:psi_bar
-          endpoint_particle_id: e-
-          momentum_label: q_s
-          momentum_substitution: -q_s
-          crossing_treatment: internal_line_orientation
-          convention_conversion:
-            source: internal_routing
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: psi_bar
-            flow_direction: through_internal_line
-        - rule_slot: 2
-          endpoint_id: leg:b02:s:1
-          endpoint_kind: external_leg
-          expected_particle_id: e-
-          expected_field_id: field:qed:e:psi
-          endpoint_particle_id: e-
-          momentum_label: p1
-          momentum_substitution: p1
-          crossing_treatment: external_incoming_as_rule_incoming
-          convention_conversion:
-            source: physical_external_momenta
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: psi
-            flow_direction: into_vertex
-        - rule_slot: 3
-          endpoint_id: leg:b02:s:2
-          endpoint_kind: external_leg
-          expected_particle_id: gamma
-          expected_field_id: field:qed:gamma:a
-          endpoint_particle_id: gamma
-          momentum_label: k1
-          momentum_substitution: k1
-          crossing_treatment: external_incoming_as_rule_incoming
-          convention_conversion:
-            source: physical_external_momenta
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: not_applicable
-            flow_direction: not_applicable
-      - vertex_id: vertex:b02:s:2
-        rule_id: rule:qed_tree_v1:e_e_gamma_vertex
-        slot_bindings:
-        - rule_slot: 1
-          endpoint_id: leg:b02:s:3
-          endpoint_kind: external_leg
-          expected_particle_id: e-
-          expected_field_id: field:qed:e:psi_bar
-          endpoint_particle_id: e-
-          momentum_label: p2
-          momentum_substitution: -p2
-          crossing_treatment: external_outgoing_crossed_to_rule_incoming
-          convention_conversion:
-            source: physical_external_momenta
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: psi_bar
-            flow_direction: out_of_vertex
-        - rule_slot: 2
-          endpoint_id: line:b02:s:electron
-          endpoint_kind: internal_line
-          expected_particle_id: e-
-          expected_field_id: field:qed:e:psi
-          endpoint_particle_id: e-
-          momentum_label: q_s
-          momentum_substitution: q_s
-          crossing_treatment: internal_line_orientation
-          convention_conversion:
-            source: internal_routing
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: psi
-            flow_direction: through_internal_line
-        - rule_slot: 3
-          endpoint_id: leg:b02:s:4
-          endpoint_kind: external_leg
-          expected_particle_id: gamma
-          expected_field_id: field:qed:gamma:a
-          endpoint_particle_id: gamma
-          momentum_label: k2
-          momentum_substitution: -k2
-          crossing_treatment: external_outgoing_crossed_to_rule_incoming
-          convention_conversion:
-            source: physical_external_momenta
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: not_applicable
-            flow_direction: not_applicable
-    internal_lines:
-      - line_id: line:b02:s:electron
-        particle_id: e-
-        propagator_rule_id: rule:qed_tree_v1:electron_propagator
-        from:
-          kind: vertex
-          id: vertex:b02:s:1
-          slot: 1
-        to:
-          kind: vertex
-          id: vertex:b02:s:2
-          slot: 2
-        momentum:
-          label: q_s
-          expression: p1+k1
-          external_convention: physical_external_momenta
-    momentum_routing:
-      - target_id: line:b02:s:electron
-        momentum_label: q_s
-        definition: p1+k1
-    rule_references:
-      - rule_id: rule:qed_tree_v1:e_e_gamma_vertex
-        rule_type: vertex
-      - rule_id: rule:qed_tree_v1:electron_propagator
-        rule_type: propagator
-    coupling_order:
-      - coupling: e
-        power: 2
-    symmetry_factor: "1"
-    metadata:
-      notes: S-channel electron exchange topology only; no amplitude expression is encoded.
-  - diagram_id: diagram:b02_compton:u_channel
-    process_id: process:b02_compton
-    status: approved
-    loop_order: 0
-    channel: u
-    external_legs:
-      - leg_id: leg:b02:u:1
-        slot: 1
-        particle_id: e-
-        state_role: incoming
-        momentum_label: p1
-      - leg_id: leg:b02:u:2
-        slot: 2
-        particle_id: gamma
-        state_role: incoming
-        momentum_label: k1
-      - leg_id: leg:b02:u:3
-        slot: 3
-        particle_id: e-
-        state_role: outgoing
-        momentum_label: p2
-      - leg_id: leg:b02:u:4
-        slot: 4
-        particle_id: gamma
-        state_role: outgoing
-        momentum_label: k2
-    vertex_instances:
-      - vertex_id: vertex:b02:u:1
-        rule_id: rule:qed_tree_v1:e_e_gamma_vertex
-        slot_bindings:
-        - rule_slot: 1
-          endpoint_id: line:b02:u:electron
-          endpoint_kind: internal_line
-          expected_particle_id: e-
-          expected_field_id: field:qed:e:psi_bar
-          endpoint_particle_id: e-
-          momentum_label: q_u
-          momentum_substitution: -q_u
-          crossing_treatment: internal_line_orientation
-          convention_conversion:
-            source: internal_routing
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: psi_bar
-            flow_direction: through_internal_line
-        - rule_slot: 2
-          endpoint_id: leg:b02:u:1
-          endpoint_kind: external_leg
-          expected_particle_id: e-
-          expected_field_id: field:qed:e:psi
-          endpoint_particle_id: e-
-          momentum_label: p1
-          momentum_substitution: p1
-          crossing_treatment: external_incoming_as_rule_incoming
-          convention_conversion:
-            source: physical_external_momenta
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: psi
-            flow_direction: into_vertex
-        - rule_slot: 3
-          endpoint_id: leg:b02:u:4
-          endpoint_kind: external_leg
-          expected_particle_id: gamma
-          expected_field_id: field:qed:gamma:a
-          endpoint_particle_id: gamma
-          momentum_label: k2
-          momentum_substitution: -k2
-          crossing_treatment: external_outgoing_crossed_to_rule_incoming
-          convention_conversion:
-            source: physical_external_momenta
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: not_applicable
-            flow_direction: not_applicable
-      - vertex_id: vertex:b02:u:2
-        rule_id: rule:qed_tree_v1:e_e_gamma_vertex
-        slot_bindings:
-        - rule_slot: 1
-          endpoint_id: leg:b02:u:3
-          endpoint_kind: external_leg
-          expected_particle_id: e-
-          expected_field_id: field:qed:e:psi_bar
-          endpoint_particle_id: e-
-          momentum_label: p2
-          momentum_substitution: -p2
-          crossing_treatment: external_outgoing_crossed_to_rule_incoming
-          convention_conversion:
-            source: physical_external_momenta
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: psi_bar
-            flow_direction: out_of_vertex
-        - rule_slot: 2
-          endpoint_id: line:b02:u:electron
-          endpoint_kind: internal_line
-          expected_particle_id: e-
-          expected_field_id: field:qed:e:psi
-          endpoint_particle_id: e-
-          momentum_label: q_u
-          momentum_substitution: q_u
-          crossing_treatment: internal_line_orientation
-          convention_conversion:
-            source: internal_routing
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: psi
-            flow_direction: through_internal_line
-        - rule_slot: 3
-          endpoint_id: leg:b02:u:2
-          endpoint_kind: external_leg
-          expected_particle_id: gamma
-          expected_field_id: field:qed:gamma:a
-          endpoint_particle_id: gamma
-          momentum_label: k1
-          momentum_substitution: k1
-          crossing_treatment: external_incoming_as_rule_incoming
-          convention_conversion:
-            source: physical_external_momenta
-            target: all_momenta_incoming_vertex
-          fermion_flow:
-            field_orientation: not_applicable
-            flow_direction: not_applicable
-    internal_lines:
-      - line_id: line:b02:u:electron
-        particle_id: e-
-        propagator_rule_id: rule:qed_tree_v1:electron_propagator
-        from:
-          kind: vertex
-          id: vertex:b02:u:1
-          slot: 1
-        to:
-          kind: vertex
-          id: vertex:b02:u:2
-          slot: 2
-        momentum:
-          label: q_u
-          expression: p1-k2
-          external_convention: physical_external_momenta
-    momentum_routing:
-      - target_id: line:b02:u:electron
-        momentum_label: q_u
-        definition: p1-k2
-    rule_references:
-      - rule_id: rule:qed_tree_v1:e_e_gamma_vertex
-        rule_type: vertex
-      - rule_id: rule:qed_tree_v1:electron_propagator
-        rule_type: propagator
-    coupling_order:
-      - coupling: e
-        power: 2
-    symmetry_factor: "1"
-    metadata:
-      notes: U-channel electron exchange topology only; no amplitude expression is encoded.
+- diagram_id: diagram:generated:b02-compton:s:e-
+  process_id: process:b02_compton
+  status: approved
+  loop_order: 0
+  channel: s
+  external_legs:
+  - leg_id: leg:generated:b02-compton:s:1
+    slot: 1
+    particle_id: e-
+    state_role: incoming
+    momentum_label: p1
+  - leg_id: leg:generated:b02-compton:s:2
+    slot: 2
+    particle_id: gamma
+    state_role: incoming
+    momentum_label: k1
+  - leg_id: leg:generated:b02-compton:s:3
+    slot: 3
+    particle_id: e-
+    state_role: outgoing
+    momentum_label: p2
+  - leg_id: leg:generated:b02-compton:s:4
+    slot: 4
+    particle_id: gamma
+    state_role: outgoing
+    momentum_label: k2
+  vertex_instances:
+  - vertex_id: vertex:generated:b02-compton:s:1
+    rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    slot_bindings:
+    - rule_slot: 1
+      endpoint_id: line:generated:b02-compton:s:e-
+      endpoint_kind: internal_line
+      expected_particle_id: e-
+      expected_field_id: field:qed:e:psi_bar
+      endpoint_particle_id: e-
+      momentum_label: q_s
+      momentum_substitution: -q_s
+      crossing_treatment: internal_line_orientation
+      convention_conversion:
+        source: internal_routing
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: psi_bar
+        flow_direction: out_of_vertex
+    - rule_slot: 2
+      endpoint_id: leg:generated:b02-compton:s:1
+      endpoint_kind: external_leg
+      expected_particle_id: e-
+      expected_field_id: field:qed:e:psi
+      endpoint_particle_id: e-
+      momentum_label: p1
+      momentum_substitution: p1
+      crossing_treatment: external_incoming_as_rule_incoming
+      convention_conversion:
+        source: physical_external_momenta
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: psi
+        flow_direction: into_vertex
+    - rule_slot: 3
+      endpoint_id: leg:generated:b02-compton:s:2
+      endpoint_kind: external_leg
+      expected_particle_id: gamma
+      expected_field_id: field:qed:gamma:a
+      endpoint_particle_id: gamma
+      momentum_label: k1
+      momentum_substitution: k1
+      crossing_treatment: external_incoming_as_rule_incoming
+      convention_conversion:
+        source: physical_external_momenta
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: not_applicable
+        flow_direction: not_applicable
+  - vertex_id: vertex:generated:b02-compton:s:2
+    rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    slot_bindings:
+    - rule_slot: 1
+      endpoint_id: leg:generated:b02-compton:s:3
+      endpoint_kind: external_leg
+      expected_particle_id: e-
+      expected_field_id: field:qed:e:psi_bar
+      endpoint_particle_id: e-
+      momentum_label: p2
+      momentum_substitution: -p2
+      crossing_treatment: external_outgoing_crossed_to_rule_incoming
+      convention_conversion:
+        source: physical_external_momenta
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: psi_bar
+        flow_direction: out_of_vertex
+    - rule_slot: 2
+      endpoint_id: line:generated:b02-compton:s:e-
+      endpoint_kind: internal_line
+      expected_particle_id: e-
+      expected_field_id: field:qed:e:psi
+      endpoint_particle_id: e-
+      momentum_label: q_s
+      momentum_substitution: q_s
+      crossing_treatment: internal_line_orientation
+      convention_conversion:
+        source: internal_routing
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: psi
+        flow_direction: into_vertex
+    - rule_slot: 3
+      endpoint_id: leg:generated:b02-compton:s:4
+      endpoint_kind: external_leg
+      expected_particle_id: gamma
+      expected_field_id: field:qed:gamma:a
+      endpoint_particle_id: gamma
+      momentum_label: k2
+      momentum_substitution: -k2
+      crossing_treatment: external_outgoing_crossed_to_rule_incoming
+      convention_conversion:
+        source: physical_external_momenta
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: not_applicable
+        flow_direction: not_applicable
+  internal_lines:
+  - line_id: line:generated:b02-compton:s:e-
+    particle_id: e-
+    propagator_rule_id: rule:qed_tree_v1:electron_propagator
+    from:
+      kind: vertex
+      id: vertex:generated:b02-compton:s:1
+      slot: 1
+    to:
+      kind: vertex
+      id: vertex:generated:b02-compton:s:2
+      slot: 2
+    momentum:
+      label: q_s
+      expression: p1+k1
+      external_convention: physical_external_momenta
+  momentum_routing:
+  - target_id: line:generated:b02-compton:s:e-
+    momentum_label: q_s
+    definition: p1+k1
+  rule_references:
+  - rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    rule_type: vertex
+  - rule_id: rule:qed_tree_v1:electron_propagator
+    rule_type: propagator
+  coupling_order:
+  - coupling: e
+    power: 2
+  symmetry_factor: '1'
+  metadata:
+    notes: Generated exchange topology only; no amplitude expression is encoded.
+- diagram_id: diagram:generated:b02-compton:u:e-
+  process_id: process:b02_compton
+  status: approved
+  loop_order: 0
+  channel: u
+  external_legs:
+  - leg_id: leg:generated:b02-compton:u:1
+    slot: 1
+    particle_id: e-
+    state_role: incoming
+    momentum_label: p1
+  - leg_id: leg:generated:b02-compton:u:2
+    slot: 2
+    particle_id: gamma
+    state_role: incoming
+    momentum_label: k1
+  - leg_id: leg:generated:b02-compton:u:3
+    slot: 3
+    particle_id: e-
+    state_role: outgoing
+    momentum_label: p2
+  - leg_id: leg:generated:b02-compton:u:4
+    slot: 4
+    particle_id: gamma
+    state_role: outgoing
+    momentum_label: k2
+  vertex_instances:
+  - vertex_id: vertex:generated:b02-compton:u:1
+    rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    slot_bindings:
+    - rule_slot: 1
+      endpoint_id: line:generated:b02-compton:u:e-
+      endpoint_kind: internal_line
+      expected_particle_id: e-
+      expected_field_id: field:qed:e:psi_bar
+      endpoint_particle_id: e-
+      momentum_label: q_u
+      momentum_substitution: -q_u
+      crossing_treatment: internal_line_orientation
+      convention_conversion:
+        source: internal_routing
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: psi_bar
+        flow_direction: out_of_vertex
+    - rule_slot: 2
+      endpoint_id: leg:generated:b02-compton:u:1
+      endpoint_kind: external_leg
+      expected_particle_id: e-
+      expected_field_id: field:qed:e:psi
+      endpoint_particle_id: e-
+      momentum_label: p1
+      momentum_substitution: p1
+      crossing_treatment: external_incoming_as_rule_incoming
+      convention_conversion:
+        source: physical_external_momenta
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: psi
+        flow_direction: into_vertex
+    - rule_slot: 3
+      endpoint_id: leg:generated:b02-compton:u:4
+      endpoint_kind: external_leg
+      expected_particle_id: gamma
+      expected_field_id: field:qed:gamma:a
+      endpoint_particle_id: gamma
+      momentum_label: k2
+      momentum_substitution: -k2
+      crossing_treatment: external_outgoing_crossed_to_rule_incoming
+      convention_conversion:
+        source: physical_external_momenta
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: not_applicable
+        flow_direction: not_applicable
+  - vertex_id: vertex:generated:b02-compton:u:2
+    rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    slot_bindings:
+    - rule_slot: 1
+      endpoint_id: leg:generated:b02-compton:u:3
+      endpoint_kind: external_leg
+      expected_particle_id: e-
+      expected_field_id: field:qed:e:psi_bar
+      endpoint_particle_id: e-
+      momentum_label: p2
+      momentum_substitution: -p2
+      crossing_treatment: external_outgoing_crossed_to_rule_incoming
+      convention_conversion:
+        source: physical_external_momenta
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: psi_bar
+        flow_direction: out_of_vertex
+    - rule_slot: 2
+      endpoint_id: line:generated:b02-compton:u:e-
+      endpoint_kind: internal_line
+      expected_particle_id: e-
+      expected_field_id: field:qed:e:psi
+      endpoint_particle_id: e-
+      momentum_label: q_u
+      momentum_substitution: q_u
+      crossing_treatment: internal_line_orientation
+      convention_conversion:
+        source: internal_routing
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: psi
+        flow_direction: into_vertex
+    - rule_slot: 3
+      endpoint_id: leg:generated:b02-compton:u:2
+      endpoint_kind: external_leg
+      expected_particle_id: gamma
+      expected_field_id: field:qed:gamma:a
+      endpoint_particle_id: gamma
+      momentum_label: k1
+      momentum_substitution: k1
+      crossing_treatment: external_incoming_as_rule_incoming
+      convention_conversion:
+        source: physical_external_momenta
+        target: all_momenta_incoming_vertex
+      fermion_flow:
+        field_orientation: not_applicable
+        flow_direction: not_applicable
+  internal_lines:
+  - line_id: line:generated:b02-compton:u:e-
+    particle_id: e-
+    propagator_rule_id: rule:qed_tree_v1:electron_propagator
+    from:
+      kind: vertex
+      id: vertex:generated:b02-compton:u:1
+      slot: 1
+    to:
+      kind: vertex
+      id: vertex:generated:b02-compton:u:2
+      slot: 2
+    momentum:
+      label: q_u
+      expression: p1-k2
+      external_convention: physical_external_momenta
+  momentum_routing:
+  - target_id: line:generated:b02-compton:u:e-
+    momentum_label: q_u
+    definition: p1-k2
+  rule_references:
+  - rule_id: rule:qed_tree_v1:e_e_gamma_vertex
+    rule_type: vertex
+  - rule_id: rule:qed_tree_v1:electron_propagator
+    rule_type: propagator
+  coupling_order:
+  - coupling: e
+    power: 2
+  symmetry_factor: '1'
+  metadata:
+    notes: Generated exchange topology only; no amplitude expression is encoded.
 metadata:
-  notes: Gold tree topology representation for e- gamma -> e- gamma in QED. Vertex slot bindings are explicit and no amplitude expression is encoded.
+  notes: B02_compton gold topology migrated to DiagramIR 0.1.2 fermion-flow semantics;
+    no amplitudes are encoded.

@@ -44,7 +44,7 @@ def assert_validates(testcase, instance, schema_name):
 
 def synthetic_scalar_fixture():
     physics = {
-        "schema_version": "0.1.1",
+        "schema_version": "0.1.2",
         "object_id": "physics_card:synthetic_abcd",
         "status": "approved",
         "process_id": "process:synthetic_abcd",
@@ -263,6 +263,38 @@ class TopologyGeneratorTests(unittest.TestCase):
         }
         self.assertTrue(_field_accepts_external(psi_bar_field, incoming_antiparticle, catalog))
 
+
+
+    def test_external_dirac_fermion_flow_truth_table(self):
+        physics = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "physics_card.yaml")
+        convention = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "convention_card.yaml")
+        registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
+        diagram = generate_tree_2_to_2(physics, convention, registry)["diagrams"][0]
+        external_by_id = {leg["leg_id"]: leg for leg in diagram["external_legs"]}
+        table = {}
+        for vertex in diagram["vertex_instances"]:
+            for binding in vertex["slot_bindings"]:
+                if binding["endpoint_kind"] != "external_leg":
+                    continue
+                leg = external_by_id[binding["endpoint_id"]]
+                table[(leg["state_role"], leg["particle_id"])] = (
+                    binding["fermion_flow"]["field_orientation"],
+                    binding["fermion_flow"]["flow_direction"],
+                )
+
+        self.assertEqual(table[("incoming", "e-")], ("psi", "into_vertex"))
+        self.assertEqual(table[("outgoing", "mu-")], ("psi_bar", "out_of_vertex"))
+        self.assertEqual(table[("incoming", "e+")], ("psi_bar", "out_of_vertex"))
+        self.assertEqual(table[("outgoing", "mu+")], ("psi", "into_vertex"))
+
+    def test_signature_includes_fermion_flow_direction(self):
+        physics = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "physics_card.yaml")
+        convention = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "convention_card.yaml")
+        registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
+        diagram = generate_tree_2_to_2(physics, convention, registry)["diagrams"][0]
+        altered = copy.deepcopy(diagram)
+        altered["vertex_instances"][0]["slot_bindings"][0]["fermion_flow"]["flow_direction"] = "into_vertex"
+        self.assertNotEqual(diagram_signature(diagram), diagram_signature(altered))
 
     def test_contact_diagram_when_compatible_four_point_rule_exists(self):
         physics, convention, registry = synthetic_scalar_fixture()

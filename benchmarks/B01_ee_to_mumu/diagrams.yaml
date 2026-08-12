@@ -1,4 +1,4 @@
-schema_version: 0.1.1
+schema_version: 0.1.2
 object_id: diagram_ir:b01_ee_to_mumu_gold_topology
 status: approved
 process_id: process:b01_ee_to_mumu
@@ -47,7 +47,7 @@ diagrams:
         target: all_momenta_incoming_vertex
       fermion_flow:
         field_orientation: psi_bar
-        flow_direction: into_vertex
+        flow_direction: out_of_vertex
     - rule_slot: 2
       endpoint_id: leg:generated:b01-ee-to-mumu:s:1
       endpoint_kind: external_leg
@@ -110,7 +110,7 @@ diagrams:
         target: all_momenta_incoming_vertex
       fermion_flow:
         field_orientation: psi
-        flow_direction: out_of_vertex
+        flow_direction: into_vertex
     - rule_slot: 3
       endpoint_id: line:generated:b01-ee-to-mumu:s:gamma
       endpoint_kind: internal_line
@@ -160,5 +160,5 @@ diagrams:
   metadata:
     notes: Generated exchange topology only; no amplitude expression is encoded.
 metadata:
-  notes: Gold tree topology for e- e+ -> mu- mu+ in QED. No amplitude expression is
-    encoded.
+  notes: B01_ee_to_mumu gold topology migrated to DiagramIR 0.1.2 fermion-flow semantics;
+    no amplitudes are encoded.
