@@ -1,4 +1,4 @@
-schema_version: 0.1.2
+schema_version: 0.2.0
 object_id: physics_card:b01_ee_to_mumu
 status: approved
 process_id: process:b01_ee_to_mumu
@@ -38,10 +38,6 @@ particles:
     state_role: outgoing
     momentum_label: p4
     latex_label: \mu^{+}
-selected_rule_set:
-  registry_id: registry:qed_tree_v1
-  rule_set_ids:
-  - ruleset:qed_tree_v1
 internal_species_policy:
   allowed_particle_ids:
   - gamma
@@ -58,12 +54,14 @@ approval:
     status: approved
     approved_by: user
     approved_at: '2026-08-12T19:48:05.9409820+08:00'
-    notes: Approved for B01 only after QED convention audit; no amplitude was generated in this approval step.
+    notes: Approved for B01 only after QED convention audit; no amplitude was generated
+      in this approval step.
   heavy_calculation:
     status: not_requested
     notes: Heavy calculation remains explicitly unapproved.
 metadata:
-  notes: B01 e- e+ -> mu- mu+ benchmark; amplitude generation is approved after the QED convention audit, but no amplitudes were generated in the approval step.
+  notes: B01 e- e+ -> mu- mu+ benchmark; amplitude generation is approved after the
+    QED convention audit, but no amplitudes were generated in the approval step.
 presentation:
   particle_latex_labels:
   - particle_id: e+
@@ -76,3 +74,5 @@ presentation:
     latex_label: \mu^{+}
   - particle_id: mu-
     latex_label: \mu^{-}
+model_id: sm_qed
+sector: qed

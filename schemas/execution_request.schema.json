@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://feynagent.local/schemas/execution_request.schema.json",
+  "title": "ExecutionRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "object_id",
+    "status",
+    "request_id",
+    "physics_card_id",
+    "backend_profile_id",
+    "execution_mode",
+    "authorized_by",
+    "authorized_at",
+    "timeout_policy",
+    "allowed_operations",
+    "metadata"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "object_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "expired",
+        "revoked"
+      ]
+    },
+    "request_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "physics_card_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "backend_profile_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "execution_mode": {
+      "type": "string",
+      "enum": [
+        "structural",
+        "amplitude_only",
+        "benchmark_regression",
+        "production_heavy"
+      ]
+    },
+    "authorized_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authorized_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "timeout_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "none",
+            "fixed_seconds"
+          ]
+        },
+        "seconds": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "allowed_operations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "schema_validation",
+          "diagram_generation",
+          "amplitude_generation",
+          "latex_render",
+          "feyncalc_smoke",
+          "m2_regression",
+          "spin_sums",
+          "polarization_sums",
+          "heavy_simplification"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "timeout_policy": {
+            "properties": {
+              "kind": {
+                "const": "fixed_seconds"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "timeout_policy": {
+            "required": [
+              "seconds"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "execution_mode": {
+            "const": "production_heavy"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "allowed_operations": {
+            "contains": {
+              "enum": [
+                "spin_sums",
+                "polarization_sums",
+                "heavy_simplification"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "object_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

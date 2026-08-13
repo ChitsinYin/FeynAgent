@@ -1,0 +1,25 @@
+schema_version: 0.1.0
+object_id: backend_profile:legacy_sm_qed
+backend_profile_id: backend_profile:legacy_sm_qed
+backend_kind: legacy_custom_backend
+status: approved
+resolves:
+  model_id: sm_qed
+  sector: qed
+capabilities:
+  process_types:
+  - scattering_2_to_2
+  loop_orders:
+  - 0
+  operations:
+  - structural
+  - amplitude_only
+legacy:
+  rule_registry:
+    registry_id: registry:qed_tree_v1
+    relative_path: ../../rules/qed/qed_tree_v1.yaml
+    rule_set_ids:
+    - ruleset:qed_tree_v1
+metadata:
+  notes: Legacy custom backend profile resolving sm_qed/qed to the audited QED RuleRegistry
+    snapshot for regression and fallback use.

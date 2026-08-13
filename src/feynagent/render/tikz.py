@@ -398,8 +398,8 @@ def _validate_inputs(
     convention_card: dict[str, Any],
     diagram_ir: dict[str, Any],
 ) -> None:
-    if physics_card.get("schema_version") != "0.1.2":
-        raise RenderError("PhysicsCard schema_version must be 0.1.2")
+    if physics_card.get("schema_version") != "0.2.0":
+        raise RenderError("PhysicsCard schema_version must be 0.2.0")
     if convention_card.get("schema_version") != "0.1.1":
         raise RenderError("ConventionCard schema_version must be 0.1.1")
     if diagram_ir.get("schema_version") != "0.1.2":

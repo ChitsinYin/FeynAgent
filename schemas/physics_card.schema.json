@@ -9,17 +9,18 @@
     "object_id",
     "status",
     "process_id",
+    "model_id",
+    "sector",
     "process_type",
     "perturbative_order",
     "particles",
-    "selected_rule_set",
     "requested_outputs",
     "approval"
   ],
   "properties": {
     "schema_version": {
       "type": "string",
-      "const": "0.1.2"
+      "const": "0.2.0"
     },
     "object_id": {
       "$ref": "#/$defs/object_id"
@@ -36,6 +37,14 @@
     },
     "process_id": {
       "$ref": "#/$defs/object_id"
+    },
+    "model_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "sector": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_./:-]*$"
     },
     "process_type": {
       "type": "string",
@@ -143,27 +152,6 @@
             "$ref": "#/$defs/process_particle"
           },
           "minItems": 1
-        }
-      }
-    },
-    "selected_rule_set": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "registry_id",
-        "rule_set_ids"
-      ],
-      "properties": {
-        "registry_id": {
-          "$ref": "#/$defs/object_id"
-        },
-        "rule_set_ids": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/object_id"
-          },
-          "minItems": 1,
-          "uniqueItems": true
         }
       }
     },

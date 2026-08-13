@@ -1,4 +1,4 @@
-schema_version: 0.1.2
+schema_version: 0.2.0
 object_id: physics_card:b02_compton
 status: approved
 process_id: process:b02_compton
@@ -38,10 +38,6 @@ particles:
     state_role: outgoing
     momentum_label: k2
     latex_label: \gamma
-selected_rule_set:
-  registry_id: registry:qed_tree_v1
-  rule_set_ids:
-  - ruleset:qed_tree_v1
 internal_species_policy:
   allowed_particle_ids:
   - e-
@@ -62,7 +58,8 @@ approval:
     status: approved
     approved_by: user
     approved_at: '2026-08-12T19:48:05.9409820+08:00'
-    notes: Approved for B02 only after QED convention audit; no amplitude was generated in this approval step.
+    notes: Approved for B02 only after QED convention audit; no amplitude was generated
+      in this approval step.
   heavy_calculation:
     status: not_requested
     notes: Heavy Mathematica/FeynCalc calculations remain explicitly unapproved.
@@ -76,3 +73,5 @@ presentation:
     latex_label: e^{-}
   - particle_id: gamma
     latex_label: \gamma
+model_id: sm_qed
+sector: qed

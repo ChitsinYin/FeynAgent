@@ -65,18 +65,22 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--physics-card", required=True, type=Path)
     parser.add_argument("--convention-card", required=True, type=Path)
     parser.add_argument("--rule-registry", required=True, type=Path)
+    parser.add_argument("--backend-profile", type=Path, help="BackendProfile resolving the backend-neutral PhysicsCard")
     parser.add_argument("--output", required=True, type=Path, help="Output directory")
     args = parser.parse_args(argv)
 
     physics = _load_yaml(args.physics_card)
     convention = _load_yaml(args.convention_card)
     rules = _load_yaml(args.rule_registry)
+    backend_profile = _load_yaml(args.backend_profile) if args.backend_profile else None
 
     try:
         _validate("physics_card.schema.json", physics)
         _validate("convention_card.schema.json", convention)
         _validate("rule_registry.schema.json", rules)
-        generated = generate_tree_2_to_2(physics, convention, rules)
+        if backend_profile is not None:
+            _validate("backend_profile.schema.json", backend_profile)
+        generated = generate_tree_2_to_2(physics, convention, rules, backend_profile)
         _validate("diagram_ir.schema.json", generated)
     except DiagramGenerationError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

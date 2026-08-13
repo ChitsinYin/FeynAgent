@@ -12,6 +12,17 @@ The backend roles are:
 
 Standard QED production amplitudes must not be generated from duplicate Python-maintained QED rule formulas when FeynArts/FeynCalc can generate the process natively. The legacy QED RuleRegistry remains a convention-audited reference snapshot and a useful custom-rule template, not the production source for native standard-sector amplitudes.
 
+
+## Day-5 Contract Separation
+
+Day 5 separates three concerns that were coupled during Days 1-4:
+
+- `PhysicsCard` records backend-neutral physics intent: process, external particles, perturbative order, `model_id`, and `sector`.
+- `BackendProfile` records how an implementation resolves that intent: native FeynArts/FeynCalc model settings or legacy RuleRegistry selection.
+- `ExecutionRequest` records runtime authorization: structural, amplitude-only, bounded benchmark regression, or production-heavy execution, including who authorized it, when, timeout policy, and allowed operations.
+
+`ExecutionRequest` is not canonical physics truth. It grants permission for a particular run mode. This repairs the Day-4 contradiction where bounded benchmark M2 regression was user-authorized while production `heavy_calculation` remained not requested.
+
 ## Standard Native Pipeline
 
 ```text
@@ -45,7 +56,7 @@ Future nonstandard interactions should use `custom_audited_model`. In that mode,
 
 ## Canonical Inputs And Derived Artifacts
 
-`PhysicsCard`, `ConventionCard`, backend profiles, and approved rule/model sources are canonical inputs. Generated amplitudes, PDFs, Wolfram scripts, logs, M2 outputs, and review bundles are derived artifacts.
+`PhysicsCard`, `ConventionCard`, backend profiles, execution requests, and approved rule/model sources are structured inputs. `PhysicsCard` remains backend-neutral physics intent; `BackendProfile` and `ExecutionRequest` are implementation/runtime contracts. Generated amplitudes, PDFs, Wolfram scripts, logs, M2 outputs, and review bundles are derived artifacts.
 
 Derived artifacts belong under `runs/` with stable run IDs. `benchmarks/` contains benchmark specs, gold/reference fixtures, and explicitly marked legacy fixtures only. Machine-local probes and absolute-path diagnostics belong under `.feynagent/` or run-specific locations such as `runs/init/<run_id>/`.
 
@@ -53,11 +64,13 @@ Derived artifacts belong under `runs/` with stable run IDs. `benchmarks/` contai
 
 JSON Schemas under `schemas/` define the structured contracts currently used by the legacy and benchmark validation paths:
 
-- `PhysicsCard`: process request, backend/rule selection, scope, and approval gates.
+- `PhysicsCard`: backend-neutral process request, `model_id`, `sector`, scope, and approval gates.
 - `ConventionCard`: explicit metric, momentum, spinor, polarization, and calculation conventions.
 - `RuleRegistry`: provenance-aware rule snapshot for legacy/custom audited paths.
 - `DiagramIR`: legacy tree-level diagram structure with explicit rule bindings.
 - `AmplitudeIR`: derived legacy amplitude structure used to prevent LaTeX/FeynCalc divergence in the custom backend.
+- `BackendProfile`: implementation mapping from backend-neutral theory intent to native package settings or legacy RuleRegistry sources.
+- `ExecutionRequest`: runtime authorization contract for structural, amplitude-only, benchmark-regression, or production-heavy operations.
 
 Native FeynArts/FeynCalc amplitudes are not reconstructed through the legacy RuleRegistry. They are produced by the installed native model and converted by `FCFAConvert`.
 

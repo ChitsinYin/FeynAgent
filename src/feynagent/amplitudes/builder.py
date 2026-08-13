@@ -126,9 +126,6 @@ def _validate_inputs(
         raise AmplitudeBuildError("AmplitudeIR builder requires all-momenta-incoming vertex convention")
     if physics_card.get("process_id") != diagram_ir.get("process_id"):
         raise AmplitudeBuildError("PhysicsCard process_id does not match DiagramIR process_id")
-    if physics_card.get("selected_rule_set", {}).get("registry_id") != rule_registry.get("registry_id"):
-        raise AmplitudeBuildError("PhysicsCard selected registry does not match RuleRegistry")
-
     rules_by_id = _rules_by_id(rule_registry)
     for diagram in diagram_ir.get("diagrams", []):
         if diagram.get("loop_order") != 0:

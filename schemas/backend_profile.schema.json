@@ -1,0 +1,278 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://feynagent.local/schemas/backend_profile.schema.json",
+  "title": "BackendProfile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "object_id",
+    "backend_profile_id",
+    "backend_kind",
+    "status",
+    "resolves",
+    "capabilities",
+    "metadata"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.0"
+    },
+    "object_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "backend_profile_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "backend_kind": {
+      "type": "string",
+      "enum": [
+        "feynarts_feyncalc_native",
+        "legacy_custom_backend"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "deprecated"
+      ]
+    },
+    "resolves": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_id",
+        "sector"
+      ],
+      "properties": {
+        "model_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "sector": {
+          "$ref": "#/$defs/object_id"
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "process_types",
+        "loop_orders",
+        "operations"
+      ],
+      "properties": {
+        "process_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "loop_orders": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "structural",
+              "amplitude_only",
+              "benchmark_regression",
+              "production_heavy"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "native": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "feynarts"
+      ],
+      "properties": {
+        "feynarts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "model",
+            "generic_model",
+            "restrictions",
+            "insertion_level",
+            "exclude_topologies",
+            "particle_mappings"
+          ],
+          "properties": {
+            "model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "generic_model": {
+              "type": "string",
+              "minLength": 1
+            },
+            "restrictions": {
+              "type": "string",
+              "minLength": 1
+            },
+            "insertion_level": {
+              "type": "string",
+              "minLength": 1
+            },
+            "exclude_topologies": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            },
+            "particle_mappings": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/particle_mapping"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          }
+        }
+      }
+    },
+    "legacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_registry"
+      ],
+      "properties": {
+        "rule_registry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "registry_id",
+            "relative_path",
+            "rule_set_ids"
+          ],
+          "properties": {
+            "registry_id": {
+              "$ref": "#/$defs/object_id"
+            },
+            "relative_path": {
+              "type": "string",
+              "minLength": 1
+            },
+            "rule_set_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/object_id"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "backend_kind": {
+            "const": "feynarts_feyncalc_native"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "native"
+        ],
+        "not": {
+          "required": [
+            "legacy"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "backend_kind": {
+            "const": "legacy_custom_backend"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "legacy"
+        ],
+        "not": {
+          "required": [
+            "native"
+          ]
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "object_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "particle_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_./:+-]*$"
+    },
+    "particle_mapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "particle_id",
+        "backend_identifier"
+      ],
+      "properties": {
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "backend_identifier": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

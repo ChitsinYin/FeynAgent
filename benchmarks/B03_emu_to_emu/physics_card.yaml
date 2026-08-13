@@ -1,4 +1,4 @@
-﻿schema_version: 0.1.2
+schema_version: 0.2.0
 object_id: physics_card:b03_emu_to_emu
 status: approved
 process_id: process:b03_emu_to_emu
@@ -38,10 +38,6 @@ particles:
     state_role: outgoing
     momentum_label: p4
     latex_label: \mu^{-}
-selected_rule_set:
-  registry_id: native:feynarts_sm_qedonly
-  rule_set_ids:
-  - native:feynarts_sm_qedonly
 internal_species_policy:
   allowed_particle_ids:
   - gamma
@@ -72,3 +68,5 @@ presentation:
     latex_label: \gamma
   - particle_id: mu-
     latex_label: \mu^{-}
+model_id: sm_qed
+sector: qed

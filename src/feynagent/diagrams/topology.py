@@ -21,13 +21,14 @@ def generate_tree_2_to_2(
     physics_card: dict[str, Any],
     convention_card: dict[str, Any],
     rule_registry: dict[str, Any],
+    backend_profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Generate exchange/contact DiagramIR for supported tree-level 2->2 inputs."""
 
-    _validate_supported_inputs(physics_card, convention_card, rule_registry)
+    _validate_supported_inputs(physics_card, convention_card, rule_registry, backend_profile)
 
     external_by_slot = _external_particles_by_slot(physics_card)
-    selected_rule_sets = set(physics_card["selected_rule_set"]["rule_set_ids"])
+    selected_rule_sets = set(_selected_rule_set_ids(physics_card, backend_profile))
     vertices = [
         rule
         for rule in rule_registry.get("vertices", [])
@@ -168,9 +169,10 @@ def _validate_supported_inputs(
     physics_card: dict[str, Any],
     convention_card: dict[str, Any],
     rule_registry: dict[str, Any],
+    backend_profile: dict[str, Any] | None = None,
 ) -> None:
-    if physics_card.get("schema_version") != "0.1.2":
-        raise DiagramGenerationError("PhysicsCard schema_version must be 0.1.2")
+    if physics_card.get("schema_version") != "0.2.0":
+        raise DiagramGenerationError("PhysicsCard schema_version must be 0.2.0")
     if convention_card.get("schema_version") != "0.1.1":
         raise DiagramGenerationError("ConventionCard schema_version must be 0.1.1")
     if rule_registry.get("schema_version") != "0.1.1":
@@ -184,8 +186,33 @@ def _validate_supported_inputs(
     external = physics_card.get("particles", {})
     if len(external.get("incoming", [])) != 2 or len(external.get("outgoing", [])) != 2:
         raise DiagramGenerationError("exactly 2 incoming and 2 outgoing particles are required")
-    if physics_card.get("selected_rule_set", {}).get("registry_id") != rule_registry.get("registry_id"):
-        raise DiagramGenerationError("PhysicsCard selected registry_id does not match RuleRegistry")
+    if physics_card.get("model_id") is None or physics_card.get("sector") is None:
+        raise DiagramGenerationError("PhysicsCard must declare backend-neutral model_id and sector")
+    if backend_profile is not None:
+        if backend_profile.get("backend_kind") != "legacy_custom_backend":
+            raise DiagramGenerationError("legacy DiagramIR generation requires a legacy_custom_backend profile")
+        resolves = backend_profile.get("resolves", {})
+        if resolves.get("model_id") != physics_card.get("model_id") or resolves.get("sector") != physics_card.get("sector"):
+            raise DiagramGenerationError("BackendProfile model_id/sector does not match PhysicsCard")
+        registry = backend_profile.get("legacy", {}).get("rule_registry", {})
+        if registry.get("registry_id") != rule_registry.get("registry_id"):
+            raise DiagramGenerationError("BackendProfile registry_id does not match RuleRegistry")
+
+
+def _selected_rule_set_ids(
+    physics_card: dict[str, Any],
+    backend_profile: dict[str, Any] | None,
+) -> list[str]:
+    if backend_profile is not None:
+        rule_set_ids = backend_profile.get("legacy", {}).get("rule_registry", {}).get("rule_set_ids", [])
+        if not rule_set_ids:
+            raise DiagramGenerationError("legacy BackendProfile must provide rule_set_ids")
+        return list(rule_set_ids)
+    selected = physics_card.get("selected_rule_set", {})
+    rule_set_ids = selected.get("rule_set_ids", [])
+    if not rule_set_ids:
+        raise DiagramGenerationError("legacy generation requires rule_set_ids from BackendProfile")
+    return list(rule_set_ids)
 
 
 def _external_particles_by_slot(physics_card: dict[str, Any]) -> dict[int, dict[str, Any]]:

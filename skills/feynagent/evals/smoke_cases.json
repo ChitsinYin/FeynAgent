@@ -1,0 +1,31 @@
+{
+  "cases": [
+    {
+      "id": "standard_compton",
+      "request": "Generate e- gamma -> e- gamma Compton scattering amplitudes for a benchmark regression.",
+      "expected_classification": "standard_native"
+    },
+    {
+      "id": "b01_annihilation",
+      "request": "B01 e- e+ annihilation into mu- mu+ using standard QED.",
+      "expected_classification": "standard_native"
+    },
+    {
+      "id": "toy_custom_yukawa",
+      "request": "Use a custom Yukawa L = - y phibar psi phi rule with stated metric and provenance from my note.",
+      "expected_classification": "custom_audited"
+    },
+    {
+      "id": "missing_initialization",
+      "request": "Run B02 Compton with native FeynCalc backend.",
+      "initialized": false,
+      "expected_classification": "unsupported_requires_review",
+      "expected_action_contains": "python -m feynagent init"
+    },
+    {
+      "id": "ambiguous_custom_rule",
+      "request": "Invent some new interaction and generate amplitudes for whatever custom model.",
+      "expected_classification": "unsupported_requires_review"
+    }
+  ]
+}

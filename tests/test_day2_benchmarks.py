@@ -41,6 +41,7 @@ class Day2BenchmarkGenerationTests(unittest.TestCase):
     def setUp(self):
         self.registry_path = ROOT / "rules" / "qed" / "qed_tree_v1.yaml"
         self.registry = load_yaml(self.registry_path)
+        self.legacy_profile = load_yaml(ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml")
         self.rule_ids = {
             rule["rule_id"]
             for rule in self.registry["vertices"] + self.registry["propagators"]
@@ -51,8 +52,8 @@ class Day2BenchmarkGenerationTests(unittest.TestCase):
         physics = load_yaml(bench_dir / "physics_card.yaml")
         convention = load_yaml(bench_dir / "convention_card.yaml")
         gold = load_yaml(bench_dir / "legacy" / "diagrams.yaml")
-        generated = generate_tree_2_to_2(physics, convention, self.registry)
-        generated_again = generate_tree_2_to_2(physics, convention, self.registry)
+        generated = generate_tree_2_to_2(physics, convention, self.registry, self.legacy_profile)
+        generated_again = generate_tree_2_to_2(physics, convention, self.registry, self.legacy_profile)
         return bench_dir, generated, generated_again, gold
 
     def test_b01_and_b02_generated_channels_match_expected(self):

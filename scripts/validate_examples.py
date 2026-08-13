@@ -11,10 +11,13 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 BENCHMARK_ROOT = ROOT / "benchmarks"
 SHARED_NATIVE_PROFILE = ROOT / "profiles" / "backends" / "feynarts_sm_qed.yaml"
+SHARED_LEGACY_PROFILE = ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml"
 QED_RULE_REGISTRY = ROOT / "rules" / "qed" / "qed_tree_v1.yaml"
 
 SCHEMA_VALIDATIONS = [
     (QED_RULE_REGISTRY, ROOT / "schemas" / "rule_registry.schema.json"),
+    (SHARED_NATIVE_PROFILE, ROOT / "schemas" / "backend_profile.schema.json"),
+    (SHARED_LEGACY_PROFILE, ROOT / "schemas" / "backend_profile.schema.json"),
 ]
 
 REQUIRED_BENCHMARK_IDS = {"B01_ee_to_mumu", "B02_compton", "B03_emu_to_emu"}
@@ -74,18 +77,43 @@ def _require(condition: bool, message: str) -> None:
 def _validate_native_profile(yaml: Any) -> int:
     try:
         profile = _load_yaml(SHARED_NATIVE_PROFILE, yaml)
-        _require(profile.get("backend_id") == "feynarts_feyncalc_native", "backend_id must be feynarts_feyncalc_native")
-        _require(profile.get("model") == "SM", "model must be SM")
-        _require(profile.get("generic_model") == "Lorentz", "generic_model must be Lorentz")
-        _require(profile.get("restrictions") == "QEDOnly", "restrictions must be QEDOnly")
-        _require(profile.get("insertion_level") == "Classes", "insertion_level must be Classes")
-        _require(isinstance(profile.get("exclude_topologies"), list), "exclude_topologies must be a list")
+        _require(profile.get("backend_kind") == "feynarts_feyncalc_native", "backend_kind must be feynarts_feyncalc_native")
+        _require(profile.get("resolves", {}).get("model_id") == "sm_qed", "profile must resolve model_id sm_qed")
+        _require(profile.get("resolves", {}).get("sector") == "qed", "profile must resolve sector qed")
+        feynarts = profile.get("native", {}).get("feynarts", {})
+        _require(feynarts.get("model") == "SM", "model must be SM")
+        _require(feynarts.get("generic_model") == "Lorentz", "generic_model must be Lorentz")
+        _require(feynarts.get("restrictions") == "QEDOnly", "restrictions must be QEDOnly")
+        _require(feynarts.get("insertion_level") == "Classes", "insertion_level must be Classes")
+        _require(isinstance(feynarts.get("exclude_topologies"), list), "exclude_topologies must be a list")
+        mapped = {item.get("particle_id") for item in feynarts.get("particle_mappings", [])}
+        _require({"e-", "e+", "mu-", "mu+", "gamma"}.issubset(mapped), "native particle mappings must cover B01/B02/B03")
     except (OSError, ValidationFailure) as exc:
         print(f"FAIL {_relative(SHARED_NATIVE_PROFILE)}")
         print(f"  $: {exc}")
         return 1
 
     print(f"PASS {_relative(SHARED_NATIVE_PROFILE)}")
+    return 0
+
+
+def _validate_legacy_profile(yaml: Any) -> int:
+    try:
+        profile = _load_yaml(SHARED_LEGACY_PROFILE, yaml)
+        _require(profile.get("backend_kind") == "legacy_custom_backend", "backend_kind must be legacy_custom_backend")
+        _require(profile.get("resolves", {}).get("model_id") == "sm_qed", "profile must resolve model_id sm_qed")
+        _require(profile.get("resolves", {}).get("sector") == "qed", "profile must resolve sector qed")
+        registry = profile.get("legacy", {}).get("rule_registry", {})
+        _require(registry.get("registry_id") == "registry:qed_tree_v1", "legacy profile must resolve registry:qed_tree_v1")
+        resolved = (SHARED_LEGACY_PROFILE.parent / registry.get("relative_path", "")).resolve()
+        _require(resolved == QED_RULE_REGISTRY.resolve(), "legacy profile relative_path must resolve to rules/qed/qed_tree_v1.yaml")
+        _require("ruleset:qed_tree_v1" in registry.get("rule_set_ids", []), "legacy profile must select ruleset:qed_tree_v1")
+    except (OSError, ValidationFailure) as exc:
+        print(f"FAIL {_relative(SHARED_LEGACY_PROFILE)}")
+        print(f"  $: {exc}")
+        return 1
+
+    print(f"PASS {_relative(SHARED_LEGACY_PROFILE)}")
     return 0
 
 
@@ -191,6 +219,7 @@ def main() -> int:
         failures += _validate_schema(example_path, schema_path, yaml, jsonschema)
 
     failures += _validate_native_profile(yaml)
+    failures += _validate_legacy_profile(yaml)
 
     for benchmark in benchmarks:
         native_expected = benchmark / "native_expected.yaml"

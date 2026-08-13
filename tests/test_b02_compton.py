@@ -61,7 +61,7 @@ class B02ComptonBenchmarkTests(unittest.TestCase):
         self.assert_validates(self.diagrams_doc, "diagram_ir.schema.json")
 
     def test_schema_versions_migrated_to_0_1_2_where_semantics_changed(self):
-        self.assertEqual(self.physics["schema_version"], "0.1.2")
+        self.assertEqual(self.physics["schema_version"], "0.2.0")
         self.assertEqual(self.diagrams_doc["schema_version"], "0.1.2")
         self.assertEqual(self.expected["schema_version"], "0.1.2")
         self.assertEqual(self.convention["schema_version"], "0.1.1")

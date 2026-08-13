@@ -10,6 +10,8 @@ SCHEMA_NAMES = [
     "rule_registry.schema.json",
     "diagram_ir.schema.json",
     "amplitude_ir.schema.json",
+    "backend_profile.schema.json",
+    "execution_request.schema.json",
 ]
 
 

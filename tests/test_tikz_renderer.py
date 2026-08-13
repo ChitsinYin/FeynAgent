@@ -32,7 +32,8 @@ class TikzRendererTests(unittest.TestCase):
         physics = load_yaml(ROOT / "benchmarks" / "B02_compton" / "physics_card.yaml")
         convention = load_yaml(ROOT / "benchmarks" / "B02_compton" / "convention_card.yaml")
         registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
-        diagram_ir = generate_tree_2_to_2(physics, convention, registry)
+        profile = load_yaml(ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml")
+        diagram_ir = generate_tree_2_to_2(physics, convention, registry, profile)
         return physics, convention, diagram_ir
 
     def test_deterministic_tex_generation_orders_channels(self):
@@ -61,7 +62,8 @@ class TikzRendererTests(unittest.TestCase):
         physics = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "physics_card.yaml")
         convention = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "convention_card.yaml")
         registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
-        diagram_ir = generate_tree_2_to_2(physics, convention, registry)
+        profile = load_yaml(ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml")
+        diagram_ir = generate_tree_2_to_2(physics, convention, registry, profile)
         tex = build_tikz_document(physics, diagram_ir)
         self.assertIn(r"\gamma(q_{s}=p_{1}+p_{2})", tex)
         self.assertNotIn(r"\mathrm{gamma}", tex)

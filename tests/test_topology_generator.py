@@ -44,10 +44,12 @@ def assert_validates(testcase, instance, schema_name):
 
 def synthetic_scalar_fixture():
     physics = {
-        "schema_version": "0.1.2",
+        "schema_version": "0.2.0",
         "object_id": "physics_card:synthetic_abcd",
         "status": "approved",
         "process_id": "process:synthetic_abcd",
+        "model_id": "synthetic_scalar",
+        "sector": "synthetic",
         "process_type": "scattering_2_to_2",
         "perturbative_order": {"loop_order": 0, "restriction": "tree_level_only"},
         "coupling_order": {"mode": "explicit", "orders": [{"coupling": "g", "power": 2}]},
@@ -208,7 +210,8 @@ class TopologyGeneratorTests(unittest.TestCase):
         physics = load_yaml(ROOT / "benchmarks" / "B02_compton" / "physics_card.yaml")
         convention = load_yaml(ROOT / "benchmarks" / "B02_compton" / "convention_card.yaml")
         registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
-        generated = generate_tree_2_to_2(physics, convention, registry)
+        profile = load_yaml(ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml")
+        generated = generate_tree_2_to_2(physics, convention, registry, profile)
         assert_validates(self, generated, "diagram_ir.schema.json")
         self.assertEqual({diagram["channel"] for diagram in generated["diagrams"]}, {"s", "u"})
 
@@ -269,7 +272,8 @@ class TopologyGeneratorTests(unittest.TestCase):
         physics = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "physics_card.yaml")
         convention = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "convention_card.yaml")
         registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
-        diagram = generate_tree_2_to_2(physics, convention, registry)["diagrams"][0]
+        profile = load_yaml(ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml")
+        diagram = generate_tree_2_to_2(physics, convention, registry, profile)["diagrams"][0]
         external_by_id = {leg["leg_id"]: leg for leg in diagram["external_legs"]}
         table = {}
         for vertex in diagram["vertex_instances"]:
@@ -287,11 +291,23 @@ class TopologyGeneratorTests(unittest.TestCase):
         self.assertEqual(table[("incoming", "e+")], ("psi_bar", "out_of_vertex"))
         self.assertEqual(table[("outgoing", "mu+")], ("psi", "into_vertex"))
 
+    def test_legacy_profile_generates_b03_without_benchmark_specific_patch(self):
+        physics = load_yaml(ROOT / "benchmarks" / "B03_emu_to_emu" / "physics_card.yaml")
+        convention = load_yaml(ROOT / "benchmarks" / "B03_emu_to_emu" / "convention_card.yaml")
+        registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
+        profile = load_yaml(ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml")
+        generated = generate_tree_2_to_2(physics, convention, registry, profile)
+        assert_validates(self, generated, "diagram_ir.schema.json")
+        self.assertEqual([diagram["channel"] for diagram in generated["diagrams"]], ["t"])
+        self.assertEqual(generated["diagrams"][0]["internal_lines"][0]["particle_id"], "gamma")
+        self.assertEqual(generated["diagrams"][0]["internal_lines"][0]["momentum"]["expression"], "p1-p3")
+
     def test_signature_includes_fermion_flow_direction(self):
         physics = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "physics_card.yaml")
         convention = load_yaml(ROOT / "benchmarks" / "B01_ee_to_mumu" / "convention_card.yaml")
         registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
-        diagram = generate_tree_2_to_2(physics, convention, registry)["diagrams"][0]
+        profile = load_yaml(ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml")
+        diagram = generate_tree_2_to_2(physics, convention, registry, profile)["diagrams"][0]
         altered = copy.deepcopy(diagram)
         altered["vertex_instances"][0]["slot_bindings"][0]["fermion_flow"]["flow_direction"] = "into_vertex"
         self.assertNotEqual(diagram_signature(diagram), diagram_signature(altered))
@@ -328,6 +344,8 @@ class TopologyGeneratorTests(unittest.TestCase):
                 str(ROOT / "benchmarks" / "B02_compton" / "convention_card.yaml"),
                 "--rule-registry",
                 str(ROOT / "rules" / "qed" / "qed_tree_v1.yaml"),
+                "--backend-profile",
+                str(ROOT / "profiles" / "backends" / "legacy_sm_qed.yaml"),
                 "--output",
                 str(out),
             ]

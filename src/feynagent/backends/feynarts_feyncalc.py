@@ -11,7 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -23,23 +23,18 @@ class NativeBackendError(ValueError):
 
 @dataclass(frozen=True)
 class BackendConfig:
-    """Configuration for the bounded Day-4 native QED backend."""
+    """Configuration resolved from a BackendProfile for native QED."""
 
+    backend_profile_id: str = "backend_profile:feynarts_sm_qed"
     backend_id: str = "feynarts_feyncalc_native"
+    model_id: str = "sm_qed"
+    sector: str = "qed"
     model: str = "SM"
     generic_model: str = "Lorentz"
     restrictions: str = "QEDOnly"
     insertion_level: str = "Classes"
     exclude_topologies: tuple[str, ...] = ("Tadpoles", "SelfEnergies", "WFCorrections")
-
-
-PARTICLE_TO_FEYNARTS = {
-    "e-": "F[2, {1}]",
-    "e+": "-F[2, {1}]",
-    "mu-": "F[2, {2}]",
-    "mu+": "-F[2, {2}]",
-    "gamma": "V[1]",
-}
+    particle_to_feynarts: dict[str, str] = field(default_factory=dict)
 
 OUTPUT_FILES = (
     "native_amplitude.wl",
@@ -55,28 +50,40 @@ OUTPUT_FILES = (
 
 
 def backend_config_from_dict(data: dict[str, Any]) -> BackendConfig:
-    """Build BackendConfig from structured backend configuration YAML."""
+    """Build BackendConfig from a structured BackendProfile YAML object."""
 
-    allowed = {"backend_id", "model", "generic_model", "restrictions", "insertion_level", "exclude_topologies"}
-    unknown = sorted(set(data) - allowed - {"scope", "notes"})
-    if unknown:
-        raise NativeBackendError(f"unknown native backend config key(s): {unknown}")
+    if data.get("backend_kind") != "feynarts_feyncalc_native":
+        raise NativeBackendError("backend profile must have backend_kind feynarts_feyncalc_native")
+    resolves = data.get("resolves", {})
+    native = data.get("native", {}).get("feynarts", {})
+    mappings = native.get("particle_mappings", [])
+    particle_to_feynarts = {
+        item["particle_id"]: item["backend_identifier"]
+        for item in mappings
+    }
+    if not particle_to_feynarts:
+        raise NativeBackendError("native backend profile must define particle_mappings")
     return BackendConfig(
-        backend_id=data.get("backend_id", BackendConfig.backend_id),
-        model=data.get("model", BackendConfig.model),
-        generic_model=data.get("generic_model", BackendConfig.generic_model),
-        restrictions=data.get("restrictions", BackendConfig.restrictions),
-        insertion_level=data.get("insertion_level", BackendConfig.insertion_level),
-        exclude_topologies=tuple(data.get("exclude_topologies", BackendConfig.exclude_topologies)),
+        backend_profile_id=data.get("backend_profile_id", data.get("object_id", BackendConfig.backend_profile_id)),
+        backend_id=data.get("backend_kind", BackendConfig.backend_id),
+        model_id=resolves.get("model_id", BackendConfig.model_id),
+        sector=resolves.get("sector", BackendConfig.sector),
+        model=native.get("model", BackendConfig.model),
+        generic_model=native.get("generic_model", BackendConfig.generic_model),
+        restrictions=native.get("restrictions", BackendConfig.restrictions),
+        insertion_level=native.get("insertion_level", BackendConfig.insertion_level),
+        exclude_topologies=tuple(native.get("exclude_topologies", BackendConfig.exclude_topologies)),
+        particle_to_feynarts=particle_to_feynarts,
     )
 
 
-def validate_native_qed_request(physics_card: dict[str, Any], config: BackendConfig | None = None) -> None:
-    """Validate the bounded Day-4 native backend request."""
+def validate_native_qed_request(physics_card: dict[str, Any], config: BackendConfig) -> None:
+    """Validate the bounded native backend request against backend-neutral physics intent."""
 
-    config = config or BackendConfig()
     if config.backend_id != "feynarts_feyncalc_native":
         raise NativeBackendError("backend_id must be feynarts_feyncalc_native")
+    if physics_card.get("model_id") != config.model_id or physics_card.get("sector") != config.sector:
+        raise NativeBackendError("PhysicsCard model_id/sector does not match BackendProfile")
     if config.model != "SM" or config.generic_model != "Lorentz":
         raise NativeBackendError("Day-4 native backend supports only FeynArts SM/Lorentz")
     if config.restrictions != "QEDOnly":
@@ -95,18 +102,23 @@ def validate_native_qed_request(physics_card: dict[str, Any], config: BackendCon
     outgoing = physics_card.get("particles", {}).get("outgoing", [])
     if len(incoming) != 2 or len(outgoing) != 2:
         raise NativeBackendError("Day-4 native backend requires exactly two incoming and two outgoing particles")
-    unsupported = [leg.get("particle_id") for leg in incoming + outgoing if leg.get("particle_id") not in PARTICLE_TO_FEYNARTS]
+    if not config.particle_to_feynarts:
+        raise NativeBackendError("native backend profile must define particle mappings")
+    unsupported = [
+        leg.get("particle_id")
+        for leg in incoming + outgoing
+        if leg.get("particle_id") not in config.particle_to_feynarts
+    ]
     if unsupported:
         raise NativeBackendError(f"unsupported native QED particle(s): {unsupported}")
 
 
-def build_native_qed_script(physics_card: dict[str, Any], config: BackendConfig | None = None) -> str:
+def build_native_qed_script(physics_card: dict[str, Any], config: BackendConfig) -> str:
     """Build a Wolfram script for native FeynArts/FeynCalc amplitude generation."""
 
-    config = config or BackendConfig()
     validate_native_qed_request(physics_card, config)
-    incoming = [_map_particle(leg) for leg in sorted(physics_card["particles"]["incoming"], key=lambda leg: leg["slot"])]
-    outgoing = [_map_particle(leg) for leg in sorted(physics_card["particles"]["outgoing"], key=lambda leg: leg["slot"])]
+    incoming = [_map_particle(leg, config) for leg in sorted(physics_card["particles"]["incoming"], key=lambda leg: leg["slot"])]
+    outgoing = [_map_particle(leg, config) for leg in sorted(physics_card["particles"]["outgoing"], key=lambda leg: leg["slot"])]
     incoming_legs = sorted(physics_card["particles"]["incoming"], key=lambda leg: leg["slot"])
     outgoing_legs = sorted(physics_card["particles"]["outgoing"], key=lambda leg: leg["slot"])
     incoming_momenta = [_wl_symbol(leg["momentum_label"]) for leg in incoming_legs]
@@ -119,11 +131,13 @@ def build_native_qed_script(physics_card: dict[str, Any], config: BackendConfig 
     if transverse_momenta:
         transverse_option = f",\n  TransversePolarizationVectors -> {{{', '.join(transverse_momenta)}}}"
 
-    return f'''(* FeynAgent Day-4 native FeynArts/FeynCalc QED backend. *)
+    return f'''(* FeynAgent native FeynArts/FeynCalc QED backend. *)
+(* Loading strategy validated by `python -m feynagent init`: $LoadAddOns = {{"FeynArts"}}; << FeynCalc`. *)
 (* source_process_id = "{process_id}" *)
+(* backend_profile_id = "{config.backend_profile_id}" *)
 (* This script uses native FeynArts/FeynCalc amplitudes only. *)
 
-$LoadFeynArts = True;
+$LoadAddOns = {{"FeynArts"}};
 Quiet[Get["FeynCalc`"], FrontEndObject::notavail];
 
 outputDir = DirectoryName[$InputFileName];
@@ -166,8 +180,11 @@ Put[feyncalcAmplitude, fcAmpPath];
 Export[fcTextPath, ToString[feyncalcAmplitude, InputForm], "Text"];
 
 summary = <|
+  "backend_profile_id" -> "{config.backend_profile_id}",
   "backend_id" -> "{config.backend_id}",
   "process_id" -> "{process_id}",
+  "model_id" -> "{config.model_id}",
+  "sector" -> "{config.sector}",
   "wolfram_version" -> $Version,
   "feynarts_version" -> ToString[Quiet[Check[FeynArts`$FeynArtsVersion, "unknown"]], InputForm],
   "feyncalc_version" -> ToString[Quiet[Check[FeynCalc`$FeynCalcVersion, "unknown"]], InputForm],
@@ -190,14 +207,13 @@ Quit[0];
 def run_native_qed_backend(
     physics_card: dict[str, Any],
     output_dir: str | Path,
-    config: BackendConfig | None = None,
+    config: BackendConfig,
     *,
     wolframscript: str = "wolframscript",
     timeout_seconds: int = 60,
 ) -> dict[str, Any]:
     """Run the generated native Wolfram script and write a manifest."""
 
-    config = config or BackendConfig()
     validate_native_qed_request(physics_card, config)
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -224,6 +240,7 @@ def run_native_qed_backend(
     if summary_path.exists():
         summary = json.loads(summary_path.read_text(encoding="utf-8"))
     manifest = {
+        "backend_profile_id": config.backend_profile_id,
         "backend_id": config.backend_id,
         "process_id": physics_card.get("process_id"),
         "started_at": started_at,
@@ -245,11 +262,11 @@ def run_native_qed_backend(
     return manifest
 
 
-def _map_particle(leg: dict[str, Any]) -> str:
+def _map_particle(leg: dict[str, Any], config: BackendConfig) -> str:
     particle_id = leg.get("particle_id")
-    if particle_id not in PARTICLE_TO_FEYNARTS:
+    if particle_id not in config.particle_to_feynarts:
         raise NativeBackendError(f"unsupported native QED particle: {particle_id}")
-    return PARTICLE_TO_FEYNARTS[particle_id]
+    return config.particle_to_feynarts[particle_id]
 
 
 def _create_topologies_call(config: BackendConfig) -> str:

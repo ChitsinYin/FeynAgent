@@ -1,11 +1,41 @@
-﻿backend_id: feynarts_feyncalc_native
-model: SM
-generic_model: Lorentz
-restrictions: QEDOnly
-insertion_level: Classes
-exclude_topologies:
-- Tadpoles
-- SelfEnergies
-- WFCorrections
-scope: tree_level_2_to_2_qed_native
-notes: Shared native FeynArts/FeynCalc backend profile; generated artifacts belong under runs/.
+schema_version: 0.1.0
+object_id: backend_profile:feynarts_sm_qed
+backend_profile_id: backend_profile:feynarts_sm_qed
+backend_kind: feynarts_feyncalc_native
+status: approved
+resolves:
+  model_id: sm_qed
+  sector: qed
+capabilities:
+  process_types:
+  - scattering_2_to_2
+  loop_orders:
+  - 0
+  operations:
+  - structural
+  - amplitude_only
+  - benchmark_regression
+native:
+  feynarts:
+    model: SM
+    generic_model: Lorentz
+    restrictions: QEDOnly
+    insertion_level: Classes
+    exclude_topologies:
+    - Tadpoles
+    - SelfEnergies
+    - WFCorrections
+    particle_mappings:
+    - particle_id: e-
+      backend_identifier: F[2, {1}]
+    - particle_id: e+
+      backend_identifier: -F[2, {1}]
+    - particle_id: mu-
+      backend_identifier: F[2, {2}]
+    - particle_id: mu+
+      backend_identifier: -F[2, {2}]
+    - particle_id: gamma
+      backend_identifier: V[1]
+metadata:
+  notes: FeynArts SM/Lorentz QEDOnly profile for standard tree-level QED benchmarks;
+    generated artifacts belong under runs/.
