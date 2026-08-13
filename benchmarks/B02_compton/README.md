@@ -16,9 +16,9 @@ The physics truth for Day 2 semantic closure lives in structured files:
 
 - `physics_card.yaml`: process identity, external particles, external momenta, rule-set choice, tree-level restriction, requested outputs, and split approval gates.
 - `convention_card.yaml`: spacetime dimension, metric signature, natural units, external momentum convention, and all-momenta-incoming vertex convention.
-- `rule_manifest.yaml`: lightweight non-canonical selector for the canonical QED registry in `../../rules/qed/qed_tree_v1.yaml`.
-- `diagrams.yaml`: DiagramIR representation of the two tree topologies with explicit vertex rule-slot bindings.
-- `expected.yaml`: benchmark oracle for topology and binding tests.
+- `legacy/rule_manifest.yaml`: lightweight non-canonical selector for the canonical QED registry in `../../rules/qed/qed_tree_v1.yaml`.
+- `legacy/diagrams.yaml`: DiagramIR representation of the two tree topologies with explicit vertex rule-slot bindings.
+- `legacy/expected.yaml`: benchmark oracle for topology and binding tests.
 
 LaTeX, TikZ-Feynman, FeynCalc code, and Mathematica notebooks are not the source of truth for this benchmark.
 

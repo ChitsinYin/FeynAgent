@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "feynagent"
 version = "0.1.0"
-description = "Rules-first tree-level diagram tooling for HEP phenomenology."
+description = "Reproducible FeynArts/FeynCalc-native QED benchmark tooling with audited legacy custom backends."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []

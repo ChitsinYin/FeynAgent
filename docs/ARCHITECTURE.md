@@ -1,111 +1,79 @@
 # FeynAgent Architecture
 
-## Conceptual Pipeline
+## Day-4 Backend Architecture
+
+Day 4 pivots FeynAgent from a Python-first reimplementation path to a native-backend-first architecture for standard supported sectors.
+
+The backend roles are:
+
+- `feynarts_feyncalc_native`: primary production backend for standard QED, SM, and QCD sectors supported by installed FeynArts/FeynCalc model files.
+- `legacy_custom_backend`: retained Days 1-3 Python topology, AmplitudeIR, LaTeX, and FeynCalc renderer implementation for regression, pedagogy, audit, and fallback.
+- `custom_audited_model`: future path for user-supplied nonstandard interactions; the custom RuleRegistry remains authoritative until an audited native FeynArts-compatible model or adapter exists.
+
+Standard QED production amplitudes must not be generated from duplicate Python-maintained QED rule formulas when FeynArts/FeynCalc can generate the process natively. The legacy QED RuleRegistry remains a convention-audited reference snapshot and a useful custom-rule template, not the production source for native standard-sector amplitudes.
+
+## Standard Native Pipeline
 
 ```text
-Natural language
--> PhysicsCard
--> ConventionCard
--> RuleRegistry
--> candidate/approved process
--> DiagramIR
--> renderers/builders
--> LaTeX / FeynCalc artifacts
--> human-controlled heavy calculation
--> validators
+PhysicsCard + backend profile
+-> feynarts_feyncalc_native
+-> FeynArts CreateTopologies / InsertFields
+-> FeynArts CreateFeynAmp
+-> FeynCalc FCFAConvert
+-> native amplitude artifacts under runs/
+-> bounded validation or human-approved heavy calculation
 ```
 
-## Pipeline Responsibilities
+The shared Day-4 QED native profile lives at `profiles/backends/feynarts_sm_qed.yaml`. Benchmark cards reference this profile instead of carrying duplicate backend configuration.
 
-### Natural Language
-
-Natural language input is a convenience interface only. It may suggest particles, processes, assumptions, and requested outputs, but it is not the canonical state of the calculation.
-
-### PhysicsCard
-
-`PhysicsCard` records the requested process and physics model information in structured form. It should capture external states, allowed internal fields, model name, rule-set references, and unsupported features requested by the user.
-
-For v0.1, it is the source of truth for the process identity, incoming and outgoing particle identifiers, process type, tree-level restriction, requested coupling order or named order assumption, selected rule set, optional internal-species policy, requested output artifacts, and approval state. As of schema 0.1.1, approval is split into topology, amplitude-generation, and heavy-calculation gates.
-
-### ConventionCard
-
-`ConventionCard` records signs, metric, momentum flow, spinor ordering, polarization conventions, propagator conventions, and naming conventions. Convention changes require explicit approval.
-
-For v0.1, it records spacetime dimension, metric signature, Fourier and momentum-flow conventions, all-momenta-incoming vertex convention, external-state momentum convention, natural units, spin/polarization sum and average policy, and optional gravity conventions. It is separate from `PhysicsCard` so the same process can be reviewed against explicit convention choices.
-
-### RuleRegistry
-
-`RuleRegistry` loads and resolves Feynman rules from built-in and custom sources. Every rule must carry provenance, trust status, applicable fields, Lorentz structure metadata, coupling symbols, and convention compatibility notes.
-
-For v0.1, the registry represents vertices and propagators. Each rule records participating particle identifiers, field identifiers, field roles, quantum-field roles such as `psi` and `psi_bar`, momentum order, Lorentz/index structure, LaTeX representation, FeynCalc template, coupling order, mass dimension, symmetries, provenance entries, and trust status. As of schema 0.1.1, the registry also carries a minimal particle catalog for conjugation/crossing checks. Untrusted or conflicting rules may be stored for review, but they cannot silently become trusted inputs.
-
-### Candidate and Approved Process
-
-A candidate process is a structured interpretation that may still contain unresolved assumptions or untrusted rules. An approved process is frozen for diagram generation after conventions, rules, and process scope are accepted.
-
-Approval requires a compatible `PhysicsCard`, `ConventionCard`, and `RuleRegistry`: the process must be in v0.1 scope, conventions must be explicit, and every required rule must be selected by identifier with acceptable trust status.
-
-### DiagramIR
-
-`DiagramIR` is the canonical representation of generated diagrams. It should represent graph topology, external and internal lines, vertices, rule bindings, momentum labels, field identities, and diagram-level metadata.
-
-For v0.1, each diagram records a diagram identifier, process identifier, loop order fixed to zero, channel, external legs, vertex instances, internal lines, momentum routing, referenced rule identifiers, coupling order, symmetry factor, and diagram status. As of schema 0.1.1, each vertex instance must bind every Feynman-rule field slot explicitly through `slot_bindings`; endpoint order is not physics truth. As of DiagramIR 0.1.2, Dirac fermion flow is bound-field driven: `psi` means flow into the vertex and `psi_bar` means flow out of the vertex. It does not encode TikZ layout or Mathematica formatting as physics truth.
-
-### Renderers and Builders
-
-Renderers and builders consume `DiagramIR`; they do not define physics state. Initial targets include:
-
-- TikZ-Feynman rendering.
-- LaTeX amplitude assembly.
-- Mathematica/FeynCalc code generation.
-
-### LaTeX and FeynCalc Artifacts
-
-LaTeX and FeynCalc outputs are derived artifacts. They should be reproducible from structured cards, the rule registry, and `DiagramIR`.
-
-### Human-Controlled Heavy Calculation
-
-Long-running simplification, tensor reduction, trace evaluation, and model validation happen outside the live agent loop. FeynAgent may prepare code and checklists, but humans decide when and how to run heavy calculations.
-
-### Validators
-
-Validators check structure, provenance, scope compliance, convention consistency, rule compatibility, and benchmark reproducibility. Failed validations should be actionable and testable.
-
-## Canonical Data Contracts
-
-The four v0.1 contracts are JSON Schemas under `schemas/`:
-
-- `PhysicsCard`: describes what process is being requested and which rule set may be used.
-- `ConventionCard`: describes the explicit physics conventions used to interpret rules and generated artifacts.
-- `RuleRegistry`: stores provenance-aware vertex and propagator rules.
-- `DiagramIR`: stores tree-level diagram structure and references back to approved rule identifiers.
-
-Human-readable notes are optional metadata only. They cannot replace required structured fields.
-
-## Data Flow
+## Legacy Custom Pipeline
 
 ```text
-PhysicsCard + ConventionCard
-    -> scoped candidate process
-    -> RuleRegistry compatibility and trust checks
-    -> approved process
-    -> DiagramIR generation
-    -> derived renderers/builders
-    -> TikZ-Feynman / LaTeX / FeynCalc artifacts
-    -> human-controlled calculation
-    -> validators and regression tests
+PhysicsCard + ConventionCard + RuleRegistry
+-> approved process gates
+-> legacy DiagramIR
+-> derived AmplitudeIR
+-> legacy LaTeX / FeynCalc renderers
+-> regression, pedagogy, audit, and fallback only
 ```
 
-The data flow is intentionally one-way for derived artifacts. TikZ, LaTeX, and Mathematica/FeynCalc outputs may expose mistakes, but corrections must flow back into structured cards, registry entries, schemas, or `DiagramIR`, not into derived files as hidden sources of truth.
+The legacy pipeline remains valuable because it records explicit convention handling, external-state mapping, fermion flow, provenance, and renderer divergence checks. It is not the production route for standard QED after Day 4.
+
+## Custom Rule Pipeline
+
+Future nonstandard interactions should use `custom_audited_model`. In that mode, RuleRegistry entries remain authoritative and must retain provenance, convention audit state, and trust status. The preferred implementation target is a FeynArts-compatible model or adapter so custom interactions can use native diagram generation and FeynCalc algebra once reviewed.
+
+## Canonical Inputs And Derived Artifacts
+
+`PhysicsCard`, `ConventionCard`, backend profiles, and approved rule/model sources are canonical inputs. Generated amplitudes, PDFs, Wolfram scripts, logs, M2 outputs, and review bundles are derived artifacts.
+
+Derived artifacts belong under `runs/` with stable run IDs. `benchmarks/` contains benchmark specs, gold/reference fixtures, and explicitly marked legacy fixtures only. Machine-local probes and absolute-path diagnostics belong under `.feynagent/` or run-specific locations such as `runs/init/<run_id>/`.
+
+## Data Contracts
+
+JSON Schemas under `schemas/` define the structured contracts currently used by the legacy and benchmark validation paths:
+
+- `PhysicsCard`: process request, backend/rule selection, scope, and approval gates.
+- `ConventionCard`: explicit metric, momentum, spinor, polarization, and calculation conventions.
+- `RuleRegistry`: provenance-aware rule snapshot for legacy/custom audited paths.
+- `DiagramIR`: legacy tree-level diagram structure with explicit rule bindings.
+- `AmplitudeIR`: derived legacy amplitude structure used to prevent LaTeX/FeynCalc divergence in the custom backend.
+
+Native FeynArts/FeynCalc amplitudes are not reconstructed through the legacy RuleRegistry. They are produced by the installed native model and converted by `FCFAConvert`.
+
+## Heavy Calculation Boundary
+
+Long-running simplification, spin sums, polarization sums, and squared-amplitude calculations require explicit human authorization. Day-4 M2 regression runs were bounded benchmark checks authorized for QA; production `heavy_calculation` approval remained not requested. This contract mismatch is recorded for Day 5 repair.
 
 ## Repository Layout
 
-- `docs/`: scope, architecture, decisions, and human-readable design notes.
-- `schemas/`: future JSON/YAML schemas for structured cards and IR.
-- `src/feynagent/`: Python package source.
-- `rules/`: built-in and custom rule registry inputs.
-- `benchmarks/`: benchmark cases and gold artifacts.
-- `scripts/`: small maintenance and validation scripts.
+- `benchmarks/`: benchmark cards, native expected metadata, gold/reference fixtures, and benchmark-local legacy fixtures.
+- `docs/`: architecture, backend strategy, setup, migration notes, and design decisions.
+- `profiles/`: shared backend profiles such as native FeynArts/FeynCalc QED.
+- `reports/`: human-readable milestone reports and review-package manifests.
+- `rules/`: legacy/custom RuleRegistry inputs.
+- `runs/`: generated amplitudes, logs, PDFs, M2 outputs, and authoritative evidence runs.
+- `schemas/`: JSON Schemas for structured cards and IR.
+- `scripts/`: validation and generation entry points.
+- `src/feynagent/`: Python package source for native wrappers and legacy builders/renderers.
 - `tests/`: regression and unit tests.
-- `runs/`: generated run artifacts.
-- `reports/`: generated reports and summaries.

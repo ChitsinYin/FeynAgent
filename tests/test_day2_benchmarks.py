@@ -50,7 +50,7 @@ class Day2BenchmarkGenerationTests(unittest.TestCase):
         bench_dir = ROOT / "benchmarks" / benchmark
         physics = load_yaml(bench_dir / "physics_card.yaml")
         convention = load_yaml(bench_dir / "convention_card.yaml")
-        gold = load_yaml(bench_dir / "diagrams.yaml")
+        gold = load_yaml(bench_dir / "legacy" / "diagrams.yaml")
         generated = generate_tree_2_to_2(physics, convention, self.registry)
         generated_again = generate_tree_2_to_2(physics, convention, self.registry)
         return bench_dir, generated, generated_again, gold
@@ -113,7 +113,7 @@ class Day2BenchmarkGenerationTests(unittest.TestCase):
         canonical_hash = normalized_sha256(self.registry_path)
         for benchmark in BENCHMARKS:
             with self.subTest(benchmark=benchmark):
-                manifest = load_yaml(ROOT / "benchmarks" / benchmark / "rule_manifest.yaml")
+                manifest = load_yaml(ROOT / "benchmarks" / benchmark / "legacy" / "rule_manifest.yaml")
                 self.assertNotIn("vertices", manifest)
                 self.assertNotIn("propagators", manifest)
                 self.assertEqual(manifest["canonical_registry"]["registry_id"], self.registry["registry_id"])

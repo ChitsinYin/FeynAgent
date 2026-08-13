@@ -52,10 +52,10 @@ class AmplitudeBuilderTests(unittest.TestCase):
         physics = load_yaml(bench_dir / "physics_card.yaml")
         convention = load_yaml(bench_dir / "convention_card.yaml")
         registry = load_yaml(ROOT / "rules" / "qed" / "qed_tree_v1.yaml")
-        diagrams = load_yaml(bench_dir / "diagrams.yaml")
+        diagrams = load_yaml(bench_dir / "legacy" / "diagrams.yaml")
         hashes = {
             "rule_registry": normalized_sha256(ROOT / "rules" / "qed" / "qed_tree_v1.yaml"),
-            "diagram_ir": normalized_sha256(bench_dir / "diagrams.yaml"),
+            "diagram_ir": normalized_sha256(bench_dir / "legacy" / "diagrams.yaml"),
         }
         return physics, convention, registry, diagrams, hashes
 

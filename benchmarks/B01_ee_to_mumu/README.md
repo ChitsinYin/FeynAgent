@@ -8,7 +8,7 @@ e-(p1) + e+(p2) -> mu-(p3) + mu+(p4)
 
 It is a topology-generation benchmark only. It does not contain amplitudes, squared amplitudes, traces, polarization sums, or rendered diagrams.
 
-Gold topology:
+Legacy custom backend gold topology (`legacy/diagrams.yaml`):
 
 - exactly one connected tree diagram;
 - s-channel photon exchange;
@@ -18,4 +18,4 @@ Gold topology:
 - loop order `0`;
 - symmetry factor `1`.
 
-`rule_manifest.yaml` is a lightweight selector for the canonical QED registry in `../../rules/qed/qed_tree_v1.yaml`; it is not an editable rule copy.
+`legacy/rule_manifest.yaml` is a lightweight selector for the canonical QED registry in `../../rules/qed/qed_tree_v1.yaml`; it is not an editable rule copy.

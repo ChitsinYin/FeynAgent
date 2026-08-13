@@ -1,4 +1,4 @@
-﻿"""Generate Day-3 AmplitudeIR backend artifacts for approved benchmarks."""
+"""Generate Day-3 AmplitudeIR backend artifacts for approved benchmarks."""
 
 from __future__ import annotations
 
@@ -40,7 +40,8 @@ def build_for_benchmark(benchmark: str) -> dict:
     physics = load_yaml(bench_dir / "physics_card.yaml")
     convention = load_yaml(bench_dir / "convention_card.yaml")
     registry_path = ROOT / "rules" / "qed" / "qed_tree_v1.yaml"
-    diagrams_path = bench_dir / "diagrams.yaml"
+    legacy_dir = bench_dir / "legacy"
+    diagrams_path = legacy_dir / "diagrams.yaml"
     registry = load_yaml(registry_path)
     diagrams = load_yaml(diagrams_path)
     hashes = {
@@ -63,7 +64,9 @@ def main() -> int:
     generated_at = datetime.now(ZoneInfo("Asia/Shanghai")).astimezone().isoformat()
     for benchmark in selected:
         amplitude_ir = build_for_benchmark(benchmark)
-        written = write_backend_outputs(amplitude_ir, ROOT / "benchmarks" / benchmark, benchmark, generated_at)
+        run_id = datetime.now(ZoneInfo("Asia/Shanghai")).strftime("%Y%m%d_%H%M%S")
+        output_dir = ROOT / "runs" / "legacy_custom_backend" / run_id / benchmark
+        written = write_backend_outputs(amplitude_ir, output_dir, benchmark, generated_at)
         for path in written:
             print(path.relative_to(ROOT).as_posix())
     print(f"generated_at={generated_at}")

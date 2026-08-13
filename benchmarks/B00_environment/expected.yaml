@@ -1,0 +1,21 @@
+﻿schema_version: 0.1.0
+object_id: expected:b00_environment
+status: reference
+expected_probe_policy:
+  canonical_inputs:
+  - benchmarks/B00_environment/README.md
+  - benchmarks/B00_environment/smoke_test.wl
+  - benchmarks/B00_environment/tikz_smoke_test.tex
+  generated_outputs:
+    allowed_locations:
+    - .feynagent/
+    - runs/init/
+    forbidden_locations:
+    - benchmarks/B00_environment/outputs/
+  notes: Machine-local environment logs, executable paths, PDFs, and command outputs are not canonical benchmark fixtures.
+expected_capabilities:
+- python
+- wolframscript
+- feyncalc
+- feynarts
+- latex

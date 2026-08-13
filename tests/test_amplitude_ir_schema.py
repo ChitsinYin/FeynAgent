@@ -6,8 +6,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_PATH = ROOT / "schemas" / "amplitude_ir.schema.json"
 FIXTURES = {
-    "B01": ROOT / "benchmarks" / "B01_ee_to_mumu" / "amplitude_ir.example.yaml",
-    "B02": ROOT / "benchmarks" / "B02_compton" / "amplitude_ir.example.yaml",
+    "B01": ROOT / "benchmarks" / "B01_ee_to_mumu" / "legacy" / "amplitude_ir.example.yaml",
+    "B02": ROOT / "benchmarks" / "B02_compton" / "legacy" / "amplitude_ir.example.yaml",
 }
 
 try:

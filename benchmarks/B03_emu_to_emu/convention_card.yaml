@@ -1,0 +1,23 @@
+﻿schema_version: 0.1.1
+object_id: convention_card:b03_emu_to_emu_qed_native
+status: approved
+spacetime_dimension:
+  symbol: D
+  value: 4
+metric_signature: +---
+momentum_convention:
+  fourier_phase: exp_minus_i_p_x
+  propagator_momentum_flow: explicit_per_line
+all_momenta_incoming_vertex_convention: true
+external_state_momentum_convention:
+  incoming_particles: physical_incoming_momenta
+  outgoing_particles: physical_outgoing_momenta
+natural_units:
+  hbar: '1'
+  c: '1'
+spin_polarization_policy:
+  spin_sum: do_not_sum
+  polarization_sum: do_not_sum
+  initial_state_average: do_not_average
+metadata:
+  notes: Day-4 native FeynArts/FeynCalc B03 convention card. Native SM/QEDOnly model owns standard-rule conventions for production amplitudes.

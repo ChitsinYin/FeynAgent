@@ -1,4 +1,4 @@
-﻿import hashlib
+import hashlib
 import json
 import re
 import sys
@@ -38,7 +38,7 @@ def normalized_sha256(path):
 def load_inputs(benchmark):
     bench_dir = ROOT / "benchmarks" / benchmark
     registry_path = ROOT / "rules" / "qed" / "qed_tree_v1.yaml"
-    diagrams_path = bench_dir / "diagrams.yaml"
+    diagrams_path = bench_dir / "legacy" / "diagrams.yaml"
     return (
         load_yaml(bench_dir / "physics_card.yaml"),
         load_yaml(bench_dir / "convention_card.yaml"),

@@ -1,0 +1,11 @@
+﻿backend_id: feynarts_feyncalc_native
+model: SM
+generic_model: Lorentz
+restrictions: QEDOnly
+insertion_level: Classes
+exclude_topologies:
+- Tadpoles
+- SelfEnergies
+- WFCorrections
+scope: tree_level_2_to_2_qed_native
+notes: Shared native FeynArts/FeynCalc backend profile; generated artifacts belong under runs/.

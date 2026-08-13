@@ -1,0 +1,74 @@
+﻿schema_version: 0.1.2
+object_id: physics_card:b03_emu_to_emu
+status: approved
+process_id: process:b03_emu_to_emu
+process_type: scattering_2_to_2
+perturbative_order:
+  loop_order: 0
+  restriction: tree_level_only
+coupling_order:
+  mode: explicit
+  orders:
+  - coupling: e
+    power: 2
+particles:
+  incoming:
+  - slot: 1
+    particle_id: e-
+    display_name: electron
+    state_role: incoming
+    momentum_label: p1
+    latex_label: e^{-}
+  - slot: 2
+    particle_id: mu-
+    display_name: muon
+    state_role: incoming
+    momentum_label: p2
+    latex_label: \mu^{-}
+  outgoing:
+  - slot: 3
+    particle_id: e-
+    display_name: electron
+    state_role: outgoing
+    momentum_label: p3
+    latex_label: e^{-}
+  - slot: 4
+    particle_id: mu-
+    display_name: muon
+    state_role: outgoing
+    momentum_label: p4
+    latex_label: \mu^{-}
+selected_rule_set:
+  registry_id: native:feynarts_sm_qedonly
+  rule_set_ids:
+  - native:feynarts_sm_qedonly
+internal_species_policy:
+  allowed_particle_ids:
+  - gamma
+requested_outputs:
+- feyncalc_code
+- validation_report
+approval:
+  topology:
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-13T10:52:50.1011852+08:00'
+    notes: Approved for Day-4 native FeynArts/FeynCalc benchmark specification only.
+  amplitude_generation:
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-13T10:52:50.1011852+08:00'
+    notes: Approved for lightweight native tree-amplitude generation only; no M2 calculation.
+  heavy_calculation:
+    status: not_requested
+    notes: Heavy squared-amplitude calculation remains explicitly unapproved.
+metadata:
+  notes: B03 e- mu- -> e- mu- native QED benchmark for FeynArts/FeynCalc backend regression.
+presentation:
+  particle_latex_labels:
+  - particle_id: e-
+    latex_label: e^{-}
+  - particle_id: gamma
+    latex_label: \gamma
+  - particle_id: mu-
+    latex_label: \mu^{-}

@@ -1,0 +1,12 @@
+expected_native_backend: feynarts_feyncalc_native
+backend_profile: ../../profiles/backends/feynarts_sm_qed.yaml
+expected_feynarts_fields:
+  incoming:
+  - F[2,{1}]
+  - -F[2,{1}]
+  outgoing:
+  - F[2,{2}]
+  - -F[2,{2}]
+expected_diagram_count: 1
+official_example_id: ElAel-MuAmu
+structural_expectation: s-channel photon exchange; two external Dirac chains; no photon polarization factors.

@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 B02 = ROOT / "benchmarks" / "B02_compton"
+B02_LEGACY = B02 / "legacy"
 CANONICAL_QED = ROOT / "rules" / "qed" / "qed_tree_v1.yaml"
 
 
@@ -38,10 +39,10 @@ class B02ComptonBenchmarkTests(unittest.TestCase):
             raise unittest.SkipTest("jsonschema is not installed; install with: python -m pip install -e .[dev]")
         self.physics = load_yaml(B02 / "physics_card.yaml")
         self.convention = load_yaml(B02 / "convention_card.yaml")
-        self.manifest = load_yaml(B02 / "rule_manifest.yaml")
+        self.manifest = load_yaml(B02_LEGACY / "rule_manifest.yaml")
         self.rules = load_yaml(CANONICAL_QED)
-        self.diagrams_doc = load_yaml(B02 / "diagrams.yaml")
-        self.expected = load_yaml(B02 / "expected.yaml")
+        self.diagrams_doc = load_yaml(B02_LEGACY / "diagrams.yaml")
+        self.expected = load_yaml(B02_LEGACY / "expected.yaml")
         self.diagrams = self.diagrams_doc["diagrams"]
         self.vertex_rules = {rule["rule_id"]: rule for rule in self.rules["vertices"]}
         self.propagator_rules = {rule["rule_id"]: rule for rule in self.rules["propagators"]}
@@ -71,7 +72,7 @@ class B02ComptonBenchmarkTests(unittest.TestCase):
         self.assertNotIn("propagators", self.manifest)
         self.assertEqual(self.manifest["status"], "derived_non_canonical")
         self.assertEqual(self.manifest["canonical_registry"]["registry_id"], self.rules["registry_id"])
-        canonical_path = (B02 / self.manifest["canonical_registry"]["relative_path"]).resolve()
+        canonical_path = (B02_LEGACY / self.manifest["canonical_registry"]["relative_path"]).resolve()
         self.assertEqual(canonical_path, CANONICAL_QED.resolve())
         normalized_rules = CANONICAL_QED.read_text(encoding="utf-8-sig").replace("\r\n", "\n").replace("\r", "\n")
         actual_hash = hashlib.sha256(normalized_rules.encode("utf-8")).hexdigest()
