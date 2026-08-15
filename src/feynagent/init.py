@@ -47,6 +47,11 @@ def main(argv: list[str] | None = None) -> int:
     _add_probe_options(init_parser)
     doctor_parser = sub.add_parser("doctor", help="Re-probe local capabilities and print PASS/WARNING/FAIL")
     _add_probe_options(doctor_parser)
+    run_parser = sub.add_parser("run", help="Run the deterministic native standard-QED pipeline")
+    run_parser.add_argument("--physics-card", required=True, help="PhysicsCard YAML/JSON file")
+    run_parser.add_argument("--backend-profile", required=True, help="BackendProfile YAML/JSON file")
+    run_parser.add_argument("--execution-request", required=True, help="ExecutionRequest YAML/JSON file")
+    run_parser.add_argument("--run-root", default="runs", help="Run artifact root directory")
     args = parser.parse_args(argv)
     if args.command == "init":
         result = run_init(args)
@@ -56,6 +61,10 @@ def main(argv: list[str] | None = None) -> int:
         result = probe_environment(args)
         print(_doctor_text(result))
         return 0 if result.status in {"PASS", "WARNING"} else 1
+    if args.command == "run":
+        from .runner import run_cli
+
+        return run_cli(args)
     parser.error(f"unknown command: {args.command}")
     return 2
 

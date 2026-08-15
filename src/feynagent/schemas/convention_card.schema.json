@@ -1,0 +1,228 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://feynagent.local/schemas/convention_card.schema.json",
+  "title": "ConventionCard",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "object_id",
+    "status",
+    "spacetime_dimension",
+    "metric_signature",
+    "momentum_convention",
+    "all_momenta_incoming_vertex_convention",
+    "external_state_momentum_convention",
+    "natural_units",
+    "spin_polarization_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.1"
+    },
+    "object_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "spacetime_dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "symbol",
+        "value"
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "enum": [
+            "D",
+            "d"
+          ]
+        },
+        "value": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 2
+            },
+            {
+              "type": "string",
+              "enum": [
+                "symbolic"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "metric_signature": {
+      "type": "string",
+      "enum": [
+        "+---",
+        "-+++"
+      ]
+    },
+    "momentum_convention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fourier_phase",
+        "propagator_momentum_flow"
+      ],
+      "properties": {
+        "fourier_phase": {
+          "type": "string",
+          "enum": [
+            "exp_minus_i_p_x",
+            "exp_plus_i_p_x"
+          ]
+        },
+        "propagator_momentum_flow": {
+          "type": "string",
+          "enum": [
+            "along_arrow_or_line",
+            "explicit_per_line"
+          ]
+        }
+      }
+    },
+    "all_momenta_incoming_vertex_convention": {
+      "type": "boolean"
+    },
+    "external_state_momentum_convention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "incoming_particles",
+        "outgoing_particles"
+      ],
+      "properties": {
+        "incoming_particles": {
+          "type": "string",
+          "enum": [
+            "physical_incoming_momenta",
+            "crossed_to_all_incoming"
+          ]
+        },
+        "outgoing_particles": {
+          "type": "string",
+          "enum": [
+            "physical_outgoing_momenta",
+            "crossed_to_all_incoming"
+          ]
+        }
+      }
+    },
+    "natural_units": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hbar",
+        "c"
+      ],
+      "properties": {
+        "hbar": {
+          "type": "string",
+          "const": "1"
+        },
+        "c": {
+          "type": "string",
+          "const": "1"
+        }
+      }
+    },
+    "spin_polarization_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spin_sum",
+        "polarization_sum",
+        "initial_state_average"
+      ],
+      "properties": {
+        "spin_sum": {
+          "type": "string",
+          "enum": [
+            "do_not_sum",
+            "sum_external_spins",
+            "defer_to_feyncalc"
+          ]
+        },
+        "polarization_sum": {
+          "type": "string",
+          "enum": [
+            "do_not_sum",
+            "sum_physical_polarizations",
+            "sum_covariant",
+            "defer_to_feyncalc"
+          ]
+        },
+        "initial_state_average": {
+          "type": "string",
+          "enum": [
+            "do_not_average",
+            "average_over_initial_degrees",
+            "defer_to_human"
+          ]
+        }
+      }
+    },
+    "gravity_convention": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "metric_expansion": {
+          "type": "string",
+          "enum": [
+            "g_munu_equals_eta_plus_kappa_h",
+            "g_munu_equals_eta_plus_2_h_over_mplanck",
+            "unspecified"
+          ]
+        },
+        "planck_mass_convention": {
+          "type": "string",
+          "enum": [
+            "reduced_planck_mass",
+            "planck_mass",
+            "kappa_explicit",
+            "unspecified"
+          ]
+        }
+      }
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "object_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,8 @@
+---
+name: feynagent
+description: Use for FeynAgent high-energy physics workflows involving standard tree-level QED 2-to-2 processes, Compton scattering, electron/muon/photon amplitudes, FeynArts/FeynCalc native artifacts, deterministic `python -m feynagent run` executions, validation reports, provenance, or local FeynAgent initialization/doctor checks.
+---
+
 # FeynAgent Skill
 
 Use this skill for FeynAgent HEP workflows involving QED/SM benchmark amplitudes, FeynArts/FeynCalc native generation, audited custom rules, or local environment checks.

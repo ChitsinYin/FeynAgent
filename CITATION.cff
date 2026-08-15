@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+message: "If you use FeynAgent in research, please cite this software and the external physics packages that performed the native calculations."
+title: "FeynAgent"
+version: "0.1.0"
+date-released: "2026-08-15"
+authors:
+  - family-names: "Yin"
+    given-names: "Chitsin"
+license: "Apache-2.0"
+abstract: >-
+  FeynAgent is a reproducible, deterministic release-candidate workflow for
+  public-facing tree-level standard-QED 2-to-2 benchmarks using externally
+  installed FeynArts and FeynCalc as the native diagram and algebra backend.
+keywords:
+  - high-energy physics
+  - QED
+  - FeynArts
+  - FeynCalc
+  - reproducible workflows
+preferred-citation:
+  type: software
+  title: "FeynAgent"
+  authors:
+    - family-names: "Yin"
+      given-names: "Chitsin"
+  version: "0.1.0"
+  date-released: "2026-08-15"
+  license: "Apache-2.0"
+references:
+  - type: article
+    title: "FeynArts 3.12 User's Guide and generated model/backend output"
+    authors:
+      - family-names: "Hahn"
+        given-names: "Thomas"
+    notes: "Cite the exact FeynArts version and references required by your installed FeynArts distribution."
+  - type: article
+    title: "FeynCalc native algebra backend"
+    authors:
+      - family-names: "Mertig"
+        given-names: "Rolf"
+      - family-names: "Boehm"
+        given-names: "Markus"
+      - family-names: "Denner"
+        given-names: "Ansgar"
+    notes: "Cite the exact FeynCalc version and references required by your installed FeynCalc distribution."
+  - type: software
+    title: "Wolfram Language / Mathematica"
+    notes: "Mathematica/Wolfram is an external proprietary dependency; follow Wolfram Research license and citation guidance."

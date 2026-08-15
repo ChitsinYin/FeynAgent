@@ -1,0 +1,503 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://feynagent.local/schemas/rule_registry.schema.json",
+  "title": "RuleRegistry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "object_id",
+    "status",
+    "registry_id",
+    "particle_catalog",
+    "rule_sets",
+    "vertices",
+    "propagators"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.1.1"
+    },
+    "object_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "rejected",
+        "superseded"
+      ]
+    },
+    "registry_id": {
+      "$ref": "#/$defs/object_id"
+    },
+    "particle_catalog": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/particle_record"
+      },
+      "minItems": 1
+    },
+    "rule_sets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule_set"
+      },
+      "minItems": 1
+    },
+    "vertices": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule_record"
+      }
+    },
+    "propagators": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/rule_record"
+      }
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    }
+  },
+  "$defs": {
+    "object_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "particle_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_./:+-]*$"
+    },
+    "particle_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "particle_id",
+        "display_name",
+        "field_role",
+        "self_conjugate",
+        "antiparticle_id"
+      ],
+      "properties": {
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field_role": {
+          "type": "string",
+          "enum": [
+            "scalar",
+            "dirac_fermion",
+            "vector",
+            "symmetric_rank_2_tensor"
+          ]
+        },
+        "self_conjugate": {
+          "type": "boolean"
+        },
+        "antiparticle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "fermion_number": {
+          "type": "integer",
+          "enum": [
+            -1,
+            0,
+            1
+          ]
+        }
+      }
+    },
+    "rule_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_set_id",
+        "display_name",
+        "status"
+      ],
+      "properties": {
+        "rule_set_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "approved",
+            "rejected",
+            "superseded"
+          ]
+        },
+        "convention_card_id": {
+          "$ref": "#/$defs/object_id"
+        }
+      }
+    },
+    "rule_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "rule_type",
+        "rule_set_id",
+        "participating_fields",
+        "momentum_labels_order",
+        "lorentz_index_structure",
+        "latex",
+        "feyncalc",
+        "coupling_order",
+        "mass_dimension",
+        "symmetries",
+        "provenance",
+        "trust_status"
+      ],
+      "properties": {
+        "rule_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "rule_type": {
+          "type": "string",
+          "enum": [
+            "vertex",
+            "propagator"
+          ]
+        },
+        "rule_set_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "participating_fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/field_ref"
+          },
+          "minItems": 1
+        },
+        "momentum_labels_order": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "minItems": 1
+        },
+        "lorentz_index_structure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "form",
+            "expression"
+          ],
+          "properties": {
+            "form": {
+              "type": "string",
+              "enum": [
+                "template",
+                "symbolic"
+              ]
+            },
+            "expression": {
+              "type": "string",
+              "minLength": 1
+            },
+            "indices": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/index_ref"
+              }
+            }
+          }
+        },
+        "latex": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feyncalc": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "template"
+          ],
+          "properties": {
+            "template": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required_symbols": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true
+            }
+          }
+        },
+        "coupling_order": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/coupling_power"
+          },
+          "minItems": 1
+        },
+        "mass_dimension": {
+          "type": "integer"
+        },
+        "symmetries": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "none",
+              "field_exchange_symmetric",
+              "field_exchange_antisymmetric",
+              "charge_conjugate_related",
+              "crossing_related"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "provenance": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/provenance_entry"
+          },
+          "minItems": 1
+        },
+        "trust_status": {
+          "type": "string",
+          "enum": [
+            "trusted",
+            "validated",
+            "validated_pending_convention_review",
+            "untrusted",
+            "conflicting",
+            "rejected"
+          ]
+        },
+        "metadata": {
+          "$ref": "#/$defs/metadata"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "rule_type": {
+                "const": "vertex"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "participating_fields": {
+                "minItems": 3
+              }
+            }
+          }
+        }
+      ]
+    },
+    "field_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "slot",
+        "field_id",
+        "particle_id",
+        "field_role",
+        "quantum_field_role"
+      ],
+      "properties": {
+        "slot": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "field_id": {
+          "$ref": "#/$defs/object_id"
+        },
+        "particle_id": {
+          "$ref": "#/$defs/particle_id"
+        },
+        "field_role": {
+          "type": "string",
+          "enum": [
+            "scalar",
+            "dirac_fermion",
+            "vector",
+            "symmetric_rank_2_tensor"
+          ]
+        },
+        "quantum_field_role": {
+          "type": "string",
+          "enum": [
+            "psi",
+            "psi_bar",
+            "vector_field",
+            "scalar_field",
+            "symmetric_rank_2_tensor_field"
+          ]
+        },
+        "fermion_flow_role": {
+          "type": "string",
+          "enum": [
+            "fermion_flow_into_vertex",
+            "fermion_flow_out_of_vertex",
+            "not_applicable"
+          ]
+        },
+        "arrow_flow": {
+          "type": "string",
+          "enum": [
+            "with_momentum",
+            "against_momentum",
+            "none",
+            "not_applicable"
+          ]
+        },
+        "index_label": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        }
+      }
+    },
+    "index_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "index_type"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "index_type": {
+          "type": "string",
+          "enum": [
+            "lorentz",
+            "dirac",
+            "field_slot"
+          ]
+        }
+      }
+    },
+    "coupling_power": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coupling",
+        "power"
+      ],
+      "properties": {
+        "coupling": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "power": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "provenance_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_type",
+        "notes",
+        "checked_by",
+        "checked_at"
+      ],
+      "properties": {
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "builtin",
+            "standard_convention",
+            "paper",
+            "textbook",
+            "user_supplied",
+            "local_file",
+            "derived"
+          ]
+        },
+        "citation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "local_source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "equation": {
+          "type": "string",
+          "minLength": 1
+        },
+        "section": {
+          "type": "string",
+          "minLength": 1
+        },
+        "page": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        },
+        "checked_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "checked_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "citation"
+          ]
+        },
+        {
+          "required": [
+            "local_source_path"
+          ]
+        }
+      ]
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "notes": {
+          "type": "string"
+        },
+        "created_by": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}
