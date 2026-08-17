@@ -1,6 +1,6 @@
 ---
 name: feynagent
-description: Use for FeynAgent public v0.1 standard-native workflows: tree-level QED 2-to-2 with external e-, e+, mu-, mu+, gamma through the FeynArts/FeynCalc native backend; deterministic `python -m feynagent run`; validation/provenance; or local init/doctor checks. Use custom_audited only for custom-rule intake, convention/provenance review, and backend-feasibility assessment, not arbitrary custom BSM/gravity production.
+description: "Use FeynAgent for validated tree-level QED 2-to-2 workflows with e-, e+, mu-, mu+, and gamma through FeynArts/FeynCalc; local init/doctor checks; and audited custom-rule intake. Do not treat arbitrary SM, QCD, BSM, or gravity as validated production support."
 ---
 
 # FeynAgent Skill

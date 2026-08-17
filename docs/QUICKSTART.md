@@ -75,24 +75,22 @@ FeynAgent init: PASS
 
 ## 5. Install The Codex Skill
 
-The Day-6 tested Codex surface discovered user skills from the local skills directory. On that Windows client, the validated method was:
+Codex loads user skills from `$HOME/.agents/skills`. Install the canonical repository skill source to `$HOME/.agents/skills/feynagent`:
 
 ```powershell
-Copy-Item -Path skills\feynagent -Destination C:\Users\lenovo\.codex\skills\feynagent -Recurse
-python C:\Users\lenovo\.codex\skills\.system\skill-creator\scripts\quick_validate.py C:\Users\lenovo\.codex\skills\feynagent
+$skillTarget = Join-Path $HOME ".agents\skills\feynagent"
+New-Item -ItemType Directory -Path $skillTarget -Force
+Copy-Item -Path skills\feynagent\* -Destination $skillTarget -Recurse -Force
+python C:\Users\lenovo\.codex\skills\.system\skill-creator\scripts\quick_validate.py $skillTarget
 ```
 
-If your Codex home is elsewhere, install to:
+The user skill should end up at:
 
 ```text
-$CODEX_HOME\skills\feynagent
+$HOME/.agents/skills/feynagent
 ```
 
-or, when `CODEX_HOME` is unset on Windows:
-
-```text
-C:\Users\<you>\.codex\skills\feynagent
-```
+Do not keep a duplicate FeynAgent skill under an obsolete legacy location such as `$HOME/.codex/skills/feynagent`; duplicate skill names can both appear in Codex selectors and make validation ambiguous.
 
 ## 6. First Compton Request In Codex
 
