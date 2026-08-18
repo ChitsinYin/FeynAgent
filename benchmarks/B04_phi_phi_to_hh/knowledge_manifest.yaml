@@ -1,0 +1,58 @@
+schema_version: 0.1.0
+object_id: knowledge_manifest:b04_reheating_scalar_gravity_v1
+status: locked_for_b04_registration
+lock_version: '1.0'
+audit_timestamp: '2026-08-18T22:42:01+08:00'
+readiness: KNOWLEDGE_READY_FOR_B04
+model_id: reheating_scalar_gravity_v1
+convention_id: conventions:reheating_scalar_gravity_v1
+process_id: process:B04_phi_phi_to_h_h
+process: phi(p1) phi(p2) -> h(k1) h(k2)
+local_mapping:
+  file: .feynagent/knowledge_roots.yaml
+  policy: The local absolute external knowledge root is machine-local and must not be committed.
+registered_lock:
+  canonical_input_hashes:
+    CONVENTIONS.yaml: ff6577073e8b3c44df1a5f675752b2fc13eb5beeb24ecba05f765d52a4d6206b
+    FEYNMAN_RULES.yaml: 691acce1e9c6ca33762e5d7f8889bb98648c9fc90be1496dfebe11fe01f93b96
+    MODEL_CARD.yaml: e53ba61adaa75dc1a5f805a9018b24e462f3d768a0951b50c142c0bc9bc077ed
+    PHYSICAL_CONTEXT.yaml: b27480cba4196651bdec6277f10e4c289ae78227aa4589552292342c90f70b9e
+    PROCESS_B04.yaml: cd83e3060bef2368ff5624fabee95c2b0a0d872c65b4e1a1b8bfcad5b9487fb8
+    REFERENCE_MANIFEST.yaml: 2af22b02fbfa2715ed13a3b9728b2f398eff7f8dbe3f464077e542507c2a7b84
+  locked_source_gold_file_sha256:
+    source_material/SOURCE_INDEX.md: 1c8cf4694b3609713596031866f073dbd30eccc639386405dd147a52766f6ea3
+    source_material/arXiv-2402.04310v1_minimal_prompt_GW_reheating.pdf: 4661ff7bdac74bf1ddb9ee8491259d610bc9a939a319a35d385d2ffb781b643c
+    source_material/feynman_calculation_integrated_corrected.pdf: bf879ce083302e8cc84480c6e5a2ff59be63524a77827561234ca8d33ed78275
+    source_material/feynman_calculation_integrated_original.nb: 3e26b5179e8f93bfccc4aaf4e0e16fe1231e1a932cdf287265983ec692e46e00
+    source_material/feynman_diagrams_legacy_notes.pdf: b7d1fc218bb6e54121c9b368433bb717c4f56b794d3ace1aa34472f117723382
+    source_material/hep-th-9411092v1_linearized_gravity_rules.pdf: 707b51cb618e83c2366c458215eccadc6a43f3c406229184fbec3ebbae27e6a5
+    source_material/inflation_GW_reproduction_notes.pdf: e02f2ef24a003fe607e930c1494f50412228c963714349b58e14acfa57ffc30c
+    gold/README.md: b1a9d0de0e1da3547bcaa2e523ba7a9d25db8e15f4ceb16c11d70348c47dbf66
+    gold/amplitudes_reference.tex: 1a45eb969f82e3bee9c82cebdccb7681a76e7a5243086f27085df90cbc115a72
+    gold/amplitudes_reference.wl: ea7f12459ca9342395771addc64474528b75be8542342ebb14e2534da6d1a05f
+    gold/existing_diagrams.pdf: bf879ce083302e8cc84480c6e5a2ff59be63524a77827561234ca8d33ed78275
+    gold/m2_reference.m: 739e480db50fa4d34d63948f0c32517238cbb216bdb74f8947653ee0205c4eaf
+    gold/old_notebook.nb: 3e26b5179e8f93bfccc4aaf4e0e16fe1231e1a932cdf287265983ec692e46e00
+logical_ids:
+  rule_ids:
+  - propagator:phi
+  - vertex:h_phi_phi
+  - propagator:h
+  - vertex:h_h_h
+  - vertex:h_h_phi_phi
+  - polarization_sum:massless_graviton_b04
+  required_rules:
+  - propagator:phi
+  - vertex:h_phi_phi
+  - propagator:h
+  - vertex:h_h_h
+  - vertex:h_h_phi_phi
+  required_M2_objects:
+  - polarization_sum:massless_graviton_b04
+known_rejected_candidates:
+- candidate: historical FeynGrav 3.0 ssgg/hh_phi_phi
+  classification: CONFLICT_REQUIRES_REVIEW
+  resolution: rejected as authority; corrected manual tau rule is locked
+  blocking: false
+unresolved_conflicts: []
+notes: Hash-only external manifest. Source PDFs, notebooks, raw gold files, and private absolute paths are not copied into this benchmark.

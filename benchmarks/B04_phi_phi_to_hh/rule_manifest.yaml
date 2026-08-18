@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+object_id: rule_manifest:b04_reheating_scalar_gravity_v1
+status: approved_for_b04_registration
+model_id: reheating_scalar_gravity_v1
+registry_id: registry:reheating_scalar_gravity_v1
+registered_hashes:
+  FEYNMAN_RULES.yaml: 691acce1e9c6ca33762e5d7f8889bb98648c9fc90be1496dfebe11fe01f93b96
+canonical_symbols:
+  inflaton_mass: M
+  reduced_planck_mass: M_P
+  gravity_coupling: kappa=2/M_P
+required_rules:
+- rule_id: propagator:phi
+  role: internal scalar propagator
+  trust_status: trusted_literature_and_gold_match
+- rule_id: vertex:h_phi_phi
+  role: scalar-graviton vertex
+  trust_status: trusted_literature_and_gold_match
+- rule_id: propagator:h
+  role: internal graviton propagator
+  trust_status: trusted_literature_and_gold_match
+- rule_id: vertex:h_h_h
+  role: three-graviton vertex for s-channel graph
+  trust_status: trusted_literature_and_gold_match
+- rule_id: vertex:h_h_phi_phi
+  role: contact hh phi phi vertex
+  trust_status: trusted_corrected_gold_and_literature
+  rejected_candidate: historical FeynGrav 3.0 ssgg candidate remains CONFLICT_REQUIRES_REVIEW and is not an authority
+required_m2_objects:
+- rule_id: polarization_sum:massless_graviton_b04
+  trust_status: trusted_literature_and_gold_match
+software_policy:
+  feyngrav: helper/validator only; never overwrite canonical custom rules
+  feyncalc: tensor algebra/contractions after backend feasibility review
+notes: Logical rule IDs only. Full custom rule formulas remain in the locked external knowledge package.

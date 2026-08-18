@@ -36,7 +36,7 @@
       ]
     },
     "process_id": {
-      "$ref": "#/$defs/object_id"
+      "$ref": "#/$defs/external_object_id"
     },
     "model_id": {
       "type": "string",
@@ -243,6 +243,10 @@
     "object_id": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "external_object_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_./:-]*$"
     },
     "particle_id": {
       "type": "string",

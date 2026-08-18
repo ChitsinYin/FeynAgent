@@ -1,0 +1,35 @@
+schema_version: 0.1.0
+object_id: topology_summary:b04_phi_phi_to_hh
+status: approved_for_b04_registration
+model_id: reheating_scalar_gravity_v1
+process_id: process:B04_phi_phi_to_h_h
+registered_hashes:
+  PROCESS_B04.yaml: cd83e3060bef2368ff5624fabee95c2b0a0d872c65b4e1a1b8bfcad5b9487fb8
+tensor_shorthand: T = eta^(gamma nu) eta^(mu sigma) + eta^(gamma mu) eta^(nu sigma)
+diagrams:
+- label: a
+  topology: scalar_exchange
+  internal_species: phi
+  internal_momentum: k1-p1
+  reduced_gold_after_approved_condensate_tt_kinematics: M_a=0
+- label: b
+  topology: scalar_exchange
+  internal_species: phi
+  internal_momentum: k2-p1
+  reduced_gold_after_approved_condensate_tt_kinematics: M_b=0
+- label: c
+  topology: s_channel_graviton_exchange
+  internal_species: h
+  internal_momentum: p1+p2
+  reduced_gold_after_approved_condensate_tt_kinematics: M_c=-(3 i/8) kappa^2 M^2 T
+- label: d
+  topology: contact_h_h_phi_phi
+  internal_species: null
+  internal_momentum: null
+  reduced_gold_after_approved_condensate_tt_kinematics: M_d=+(i/2) kappa^2 M^2 T
+approved_publishable_m2_summary:
+  raw_polarization_summed_total: 2 M^4/M_P^4
+  initial_identical_factor: 1/2
+  final_identical_phase_space_factor: 1/2
+  rate_convention_M2: M^4/(2 M_P^4)
+notes: Static expected topology summary only. These entries are not newly generated amplitudes or M2 outputs.

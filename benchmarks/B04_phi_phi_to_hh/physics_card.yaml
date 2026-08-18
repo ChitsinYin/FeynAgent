@@ -1,0 +1,68 @@
+schema_version: 0.2.0
+object_id: physics_card:b04_phi_phi_to_hh
+status: approved
+process_id: process:B04_phi_phi_to_h_h
+process_type: scattering_2_to_2
+perturbative_order:
+  loop_order: 0
+  restriction: tree_level_only
+coupling_order:
+  mode: explicit
+  orders:
+  - coupling: kappa
+    power: 2
+particles:
+  incoming:
+  - slot: 1
+    particle_id: phi
+    display_name: real scalar inflaton
+    state_role: incoming
+    momentum_label: p1
+    latex_label: phi
+  - slot: 2
+    particle_id: phi
+    display_name: real scalar inflaton
+    state_role: incoming
+    momentum_label: p2
+    latex_label: phi
+  outgoing:
+  - slot: 3
+    particle_id: h
+    display_name: graviton
+    state_role: outgoing
+    momentum_label: k1
+    latex_label: h_{mu nu}
+  - slot: 4
+    particle_id: h
+    display_name: graviton
+    state_role: outgoing
+    momentum_label: k2
+    latex_label: h_{sigma gamma}
+internal_species_policy:
+  allowed_particle_ids:
+  - phi
+  - h
+requested_outputs:
+- validation_report
+approval:
+  topology:
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-18T22:42:01+08:00'
+    notes: Approved for static B04 benchmark registration from the locked external knowledge package only; no topology generation run is authorized by this card.
+  amplitude_generation:
+    status: not_requested
+    notes: B04 amplitude construction is explicitly out of scope for Day-7 Phase 3 registration.
+  heavy_calculation:
+    status: not_requested
+    notes: B04 M2 and heavy Mathematica/FeynCalc calculations remain explicitly unrequested.
+metadata:
+  notes: Backend-neutral B04 custom audited gravity PhysicsCard. External knowledge is referenced only through logical lock IDs and hashes; the local absolute root is stored in .feynagent/knowledge_roots.yaml.
+presentation:
+  particle_latex_labels:
+  - particle_id: phi
+    latex_label: phi
+  - particle_id: h
+    latex_label: h_{mu nu}
+model_id: reheating_scalar_gravity_v1
+sector: gravity

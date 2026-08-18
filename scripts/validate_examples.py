@@ -20,7 +20,7 @@ SCHEMA_VALIDATIONS = [
     (SHARED_LEGACY_PROFILE, ROOT / "schemas" / "backend_profile.schema.json"),
 ]
 
-REQUIRED_BENCHMARK_IDS = {"B01_ee_to_mumu", "B02_compton", "B03_emu_to_emu"}
+REQUIRED_BENCHMARK_IDS = {"B01_ee_to_mumu", "B02_compton", "B03_emu_to_emu", "B04_phi_phi_to_hh"}
 
 
 class ValidationFailure(Exception):

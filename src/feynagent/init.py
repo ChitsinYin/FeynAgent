@@ -92,6 +92,7 @@ def probe_environment(args: argparse.Namespace) -> ProbeResult:
     reference_index = _build_reference_index(wolfram_probe)
     checks = _capability_checks(wolframscript, wolfram_probe, latex)
     status = _overall_status(checks)
+    custom_models = _custom_model_capabilities()
     environment = {
         "schema_version": "0.1.0",
         "generated_at": detected_at,
@@ -112,6 +113,7 @@ def probe_environment(args: argparse.Namespace) -> ProbeResult:
         "wolfram_probe": wolfram_probe,
         "latex": latex,
         "native_qed_tree_capability": checks["native_qed_tree_capability"],
+        "custom_models": custom_models,
     }
     return ProbeResult(status=status, environment=environment, capabilities=capabilities, reference_index=reference_index)
 
@@ -228,6 +230,14 @@ def _capability_checks(wolframscript: str | None, probe: dict[str, Any], latex: 
     }
 
 
+def _custom_model_capabilities() -> list[dict[str, Any]]:
+    try:
+        from .custom_knowledge import custom_model_statuses
+    except Exception as exc:  # pragma: no cover
+        return [{"model_id": "unknown", "status": "CONFLICT_REQUIRES_REVIEW", "issues": [str(exc)]}]
+    return [status.as_capability() for status in custom_model_statuses()]
+
+
 def _overall_status(checks: dict[str, dict[str, Any]]) -> str:
     statuses = {item["status"] for item in checks.values()}
     if "FAIL" in statuses:
@@ -319,6 +329,8 @@ def _doctor_text(result: ProbeResult) -> str:
     for key in ("wolfram", "feyncalc", "feynarts", "native_qed_tree_capability", "latex"):
         check = result.capabilities["checks"][key]
         lines.append(f"{check['status']:7} {key}")
+    for custom in result.capabilities.get("custom_models", []):
+        lines.append(f"{custom.get('status', 'UNKNOWN'):24} custom_model:{custom.get('model_id', 'unknown')}")
     return "\n".join(lines)
 
 

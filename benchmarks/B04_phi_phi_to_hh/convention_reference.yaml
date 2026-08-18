@@ -1,0 +1,29 @@
+schema_version: 0.1.0
+object_id: convention_reference:b04_reheating_scalar_gravity_v1
+status: approved_for_b04_registration
+model_id: reheating_scalar_gravity_v1
+convention_id: conventions:reheating_scalar_gravity_v1
+knowledge_lock_readiness: KNOWLEDGE_READY_FOR_B04
+registered_hashes:
+  CONVENTIONS.yaml: ff6577073e8b3c44df1a5f675752b2fc13eb5beeb24ecba05f765d52a4d6206b
+essentials:
+  units:
+    hbar: 1
+    c: 1
+  spacetime_dimension: 4
+  metric_signature: +---
+  metric_expansion: g_mu_nu = eta_mu_nu + kappa h_mu_nu + ...
+  reduced_planck_mass_definition: M_P = (8*pi*G_N)^(-1/2)
+  canonical_kappa: kappa = sqrt(32*pi*G_N) = 2/M_P
+  graviton_propagator_gauge: de Donder
+  vertex_rule_default: all momenta incoming unless software API documents otherwise
+  external_polarization: massless symmetric transverse traceless graviton tensors
+  formal_fourier_transform_sign: not separately stated in supplied trusted sources; nonblocking for this rules-first benchmark
+source_maps:
+- source: hep-th/9411092v1
+  status: documented_not_adopted_for_normalization
+  map_for_b04: keep tensor structures symbolic, then use kappa = 2/M_P
+- source: historical FeynGrav calls
+  status: explicit_momentum_map
+  map_for_b04: translate physical outgoing momenta to inward vertex momenta exactly as in the locked gold assembly
+notes: Sanitized convention reference. This is not a schema-level ConventionCard because B04 deliberately does not invent a standalone Fourier sign beyond the locked operational vertex and propagator factors.

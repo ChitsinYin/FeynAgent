@@ -1,0 +1,33 @@
+schema_version: 0.1.0
+object_id: process_description:b04_phi_phi_to_hh
+status: approved_for_b04_registration
+model_id: reheating_scalar_gravity_v1
+process_id: process:B04_phi_phi_to_h_h
+process: phi(p1) phi(p2) -> h(k1) h(k2)
+process_type: scattering_2_to_2
+external_states:
+  incoming:
+  - slot: 1
+    particle_id: phi
+    momentum: p1
+  - slot: 2
+    particle_id: phi
+    momentum: p2
+  outgoing:
+  - slot: 3
+    particle_id: h
+    momentum: k1
+    lorentz_indices: [mu, nu]
+  - slot: 4
+    particle_id: h
+    momentum: k2
+    lorentz_indices: [sigma, gamma]
+perturbative_order:
+  loop_order: 0
+  gravity: O(kappa^2) amplitude
+benchmark_scope:
+  classification: custom_audited
+  current_phase: intake_and_backend_feasibility_only
+  amplitude_construction: not_started
+  m2_construction: not_started
+  heavy_calculation: not_authorized
