@@ -29,7 +29,8 @@
       "type": "string",
       "enum": [
         "feynarts_feyncalc_native",
-        "legacy_custom_backend"
+        "legacy_custom_backend",
+        "audited_custom_backend"
       ]
     },
     "status": {
@@ -188,6 +189,53 @@
         }
       }
     },
+    "custom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend_id",
+        "model_id",
+        "process_id",
+        "convention_id",
+        "knowledge_manifest",
+        "rule_audit_required",
+        "required_rule_ids"
+      ],
+      "properties": {
+        "backend_id": {
+          "type": "string",
+          "const": "direct_feyncalc_custom_audited"
+        },
+        "model_id": {
+          "type": "string",
+          "const": "reheating_scalar_gravity_v1"
+        },
+        "process_id": {
+          "type": "string",
+          "const": "process:B04_phi_phi_to_h_h"
+        },
+        "convention_id": {
+          "type": "string",
+          "const": "conventions:reheating_scalar_gravity_v1"
+        },
+        "knowledge_manifest": {
+          "type": "string",
+          "const": "benchmarks/B04_phi_phi_to_hh/knowledge_manifest.yaml"
+        },
+        "rule_audit_required": {
+          "type": "boolean",
+          "const": true
+        },
+        "required_rule_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/object_id"
+          },
+          "minItems": 5,
+          "uniqueItems": true
+        }
+      }
+    },
     "metadata": {
       "$ref": "#/$defs/metadata"
     }
@@ -227,6 +275,26 @@
         "not": {
           "required": [
             "native"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "backend_kind": {
+            "const": "audited_custom_backend"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "custom"
+        ],
+        "not": {
+          "anyOf": [
+            {"required": ["native"]},
+            {"required": ["legacy"]}
           ]
         }
       }

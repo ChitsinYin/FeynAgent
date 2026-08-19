@@ -18,26 +18,26 @@ particles:
     display_name: real scalar inflaton
     state_role: incoming
     momentum_label: p1
-    latex_label: phi
+    latex_label: \phi
   - slot: 2
     particle_id: phi
     display_name: real scalar inflaton
     state_role: incoming
     momentum_label: p2
-    latex_label: phi
+    latex_label: \phi
   outgoing:
   - slot: 3
     particle_id: h
     display_name: graviton
     state_role: outgoing
     momentum_label: k1
-    latex_label: h_{mu nu}
+    latex_label: h_{\mu\nu}
   - slot: 4
     particle_id: h
     display_name: graviton
     state_role: outgoing
     momentum_label: k2
-    latex_label: h_{sigma gamma}
+    latex_label: h_{\sigma\gamma}
 internal_species_policy:
   allowed_particle_ids:
   - phi
@@ -61,8 +61,8 @@ metadata:
 presentation:
   particle_latex_labels:
   - particle_id: phi
-    latex_label: phi
+    latex_label: \phi
   - particle_id: h
-    latex_label: h_{mu nu}
+    latex_label: h_{\rho\sigma}
 model_id: reheating_scalar_gravity_v1
 sector: gravity

@@ -166,7 +166,7 @@ def physics_card_for_topology(physics_card: dict[str, Any]) -> dict[str, Any]:
     physics["selected_rule_set"] = {"registry_id": REGISTRY_ID, "rule_set_ids": [RULE_SET_ID]}
     physics.setdefault("presentation", {})["particle_latex_labels"] = [
         {"particle_id": "phi", "latex_label": r"\phi"},
-        {"particle_id": "h", "latex_label": r"h_{\mu\nu}"},
+        {"particle_id": "h", "latex_label": r"h_{\rho\sigma}"},
     ]
     return physics
 
@@ -257,6 +257,7 @@ def run_b04_topology_phase(
     root: Path,
     *,
     run_id: str | None = None,
+    run_root: Path | None = None,
     latex_command: str = "lualatex",
 ) -> Phase5Result:
     root = root.resolve()
@@ -293,7 +294,8 @@ def run_b04_topology_phase(
         raise RuntimeError("B04 topology generation failed structural comparison or rule usage audit")
 
     run_id = run_id or "day7_b04_topology_" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    run_dir = root / "runs" / run_id
+    artifact_root = run_root.resolve() if run_root is not None else root / "runs"
+    run_dir = artifact_root / run_id
     request_dir = run_dir / "request"
     diagrams_dir = run_dir / "diagrams"
     validation_dir = run_dir / "validation"

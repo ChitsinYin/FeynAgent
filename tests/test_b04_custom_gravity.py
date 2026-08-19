@@ -105,6 +105,8 @@ class B04CustomGravityRegistrationTests(unittest.TestCase):
         self.assertEqual(classify_physics_card(b01, custom_model_ids=custom_ids), STANDARD_NATIVE)
 
     def test_local_mapping_is_gitignored(self):
+        if not (ROOT / ".git").exists():
+            raise unittest.SkipTest("Git metadata is excluded from review archives")
         completed = subprocess.run(
             ["git", "check-ignore", ".feynagent/knowledge_roots.yaml"],
             cwd=ROOT,

@@ -235,7 +235,20 @@ def _custom_model_capabilities() -> list[dict[str, Any]]:
         from .custom_knowledge import custom_model_statuses
     except Exception as exc:  # pragma: no cover
         return [{"model_id": "unknown", "status": "CONFLICT_REQUIRES_REVIEW", "issues": [str(exc)]}]
-    return [status.as_capability() for status in custom_model_statuses()]
+    capabilities = []
+    for status in custom_model_statuses():
+        payload = status.as_capability()
+        if status.model_id == "reheating_scalar_gravity_v1":
+            payload.update(
+                {
+                    "classification": "custom_audited",
+                    "backend_id": "direct_feyncalc_custom_audited",
+                    "production_ready_scope": "locked B04 benchmark only",
+                    "standard_qed_authority": False,
+                }
+            )
+        capabilities.append(payload)
+    return capabilities
 
 
 def _overall_status(checks: dict[str, dict[str, Any]]) -> str:
@@ -315,6 +328,8 @@ def _summary_text(result: ProbeResult, *, include_files: bool) -> str:
     lines = [f"FeynAgent init: {result.status}"]
     for key, check in result.capabilities["checks"].items():
         lines.append(f"- {key}: {check['status']}")
+    for custom in result.capabilities.get("custom_models", []):
+        lines.append(f"- custom_model:{custom.get('model_id', 'unknown')}: {custom.get('status', 'UNKNOWN')}")
     if include_files:
         lines.extend([
             f"wrote {ENVIRONMENT_YAML}",
@@ -330,7 +345,7 @@ def _doctor_text(result: ProbeResult) -> str:
         check = result.capabilities["checks"][key]
         lines.append(f"{check['status']:7} {key}")
     for custom in result.capabilities.get("custom_models", []):
-        lines.append(f"{custom.get('status', 'UNKNOWN'):24} custom_model:{custom.get('model_id', 'unknown')}")
+        lines.append(f"custom_model:{custom.get('model_id', 'unknown')} {custom.get('status', 'UNKNOWN')}")
     return "\n".join(lines)
 
 

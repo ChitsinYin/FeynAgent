@@ -1,4 +1,4 @@
-"""Deterministic public runner for the native standard-QED workflow."""
+"""Deterministic runner for native QED and the single audited B04 route."""
 
 from __future__ import annotations
 
@@ -24,6 +24,9 @@ from .backends import (
     validate_native_qed_artifacts,
     validate_native_qed_request,
 )
+from .backends.b04_custom import B04CustomBackendError, run_b04_custom_backend, validate_b04_custom_execution
+from .custom_knowledge import AVAILABLE, discover_custom_model_ids
+from .dispatch import B04_CUSTOM_BACKEND, NATIVE_QED_BACKEND, DispatchError, resolve_backend_route
 from .init import probe_environment
 
 try:
@@ -101,7 +104,7 @@ def run_from_files(
     gates: list[dict[str, Any]] = []
     manifest: dict[str, Any] = {
         "schema_version": "0.1.0",
-        "runner": "feynagent.deterministic_native_qed_v0_1",
+        "runner": "feynagent.deterministic_dispatch_v0_2",
         "started_at": started_at,
         "status": "FAIL",
         "gates": gates,
@@ -120,19 +123,35 @@ def run_from_files(
         _validate_request_links(physics_card, backend_profile, execution_request)
         gates.append(_gate("execution_request_links", "PASS"))
 
-        doctor = probe_environment(argparse.Namespace(wolframscript=None, feyncalc_dir=None, timeout=60))
-        doctor_ready = doctor.status in {"PASS", "WARNING"} and (
-            doctor.capabilities.get("checks", {}).get("native_qed_tree_capability", {}).get("status") == "PASS"
+        route = resolve_backend_route(
+            physics_card,
+            backend_profile,
+            custom_model_ids=discover_custom_model_ids(ROOT / "benchmarks"),
         )
-        if not doctor_ready:
-            raise RunnerGateError("doctor_readiness", "native_qed_tree_capability is not ready", {"doctor_status": doctor.status})
-        gates.append(_gate("doctor_readiness", "PASS", {"doctor_status": doctor.status}))
+        gates.append(_gate("backend_dispatch", "PASS", route.as_dict()))
 
-        config = backend_config_from_dict(backend_profile)
-        validate_native_qed_request(physics_card, config)
-        _validate_native_generation_authorization(execution_request)
-        gates.append(_gate("backend_resolution", "PASS", {"backend_id": config.backend_id}))
-        gates.append(_gate("native_generation_authorization", "PASS"))
+        doctor = probe_environment(argparse.Namespace(wolframscript=None, feyncalc_dir=None, timeout=60))
+        if route.backend_id == NATIVE_QED_BACKEND:
+            doctor_ready = doctor.status in {"PASS", "WARNING"} and (
+                doctor.capabilities.get("checks", {}).get("native_qed_tree_capability", {}).get("status") == "PASS"
+            )
+            if not doctor_ready:
+                raise RunnerGateError("doctor_readiness", "native_qed_tree_capability is not ready", {"doctor_status": doctor.status})
+            config = backend_config_from_dict(backend_profile)
+            validate_native_qed_request(physics_card, config)
+            _validate_native_generation_authorization(execution_request)
+            gates.append(_gate("doctor_readiness", "PASS", {"doctor_status": doctor.status, "route": "standard_native"}))
+            gates.append(_gate("backend_resolution", "PASS", {"backend_id": config.backend_id}))
+            gates.append(_gate("native_generation_authorization", "PASS"))
+        else:
+            custom_capability = _custom_model_capability(doctor.capabilities, route.model_id)
+            if custom_capability.get("status") != AVAILABLE:
+                raise RunnerGateError("doctor_readiness", "B04 custom knowledge capability is not AVAILABLE", custom_capability)
+            custom_gate = validate_b04_custom_execution(ROOT, physics_card, backend_profile, execution_request, route)
+            gates.append(_gate("doctor_readiness", "PASS", {"doctor_status": doctor.status, "route": "custom_audited"}))
+            gates.append(_gate("custom_knowledge_and_convention", "PASS", custom_gate))
+            gates.append(_gate("backend_resolution", "PASS", {"backend_id": route.backend_id}))
+            gates.append(_gate("custom_execution_authorization", "PASS"))
 
         run_id = _new_run_id(physics_card)
         run_dir = (run_root / run_id).resolve()
@@ -150,49 +169,65 @@ def run_from_files(
                 "run_id": run_id,
                 "run_dir": str(run_dir),
                 "process_id": physics_card.get("process_id"),
-                "backend_profile_id": config.backend_profile_id,
+                "backend_profile_id": backend_profile.get("backend_profile_id"),
+                "dispatch": route.as_dict(),
                 "inputs": copied_inputs,
             }
         )
         gates.append(_gate("immutable_input_snapshot", "PASS"))
 
-        native_manifest = run_native_qed_backend(physics_card, run_dir, config)
-        native_status = "PASS" if native_manifest.get("exit_code") == 0 and not native_manifest.get("artifact_validation") else "FAIL"
-        if native_status != "PASS":
-            raise RunnerGateError("native_artifact_generation", "native backend artifact generation failed", native_manifest)
-        gates.append(_gate("native_artifact_generation", "PASS"))
+        if route.backend_id == NATIVE_QED_BACKEND:
+            native_manifest = run_native_qed_backend(physics_card, run_dir, config)
+            native_status = "PASS" if native_manifest.get("exit_code") == 0 and not native_manifest.get("artifact_validation") else "FAIL"
+            if native_status != "PASS":
+                raise RunnerGateError("native_artifact_generation", "native backend artifact generation failed", native_manifest)
+            gates.append(_gate("native_artifact_generation", "PASS"))
 
-        gold_expression = GOLD_M2_BY_PROCESS_ID.get(physics_card.get("process_id"))
-        try:
-            m2_manifest = run_native_qed_m2_generator(
-                physics_card,
-                run_dir,
-                config,
-                execution_request,
-                gold_expression=gold_expression,
-            )
-        except NativeBackendError as exc:
-            raise RunnerGateError("m2_authorization", str(exc)) from exc
-        if m2_manifest.get("executed") and m2_manifest.get("status") != "PASS":
-            raise RunnerGateError("m2_generation", "M2 execution failed", m2_manifest)
-        gates.append(_gate("m2_generation", "PASS", {"status": m2_manifest.get("status"), "executed": m2_manifest.get("executed")}))
+            gold_expression = GOLD_M2_BY_PROCESS_ID.get(physics_card.get("process_id"))
+            try:
+                m2_manifest = run_native_qed_m2_generator(
+                    physics_card,
+                    run_dir,
+                    config,
+                    execution_request,
+                    gold_expression=gold_expression,
+                )
+            except NativeBackendError as exc:
+                raise RunnerGateError("m2_authorization", str(exc)) from exc
+            if m2_manifest.get("executed") and m2_manifest.get("status") != "PASS":
+                raise RunnerGateError("m2_generation", "M2 execution failed", m2_manifest)
+            gates.append(_gate("m2_generation", "PASS", {"status": m2_manifest.get("status"), "executed": m2_manifest.get("executed")}))
 
-        validation_report = _build_validation_report(physics_card, run_dir, native_manifest, m2_manifest)
+            validation_report = _build_validation_report(physics_card, run_dir, native_manifest, m2_manifest)
+            manifest_updates = {"native_manifest": native_manifest, "m2_manifest": m2_manifest}
+        else:
+            try:
+                custom_manifest = run_b04_custom_backend(
+                    ROOT,
+                    run_id=run_id,
+                    run_dir=run_dir,
+                    physics_card=physics_card,
+                    backend_profile=backend_profile,
+                    execution_request=execution_request,
+                    route=route,
+                )
+            except B04CustomBackendError as exc:
+                raise RunnerGateError("custom_backend", str(exc)) from exc
+            if custom_manifest.get("status") != "PASS":
+                raise RunnerGateError("custom_backend", "B04 custom backend failed", custom_manifest)
+            gates.append(_gate("custom_topology_generation", "PASS", custom_manifest["topology"]))
+            gates.append(_gate("custom_per_diagram_amplitudes", "PASS", custom_manifest["amplitudes"]))
+            gates.append(_gate("custom_m2_policy", "PASS", custom_manifest["m2_policy"]))
+            validation_report = custom_manifest["validation_report"]
+            manifest_updates = {"custom_manifest": custom_manifest, "m2_policy": custom_manifest["m2_policy"]}
+
         _write_json(run_dir / "validation_report.json", validation_report)
         if validation_report["status"] != "PASS":
             raise RunnerGateError("validation_report", "validation report contains failed checks", validation_report)
         gates.append(_gate("validation_report", "PASS"))
 
-        manifest.update(
-            {
-                "status": "PASS",
-                "completed_at": _now(),
-                "native_manifest": native_manifest,
-                "m2_manifest": m2_manifest,
-                "validation_report": "validation_report.json",
-                "outputs": _hash_output_tree(run_dir),
-            }
-        )
+        manifest.update({"status": "PASS", "completed_at": _now(), "validation_report": "validation_report.json", **manifest_updates})
+        manifest["outputs"] = _hash_output_tree(run_dir)
         _write_json(run_dir / "run_manifest.json", manifest)
         return RunnerResult(status="PASS", run_id=run_id, run_dir=run_dir, manifest=manifest)
     except RunnerGateError as exc:
@@ -202,7 +237,7 @@ def run_from_files(
         details = {"cmd": exc.cmd, "timeout": exc.timeout}
         gates.append(_gate("timeout", "FAIL", details, "subprocess timed out"))
         manifest.update({"status": "FAIL", "completed_at": _now(), "failure": {"gate": "timeout", **details}})
-    except (NativeBackendError, ValueError, OSError) as exc:
+    except (B04CustomBackendError, DispatchError, NativeBackendError, ValueError, OSError) as exc:
         gates.append(_gate("runner_exception", "FAIL", message=str(exc)))
         manifest.update({"status": "FAIL", "completed_at": _now(), "failure": {"gate": "runner_exception", "message": str(exc)}})
 
@@ -286,6 +321,13 @@ def _validate_native_generation_authorization(execution_request: dict[str, Any])
     missing = sorted(required - allowed)
     if missing:
         raise RunnerGateError("native_generation_authorization", "ExecutionRequest is missing native generation operation(s)", {"missing": missing})
+
+
+def _custom_model_capability(capabilities: dict[str, Any], model_id: str) -> dict[str, Any]:
+    for item in capabilities.get("custom_models", []):
+        if item.get("model_id") == model_id:
+            return item
+    return {"model_id": model_id, "status": "MISSING_KNOWLEDGE", "issues": ["custom model absent from doctor report"]}
 
 
 def _new_run_id(physics_card: dict[str, Any]) -> str:

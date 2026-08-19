@@ -11,9 +11,29 @@
       "expected_classification": "standard_native"
     },
     {
+      "id": "b04_natural_language_custom_route",
+      "request": "Generate the audited inflaton-pair annihilation into two gravitons, including topology and per-diagram amplitudes, and report the squared-amplitude policy.",
+      "expected_classification": "custom_audited",
+      "expected_fields": {
+        "model_id": "reheating_scalar_gravity_v1",
+        "process_id": "process:B04_phi_phi_to_h_h",
+        "backend": "direct_feyncalc_custom_audited",
+        "standard_qed_authority": false
+      }
+    },
+    {
       "id": "toy_custom_yukawa",
       "request": "Use a custom Yukawa L = - y phibar psi phi rule with stated metric and provenance from my note.",
-      "expected_classification": "custom_audited"
+      "expected_classification": "custom_audited",
+      "expected_fields": {
+        "backend": null,
+        "production_ready": false
+      }
+    },
+    {
+      "id": "arbitrary_bsm_not_production",
+      "request": "Run an arbitrary supersymmetric BSM model in production and invent any missing vertices.",
+      "expected_classification": "unsupported_requires_review"
     },
     {
       "id": "missing_initialization",

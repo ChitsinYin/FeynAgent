@@ -38,8 +38,8 @@
 
 ## Diagram Artifact
 
-- PDF: `E:/003hep-ph-research/Agent/FeynAgent/runs/day7_b04_topology_20260819T000000Z/diagrams/diagrams.pdf`
-- PDF sha256: `c30c553c49cedaff6c842319a4a81f5498b134435ea3c1bc7b3e13d3200b7c40`
+- PDF: `E:/003hep-ph-research/Agent/FeynAgent/runs/day7_final_b04_diagram_labels_20260819/diagrams/diagrams.pdf`
+- PDF sha256: `ea59ae5f9e87bae9ed7bb80dfa0dc9e6a28c9af798d689030eb71b75d715701e`
 
 ## Representation Maps
 
@@ -49,11 +49,10 @@
 
 ## Tests
 
-- B04 regression tests: PASS (8 passed). Standard-QED/full regression: PASS (104 passed in 13.61 seconds).
+- Focused label regression: `python -m pytest tests\test_b04_topology_phase5.py -k b04_tex -q` -> PASS, `1 passed, 8 deselected`. Final repository regression: `python -m pytest` -> PASS, `122 passed`.
 
 ## Warnings
 
 - Scalar-exchange gold momenta match generated routing only after explicit internal-line orientation mapping.
 - Diagram rendering is presentation-only and does not modify DiagramIR physics.
 - FeynCalc is intentionally unused in Phase 5 except as the selected future algebra backend.
-

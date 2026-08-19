@@ -43,6 +43,8 @@ def inspect_initialization(root: Path) -> dict[str, Any]:
     if capabilities_path.exists():
         capabilities = json.loads(capabilities_path.read_text(encoding="utf-8"))
     status = capabilities.get("status") or ("MISSING" if missing else "UNKNOWN")
+    custom_models = capabilities.get("custom_models", [])
+    b04 = next((item for item in custom_models if item.get("model_id") == "reheating_scalar_gravity_v1"), None)
     action = "ready"
     if missing:
         action = "run python -m feynagent init"
@@ -53,6 +55,7 @@ def inspect_initialization(root: Path) -> dict[str, Any]:
         "ready": not missing and status in {"PASS", "WARNING"},
         "missing_files": missing,
         "missing_cli_options": missing_paths,
+        "custom_model": b04 or {"model_id": "reheating_scalar_gravity_v1", "status": "MISSING_KNOWLEDGE"},
         "action": action,
     }
 

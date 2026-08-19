@@ -1,0 +1,32 @@
+schema_version: 0.1.0
+object_id: backend_profile:b04_custom_gravity_audited
+backend_profile_id: backend_profile:b04_custom_gravity_audited
+backend_kind: audited_custom_backend
+status: approved
+resolves:
+  model_id: reheating_scalar_gravity_v1
+  sector: gravity
+capabilities:
+  process_types:
+  - scattering_2_to_2
+  loop_orders:
+  - 0
+  operations:
+  - structural
+  - amplitude_only
+  - benchmark_regression
+custom:
+  backend_id: direct_feyncalc_custom_audited
+  model_id: reheating_scalar_gravity_v1
+  process_id: process:B04_phi_phi_to_h_h
+  convention_id: conventions:reheating_scalar_gravity_v1
+  knowledge_manifest: benchmarks/B04_phi_phi_to_hh/knowledge_manifest.yaml
+  rule_audit_required: true
+  required_rule_ids:
+  - propagator:phi
+  - vertex:h_phi_phi
+  - propagator:h
+  - vertex:h_h_h
+  - vertex:h_h_phi_phi
+metadata:
+  notes: Exact audited custom route for locked B04 only; it is not authority for arbitrary gravity or BSM models.

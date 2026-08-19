@@ -21,6 +21,7 @@ from feynagent.b04_topology import (
 )
 from feynagent.diagrams import diagram_signature, generate_tree_2_to_2
 from feynagent.render import render_tikz_feynman
+from feynagent.render.tikz import build_tikz_document
 
 try:
     import jsonschema
@@ -134,6 +135,24 @@ class B04TopologyPhase5Tests(unittest.TestCase):
             pdf = Path(manifest["outputs"]["pdf"])
             self.assertTrue(pdf.exists())
             self.assertGreater(pdf.stat().st_size, 0)
+
+    def test_b04_tex_uses_latex_particle_presentation_labels(self):
+        physics, _, _, _, generated = self.inputs()
+        tex = build_tikz_document(physics, generated)
+        for expected in [
+            r"\phi(p_{1})",
+            r"\phi(p_{2})",
+            r"h_{\mu\nu}(k_{1})",
+            r"h_{\sigma\gamma}(k_{2})",
+        ]:
+            self.assertIn(expected, tex)
+        self.assertNotRegex(tex, r"(?<!\\)phi\(p_")
+        for stale in [
+            "h_{mu nu}",
+            "h_{sigma gamma}",
+        ]:
+            self.assertNotIn(stale, tex)
+
 
     def test_no_b04_specific_logic_in_generic_topology_core(self):
         text = (ROOT / "src" / "feynagent" / "diagrams" / "topology.py").read_text(encoding="utf-8")

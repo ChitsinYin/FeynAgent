@@ -21,6 +21,9 @@ STANDARD_TERMS = {
 }
 CUSTOM_TERMS = ["custom", "yukawa", "new interaction", "nonstandard", "user supplied", "lagrangian"]
 AMBIGUOUS_TERMS = ["whatever", "something", "unknown", "unspecified", "invent", "guess"]
+B04_MODEL_ID = "reheating_scalar_gravity_v1"
+B04_PROCESS_ID = "process:B04_phi_phi_to_h_h"
+B04_BACKEND = "direct_feyncalc_custom_audited"
 
 
 def classify_request(text: str, *, initialized: bool = True) -> dict[str, Any]:
@@ -37,12 +40,32 @@ def classify_request(text: str, *, initialized: bool = True) -> dict[str, Any]:
             "reason": "ambiguous or unsupported custom physics request",
             "requires_review": ["custom rules", "conventions", "provenance"],
         }
+    if _is_b04_request(lowered):
+        return {
+            "classification": "custom_audited",
+            "reason": "matched the single locked B04 scalar-to-two-graviton route",
+            "model_id": B04_MODEL_ID,
+            "process_id": B04_PROCESS_ID,
+            "backend_kind": "audited_custom_backend",
+            "backend": B04_BACKEND,
+            "standard_qed_authority": False,
+            "production_ready_scope": "locked B04 benchmark only",
+            "requirements": [
+                "registered external knowledge package",
+                "convention lock",
+                "rule audit PASS",
+                "explicit approved ExecutionRequest",
+            ],
+            "m2_policy": "separate explicit authorization; never implied by topology/amplitudes",
+        }
     if any(term in lowered for term in CUSTOM_TERMS):
         if _has_rule_like_detail(lowered):
             return {
                 "classification": "custom_audited",
-                "reason": "custom interaction with rule-like details present",
-                "backend_preference": "custom FeynArts-compatible model/adapter; legacy fallback/reference only",
+                "reason": "custom interaction has rule-like details for intake/review only",
+                "backend": None,
+                "production_ready": False,
+                "requires_review": ["validated backend", "convention lock", "rule audit", "ExecutionRequest"],
             }
         return {
             "classification": "unsupported_requires_review",
@@ -65,6 +88,16 @@ def classify_request(text: str, *, initialized: bool = True) -> dict[str, Any]:
 
 def _has_rule_like_detail(text: str) -> bool:
     return bool(re.search(r"\b(l\s*=|lagrangian|y\s*\bar|phi|rule|vertex|provenance|metric)\b", text))
+
+
+def _is_b04_request(text: str) -> bool:
+    normalized = re.sub(r"[-_/]+", " ", text)
+    if "b04" in normalized:
+        return True
+    gravity_cue = any(term in normalized for term in ("graviton", "gravitons", "gravity"))
+    scalar_pair_cue = any(term in normalized for term in ("phi phi", "inflaton pair", "two inflatons", "scalar pair"))
+    two_graviton_cue = any(term in normalized for term in ("two gravitons", "graviton pair", "h h"))
+    return gravity_cue and scalar_pair_cue and two_graviton_cue
 
 
 def search_reference_index(root: Path, query: str) -> list[dict[str, Any]]:
@@ -92,6 +125,8 @@ def run_eval(path: Path) -> dict[str, Any]:
         passed = result["classification"] == case["expected_classification"]
         if case.get("expected_action_contains"):
             passed = passed and case["expected_action_contains"] in json.dumps(result)
+        for key, expected in case.get("expected_fields", {}).items():
+            passed = passed and result.get(key) == expected
         results.append({"id": case["id"], "passed": passed, "expected": case["expected_classification"], "actual": result})
     return {"passed": all(item["passed"] for item in results), "count": len(results), "results": results}
 

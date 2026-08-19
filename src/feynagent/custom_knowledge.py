@@ -37,7 +37,8 @@ class KnowledgeVerification:
     issues: tuple[str, ...] = ()
 
     def as_capability(self) -> dict[str, Any]:
-        payload: dict[str, Any] = {"model_id": self.model_id, "status": self.status}
+        reported_status = "CONFLICT" if self.status == CONFLICT_REQUIRES_REVIEW else self.status
+        payload: dict[str, Any] = {"model_id": self.model_id, "status": reported_status}
         if self.readiness:
             payload["readiness"] = self.readiness
         if self.process_id:

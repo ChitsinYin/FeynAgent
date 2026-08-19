@@ -14,8 +14,11 @@ Do not maintain duplicate standard QED Feynman-rule formulas as the production s
 
 ## Custom Audited
 
-Use `custom_audited` only when custom rules, conventions, and provenance are explicit. Prefer producing or adapting a FeynArts-compatible model so mature native tooling still owns diagram and algebra mechanics. Use the legacy custom backend only as fallback/reference.
+The only executable custom route is B04 `phi phi -> h h` with model `reheating_scalar_gravity_v1` and backend `direct_feyncalc_custom_audited`. It requires the registered external package, exact convention lock, rule audit `PASS`, and an approved linked ExecutionRequest.
+
+Other explicit custom rules may be classified `custom_audited` for intake/review, but have no production backend. Legacy custom code remains fallback/reference and is not authority for arbitrary BSM or gravity.
 
 ## Execution Boundary
 
 Benchmark regression is allowed only when explicitly authorized as such. Production heavy computation requires separate explicit authorization. Do not treat a benchmark regression approval as production-heavy approval.
+For B04, topology/amplitude authorization never implies M2 authorization. M2 remains a separate deterministic manual run after conflict-free amplitude closure.
