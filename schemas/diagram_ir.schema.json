@@ -30,7 +30,7 @@
       ]
     },
     "process_id": {
-      "$ref": "#/$defs/object_id"
+      "$ref": "#/$defs/external_object_id"
     },
     "diagrams": {
       "type": "array",
@@ -47,6 +47,10 @@
     "object_id": {
       "type": "string",
       "pattern": "^[a-z][a-z0-9_./:-]*$"
+    },
+    "external_object_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_./:-]*$"
     },
     "particle_id": {
       "type": "string",
@@ -74,7 +78,7 @@
           "$ref": "#/$defs/object_id"
         },
         "process_id": {
-          "$ref": "#/$defs/object_id"
+          "$ref": "#/$defs/external_object_id"
         },
         "status": {
           "type": "string",
@@ -466,6 +470,10 @@
         "created_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "source_knowledge_lock_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
         }
       }
     }

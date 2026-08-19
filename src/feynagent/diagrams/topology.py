@@ -135,21 +135,7 @@ def diagram_signature(diagram: dict[str, Any]) -> tuple[Any, ...]:
     vertices = []
     for vertex in diagram.get("vertex_instances", []):
         bindings = tuple(
-            sorted(
-                (
-                    binding["rule_slot"],
-                    binding["endpoint_kind"],
-                    binding["endpoint_particle_id"],
-                    binding["momentum_label"],
-                    binding["expected_particle_id"],
-                    binding["expected_field_id"],
-                    binding["crossing_treatment"],
-                    binding["momentum_substitution"],
-                    binding["fermion_flow"]["field_orientation"],
-                    binding["fermion_flow"]["flow_direction"],
-                )
-                for binding in vertex["slot_bindings"]
-            )
+            sorted(_binding_signature(binding) for binding in vertex["slot_bindings"])
         )
         vertices.append((vertex["rule_id"], bindings))
     return (
@@ -164,6 +150,35 @@ def diagram_signature(diagram: dict[str, Any]) -> tuple[Any, ...]:
         tuple(sorted(vertices)),
     )
 
+
+
+def _binding_signature(binding: dict[str, Any]) -> tuple[Any, ...]:
+    flow = binding["fermion_flow"]
+    if flow["field_orientation"] in {"psi", "psi_bar"}:
+        return (
+            "fermion",
+            binding["rule_slot"],
+            binding["endpoint_kind"],
+            binding["endpoint_particle_id"],
+            binding["momentum_label"],
+            binding["expected_particle_id"],
+            binding["expected_field_id"],
+            binding["crossing_treatment"],
+            binding["momentum_substitution"],
+            flow["field_orientation"],
+            flow["flow_direction"],
+        )
+    return (
+        "boson",
+        binding["endpoint_kind"],
+        binding["endpoint_particle_id"],
+        binding["momentum_label"],
+        binding["expected_particle_id"],
+        binding["crossing_treatment"],
+        binding["momentum_substitution"],
+        flow["field_orientation"],
+        flow["flow_direction"],
+    )
 
 def _validate_supported_inputs(
     physics_card: dict[str, Any],
@@ -638,8 +653,10 @@ def _antiparticle(
 
 
 def _id_tail(object_id: str) -> str:
-    return object_id.split(":")[-1].replace("_", "-")
+    return object_id.split(":")[-1].replace("_", "-").lower()
 
 
 def _endpoint_slot_from_id(endpoint_id: str) -> str:
     return endpoint_id.split(":")[-1]
+
+

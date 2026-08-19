@@ -1,4 +1,4 @@
-﻿"""Deterministic TikZ-Feynman rendering for DiagramIR 0.1.2."""
+"""Deterministic TikZ-Feynman rendering for DiagramIR 0.1.2."""
 
 from __future__ import annotations
 
@@ -295,7 +295,7 @@ def _is_fermion_binding(binding: dict[str, Any]) -> bool:
 
 
 def _boson_style(particle_id: str) -> str:
-    if particle_id == "gamma":
+    if particle_id in {"gamma", "h"}:
         return "photon"
     return "scalar"
 
@@ -408,6 +408,7 @@ def _validate_inputs(
         raise RenderError("PhysicsCard process_id does not match DiagramIR")
     if not convention_card.get("all_momenta_incoming_vertex_convention"):
         raise RenderError("renderer requires explicit all-momenta-incoming convention")
+
 
 
 
