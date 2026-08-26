@@ -86,7 +86,7 @@ Codex loads user skills from `$HOME/.agents/skills`. Install the canonical repos
 $skillTarget = Join-Path $HOME ".agents\skills\feynagent"
 New-Item -ItemType Directory -Path $skillTarget -Force
 Copy-Item -Path skills\feynagent\* -Destination $skillTarget -Recurse -Force
-python C:\Users\lenovo\.codex\skills\.system\skill-creator\scripts\quick_validate.py $skillTarget
+python <path-to-skill-creator>\scripts\quick_validate.py $skillTarget
 ```
 
 Do not keep a duplicate FeynAgent skill under an obsolete legacy location such as `$HOME/.codex/skills/feynagent`; duplicate skill names can both appear in Codex selectors and make validation ambiguous.
@@ -149,4 +149,4 @@ The runner also snapshots input files under `runs/<run_id>/inputs/` and records 
 
 FeynAgent relies on externally installed FeynCalc, FeynArts, Mathematica/Wolfram, LaTeX, and the separately supplied B04 external knowledge package when that locked route is used. Those tools and materials remain subject to their own licenses, installation terms, access controls, and citation requirements. When publishing results, cite FeynAgent if used, and also cite the exact external packages and versions that performed the diagram generation, algebra, rendering, or execution.
 
-See [CITATION.cff](CITATION.cff), [docs/QUICKSTART.md](docs/QUICKSTART.md), and [docs/RELEASE_SCOPE_V0_1.md](docs/RELEASE_SCOPE_V0_1.md).
+See [CITATION.cff](CITATION.cff), [SECURITY.md](SECURITY.md), [docs/QUICKSTART.md](docs/QUICKSTART.md), [docs/RELEASE_SCOPE_V0_1.md](docs/RELEASE_SCOPE_V0_1.md), and [docs/CUSTOM_KNOWLEDGE_TRUST.md](docs/CUSTOM_KNOWLEDGE_TRUST.md).

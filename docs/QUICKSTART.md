@@ -88,7 +88,7 @@ Codex loads user skills from `$HOME/.agents/skills`. Install the canonical repos
 $skillTarget = Join-Path $HOME ".agents\skills\feynagent"
 New-Item -ItemType Directory -Path $skillTarget -Force
 Copy-Item -Path skills\feynagent\* -Destination $skillTarget -Recurse -Force
-python C:\Users\lenovo\.codex\skills\.system\skill-creator\scripts\quick_validate.py $skillTarget
+python <path-to-skill-creator>\scripts\quick_validate.py $skillTarget
 ```
 
 The user skill should end up at:

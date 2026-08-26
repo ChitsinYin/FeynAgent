@@ -23,6 +23,7 @@ PUBLIC_SURFACE_PREFIXES = (
     "CHANGELOG.md",
     "CITATION.cff",
     "CONTRIBUTING.md",
+    "SECURITY.md",
     "docs/",
     "examples/",
     "skills/feynagent/",
