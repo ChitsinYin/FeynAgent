@@ -1,6 +1,6 @@
 # Day 8 Release PR Audit
 
-Status: PR_READY_PENDING_PR_HEAD_CI_AND_HUMAN_REVIEW
+Status: PR_BODY_READY_MANUAL_CREATION_REQUIRED
 
 Audit date: 2026-08-26
 Repository: `ChitsinYin/FeynAgent`
@@ -81,5 +81,25 @@ Do not merge until all of the following are true:
 - GitHub CI passes on the final PR head;
 - local `PREMERGE_RC_PASS` is accepted;
 - human diff review is approved.
+
+## PR Creation Attempt
+
+Automatic PR creation was attempted after pushing `release/v0.1.0`.
+
+- `gh --version`: unavailable; GitHub CLI is not installed in this environment.
+- GitHub connector read check for existing open PRs: PASS; no existing open PR from `release/v0.1.0` to `main` was found.
+- GitHub connector PR creation: FAIL; GitHub API returned `403 Resource not accessible by integration`.
+
+Because no authenticated PR-creation CLI/API is available in this environment, the PR was not created automatically. The prepared PR body remains recorded in `reports/DAY8_PR_BODY.md`.
+
+Manual GitHub UI steps:
+
+1. Open `https://github.com/ChitsinYin/FeynAgent/compare/main...release/v0.1.0`.
+2. Confirm base branch is `main` and compare branch is `release/v0.1.0`.
+3. Set the PR title to `release: FeynAgent v0.1.0`.
+4. Paste the body from `reports/DAY8_PR_BODY.md`.
+5. Create the PR without merging it.
+6. Wait for GitHub CI to pass on the final PR head.
+7. Merge only after GitHub CI PASS, local `PREMERGE_RC_PASS`, and human diff review approval.
 
 No merge, release tag, GitHub release, B04 M2 rerun, or history rewrite was performed during this PR audit.
