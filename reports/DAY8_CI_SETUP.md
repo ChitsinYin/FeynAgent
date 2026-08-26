@@ -1,6 +1,6 @@
 # Day 8 CI Setup Report
 
-Status: LOCAL_PASS_PENDING_PUSH
+Status: CI_PASS
 
 Branch: `release/v0.1.0`
 Remote: `https://github.com/ChitsinYin/FeynAgent.git`
@@ -56,4 +56,16 @@ PASS:
 
 ## Push and GitHub Actions observation
 
-Pending push and remote workflow observation.
+Pushed CI setup commit:
+
+- Commit: `8d3e705d200bf4e7a1d32891e8b1122f1a1604a8`
+- Workflow: `CI`
+- Run number: `1`
+- Run ID: `32952434337`
+- Event: `push`
+- Branch: `release/v0.1.0`
+- Status: `completed`
+- Conclusion: `success`
+- GitHub Actions URL: `https://github.com/ChitsinYin/FeynAgent/actions/runs/32952434337`
+
+A report-only follow-up commit records this observation on the release branch. Inspect the latest branch checks at `https://github.com/ChitsinYin/FeynAgent/actions?query=branch%3Arelease%2Fv0.1.0` before the human release gate.
