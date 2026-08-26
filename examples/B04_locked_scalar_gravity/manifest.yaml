@@ -1,0 +1,68 @@
+schema_version: 0.1.0
+example_id: example:b04_locked_scalar_gravity
+route: custom_audited
+process: phi phi -> h h
+process_id: process:B04_phi_phi_to_h_h
+model_id: reheating_scalar_gravity_v1
+backend: direct_feyncalc_custom_audited
+backend_profile: profiles/backends/b04_custom_gravity_audited.yaml
+physics_card: benchmarks/B04_phi_phi_to_hh/physics_card.yaml
+knowledge_manifest: benchmarks/B04_phi_phi_to_hh/knowledge_manifest.yaml
+external_knowledge:
+  required: true
+  bundled: false
+  concept: Separately supplied audited external knowledge package resolved through a machine-local .feynagent/knowledge_roots.yaml mapping and checked against the committed hash-only knowledge manifest.
+required_rule_ids:
+  - propagator:phi
+  - vertex:h_phi_phi
+  - propagator:h
+  - vertex:h_h_h
+  - vertex:h_h_phi_phi
+expected_topology_classes:
+  - label: a
+    topology: scalar_exchange
+    generated_channel: t
+    internal_species: phi
+    gold_internal_momentum: k1-p1
+    generated_internal_momentum: p1-k1
+    classification: MATCH_AFTER_EXPLICIT_REPRESENTATION_MAP
+    reduced_layer_amplitude: Ma = 0
+  - label: b
+    topology: scalar_exchange
+    generated_channel: u
+    internal_species: phi
+    gold_internal_momentum: k2-p1
+    generated_internal_momentum: p1-k2
+    classification: MATCH_AFTER_EXPLICIT_REPRESENTATION_MAP
+    reduced_layer_amplitude: Mb = 0
+  - label: c
+    topology: s_channel_graviton_exchange
+    generated_channel: s
+    internal_species: h
+    internal_momentum: p1+p2
+    classification: MATCH
+    reduced_layer_amplitude: Mc = -(3 i/8) kappa^2 M^2 T
+  - label: d
+    topology: contact_h_h_phi_phi
+    generated_channel: contact
+    internal_species: null
+    internal_momentum: null
+    classification: MATCH
+    reduced_layer_amplitude: Md = +(i/2) kappa^2 M^2 T
+reduced_benchmark_m2_summary:
+  layer: REDUCED_NR_TT
+  raw_polarization_summed_total: 2 M^4/M_P^4
+  initial_identical_factor: 1/2
+  final_identical_phase_space_factor: 1/2
+  rate_convention_M2: M^4/(2 M_P^4)
+unsupported:
+  - arbitrary gravity
+  - arbitrary BSM
+  - B04 M2 automatic execution without separate explicit authorization
+  - private/source external knowledge redistribution
+provenance:
+  topology_report: reports/DAY7_B04_TOPOLOGY.md
+  amplitude_report: reports/DAY7_B04_AMPLITUDE_CLOSURE.md
+  phase7_report: reports/DAY7_B04_PHASE7_CLOSURE.md
+  skill_e2e_report: reports/DAY7_B04_SKILL_E2E.md
+notes: Documentation/example manifest only. No private source PDF, notebook, absolute local path, or unapproved third-party content is bundled here.

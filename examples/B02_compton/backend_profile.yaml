@@ -1,0 +1,56 @@
+schema_version: 0.1.0
+object_id: backend_profile:feynarts_sm_qed
+backend_profile_id: backend_profile:feynarts_sm_qed
+backend_kind: feynarts_feyncalc_native
+status: approved
+resolves:
+  model_id: sm_qed
+  sector: qed
+capabilities:
+  process_types:
+  - scattering_2_to_2
+  loop_orders:
+  - 0
+  operations:
+  - structural
+  - amplitude_only
+  - benchmark_regression
+native:
+  feynarts:
+    model: SM
+    generic_model: Lorentz
+    restrictions: QEDOnly
+    insertion_level: Classes
+    exclude_topologies:
+    - Tadpoles
+    - SelfEnergies
+    - WFCorrections
+    particle_mappings:
+    - particle_id: e-
+      backend_identifier: F[2, {1}]
+      mass: SMP["m_e"]
+      external_state_kind: dirac_spin_half
+      spin_average_denominator: 2
+    - particle_id: e+
+      backend_identifier: -F[2, {1}]
+      mass: SMP["m_e"]
+      external_state_kind: dirac_spin_half
+      spin_average_denominator: 2
+    - particle_id: mu-
+      backend_identifier: F[2, {2}]
+      mass: SMP["m_mu"]
+      external_state_kind: dirac_spin_half
+      spin_average_denominator: 2
+    - particle_id: mu+
+      backend_identifier: -F[2, {2}]
+      mass: SMP["m_mu"]
+      external_state_kind: dirac_spin_half
+      spin_average_denominator: 2
+    - particle_id: gamma
+      backend_identifier: V[1]
+      mass: '0'
+      external_state_kind: massless_vector
+      spin_average_denominator: 2
+metadata:
+  notes: FeynArts SM/Lorentz QEDOnly profile for standard tree-level QED benchmarks;
+    generated artifacts belong under runs/.

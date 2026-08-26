@@ -18,6 +18,8 @@ python -m feynagent init
 
 If auto-detection cannot find Wolfram/FeynCalc, ask only for the missing path, for example `--wolframscript` or `--feyncalc-dir`. Do not install software silently.
 
+For B04, also require `custom_model:reheating_scalar_gravity_v1 AVAILABLE`; the external knowledge package is separately supplied and is not installed by FeynAgent.
+
 ## Request Classification
 
 Use:
@@ -28,13 +30,13 @@ python skills/feynagent/scripts/run_feynagent.py classify "e- gamma -> e- gamma 
 
 Classifications:
 
-- `standard_native`: use native FeynArts/FeynCalc for standard supported sectors.
-- `custom_audited`: require explicit custom rules, conventions, and provenance.
-- `unsupported_requires_review`: ambiguous, unsupported, or missing reviewed rule information.
+- `standard_native`: use native FeynArts/FeynCalc only for validated tree-level QED 2->2 with `e-`, `e+`, `mu-`, `mu+`, and `gamma`.
+- `custom_audited`: execute only locked B04 `phi phi -> h h`, `model_id = reheating_scalar_gravity_v1`, backend `direct_feyncalc_custom_audited`; other custom requests are intake/review only.
+- `unsupported_requires_review`: ambiguous, unsupported, or missing reviewed rule information, including arbitrary SM, QCD production, arbitrary BSM, arbitrary gravity, loops, renormalization, or ungated production-heavy execution.
 
 ## Standard Native Workflow
 
-For standard QED/SM/QCD requests:
+For validated standard QED 2->2 requests:
 
 1. Search `.feynagent/reference_index.json` first.
 2. Use FeynArts/FeynCalc native backend.
@@ -47,15 +49,29 @@ Example search:
 python skills/feynagent/scripts/run_feynagent.py search-examples "ElGa-ElGa Compton"
 ```
 
-## Custom Audited Workflow
+## Locked B04 Workflow
 
-For custom interactions:
+For B04:
+
+1. Use `benchmarks/B04_phi_phi_to_hh/physics_card.yaml`.
+2. Use `profiles/backends/b04_custom_gravity_audited.yaml`.
+3. Require `model_id = reheating_scalar_gravity_v1` and backend `direct_feyncalc_custom_audited`.
+4. Resolve the separately supplied audited external knowledge package through the registered manifest.
+5. Require convention lock and rule audit `PASS` before amplitudes continue.
+6. Do not treat topology or amplitude authorization as M2 authorization.
+
+## Other Custom Requests
+
+For all custom interactions outside locked B04:
 
 1. Require explicit rules/conventions/provenance.
 2. Never invent trusted rules.
-3. Map rules to FeynCalc elementary objects where possible.
-4. Prefer a custom FeynArts-compatible model/adapter.
-5. Use the legacy custom backend only as fallback/reference.
+3. Stop at intake/review unless a separately validated backend is added.
+4. Do not present arbitrary BSM or gravity as production-ready.
+
+## Platform Boundary
+
+Full physics E2E validation for v0.1 was performed on Windows 11 with the tested Wolfram/FeynCalc/FeynArts toolchain. Do not claim Linux/macOS full physics validation merely because Python tests pass there.
 
 ## Execution Boundary
 

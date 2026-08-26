@@ -1,0 +1,77 @@
+schema_version: 0.2.0
+object_id: physics_card:b02_compton
+status: approved
+process_id: process:b02_compton
+process_type: scattering_2_to_2
+perturbative_order:
+  loop_order: 0
+  restriction: tree_level_only
+coupling_order:
+  mode: explicit
+  orders:
+  - coupling: e
+    power: 2
+particles:
+  incoming:
+  - slot: 1
+    particle_id: e-
+    display_name: electron
+    state_role: incoming
+    momentum_label: p1
+    latex_label: e^{-}
+  - slot: 2
+    particle_id: gamma
+    display_name: photon
+    state_role: incoming
+    momentum_label: k1
+    latex_label: \gamma
+  outgoing:
+  - slot: 3
+    particle_id: e-
+    display_name: electron
+    state_role: outgoing
+    momentum_label: p2
+    latex_label: e^{-}
+  - slot: 4
+    particle_id: gamma
+    display_name: photon
+    state_role: outgoing
+    momentum_label: k2
+    latex_label: \gamma
+internal_species_policy:
+  allowed_particle_ids:
+  - e-
+requested_outputs:
+- diagram_ir
+- tikz_feynman
+- latex_amplitude
+- feyncalc_code
+- validation_report
+approval:
+  topology:
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-12T13:53:39+08:00'
+    notes: Approved only for the B02 tree topology representation during the 0.1.1
+      migration.
+  amplitude_generation:
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-12T19:48:05.9409820+08:00'
+    notes: Approved for B02 only after QED convention audit; no amplitude was generated
+      in this approval step.
+  heavy_calculation:
+    status: not_requested
+    notes: Heavy Mathematica/FeynCalc calculations remain explicitly unapproved.
+metadata:
+  notes: B02 Compton scattering benchmark; amplitude generation is approved after
+    the QED convention audit, but amplitudes, traces, polarization sums, Ward identity
+    checks, and heavy calculations were not generated or run in the approval step.
+presentation:
+  particle_latex_labels:
+  - particle_id: e-
+    latex_label: e^{-}
+  - particle_id: gamma
+    latex_label: \gamma
+model_id: sm_qed
+sector: qed

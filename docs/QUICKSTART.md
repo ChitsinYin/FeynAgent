@@ -4,18 +4,22 @@ This guide assumes you are a HEP student who has not used FeynArts or FeynCalc b
 
 ## 1. What FeynAgent Can Do In v0.1
 
-FeynAgent v0.1 supports a narrow public workflow:
+FeynAgent v0.1 supports two validated public routes:
 
-- tree-level QED 2-to-2 scattering;
-- external `e-`, `e+`, `mu-`, `mu+`, and `gamma` states;
-- FeynArts/FeynCalc native backend;
+- standard native tree-level QED 2-to-2 scattering with external `e-`, `e+`, `mu-`, `mu+`, and `gamma` states;
+- FeynArts/FeynCalc native backend `feynarts_feyncalc_native` for that standard QED scope;
 - diagrams, channel-separated amplitudes, LaTeX/PDF, executable FeynCalc output;
 - bounded benchmark M2 execution when an `ExecutionRequest` authorizes it;
-- validation and provenance reports.
+- validation and provenance reports;
+- the single locked custom B04 route `phi phi -> h h`, `model_id = reheating_scalar_gravity_v1`, backend `direct_feyncalc_custom_audited`, requiring separately supplied audited external knowledge.
 
-It does not yet support arbitrary Standard Model, QCD, custom BSM, or custom graviton production workflows.
+It does not support arbitrary Standard Model workflows, arbitrary gravity, arbitrary BSM, QCD production, loops, renormalization, or ungated production-heavy execution.
 
-## 2. Install Prerequisites
+## 2. Validated Platform
+
+Full physics E2E validation for the v0.1 release candidate was performed on Windows 11 with the tested Wolfram/FeynCalc/FeynArts toolchain. Passing Python tests on Linux or macOS are not a claim that full physics E2E workflows are validated on those platforms.
+
+## 3. Install Prerequisites
 
 Install these outside FeynAgent:
 
@@ -30,10 +34,11 @@ $LoadAddOns = {"FeynArts"};
 ```
 
 5. A LaTeX engine such as `lualatex` if you want `amplitudes.pdf`.
+6. For B04 only, the audited external knowledge package registered by `benchmarks/B04_phi_phi_to_hh/knowledge_manifest.yaml`.
 
-FeynAgent does not install or relicense Mathematica/Wolfram, FeynCalc, FeynArts, LaTeX, or their documentation/examples.
+FeynAgent does not install or relicense Mathematica/Wolfram, FeynCalc, FeynArts, LaTeX, their documentation/examples, or the B04 external knowledge package.
 
-## 3. Install FeynAgent
+## 4. Install FeynAgent
 
 From a cloned repository:
 
@@ -49,9 +54,9 @@ From a wheel:
 python -m pip install dist\feynagent-0.1.0-py3-none-any.whl
 ```
 
-The Day-6 release-candidate wheel was tested in a fresh venv with no editable install and no `PYTHONPATH=src`.
+The release-candidate wheel was tested in a fresh Windows 11 physics-toolchain venv with no editable install and no `PYTHONPATH=src`.
 
-## 4. Initialize And Doctor
+## 5. Initialize And Doctor
 
 Run:
 
@@ -60,7 +65,7 @@ python -m feynagent init --timeout 60
 python -m feynagent doctor --timeout 60
 ```
 
-Expected successful shape:
+Expected successful shape for the standard native QED route:
 
 ```text
 FeynAgent init: PASS
@@ -71,9 +76,11 @@ FeynAgent init: PASS
 - latex: PASS
 ```
 
+For B04, the capability report must also show `custom_model:reheating_scalar_gravity_v1 AVAILABLE`. If it is missing, the locked B04 route is unavailable on that machine.
+
 `init` writes machine-local files under `.feynagent/`. Do not commit those files.
 
-## 5. Install The Codex Skill
+## 6. Install The Codex Skill
 
 Codex loads user skills from `$HOME/.agents/skills`. Install the canonical repository skill source to `$HOME/.agents/skills/feynagent`:
 
@@ -92,7 +99,7 @@ $HOME/.agents/skills/feynagent
 
 Do not keep a duplicate FeynAgent skill under an obsolete legacy location such as `$HOME/.codex/skills/feynagent`; duplicate skill names can both appear in Codex selectors and make validation ambiguous.
 
-## 6. First Compton Request In Codex
+## 7. First Compton Request In Codex
 
 Open a fresh Codex task in the FeynAgent project and ask:
 
@@ -102,7 +109,7 @@ Generate the standard tree-level Compton scattering artifact bundle for e- gamma
 
 Do not ask Codex to hand-write Feynman rules for this standard QED process. The native FeynArts/FeynCalc backend owns standard QED diagrams and amplitudes.
 
-## 7. Run The Public CLI Directly
+## 8. Run The Standard Native Public CLI Directly
 
 Create or reuse an approved `ExecutionRequest` for bounded benchmark regression, then run:
 
@@ -133,7 +140,26 @@ allowed_operations:
   - heavy_simplification
 ```
 
-## 8. Find Your Outputs
+## 9. Locked B04 Route
+
+The only validated custom route is B04:
+
+```text
+phi phi -> h h
+model_id = reheating_scalar_gravity_v1
+backend = direct_feyncalc_custom_audited
+```
+
+It uses the repository B04 PhysicsCard and backend profile:
+
+```text
+benchmarks/B04_phi_phi_to_hh/physics_card.yaml
+profiles/backends/b04_custom_gravity_audited.yaml
+```
+
+This route requires the separately supplied audited external knowledge package. It is not support for arbitrary gravity or arbitrary BSM models. B04 topology and amplitude authorization do not authorize a B04 M2 calculation; M2 requires separate explicit operations and remains outside automatic public execution.
+
+## 10. Find Your Outputs
 
 The runner prints a run directory such as:
 
@@ -141,7 +167,7 @@ The runner prints a run directory such as:
 runs/20260815_114653_b02_compton_7dff0c3c
 ```
 
-Important files include:
+Important files can include:
 
 ```text
 inputs/physics_card.yaml
@@ -167,7 +193,7 @@ stderr.log
 
 For B02, `amplitudes.json` should report two channels: `s` and `u`.
 
-## 9. Heavy-Computation Approval Behavior
+## 11. Heavy-Computation Approval Behavior
 
 FeynAgent separates artifact generation from heavy execution:
 
@@ -175,8 +201,8 @@ FeynAgent separates artifact generation from heavy execution:
 - `benchmark_regression`: execute bounded M2 only with approved `ExecutionRequest`, fixed timeout, and required operation permissions.
 - `production_heavy`: refused unless explicitly authorized as production-heavy.
 
-Benchmark-regression approval is not production-heavy approval.
+Benchmark-regression approval is not production-heavy approval. B04 M2 is not implied by B04 topology or amplitude authorization.
 
-## 10. Cite And Respect Third-Party Licenses
+## 12. Cite And Respect Third-Party Licenses
 
-FeynAgent is Apache-2.0. External packages remain under their own terms. Cite FeynAgent and also cite the exact FeynCalc, FeynArts, Mathematica/Wolfram, and backend versions used to produce your artifacts.
+FeynAgent is Apache-2.0. External packages remain under their own terms. Cite FeynAgent and also cite the exact FeynCalc, FeynArts, Mathematica/Wolfram, external knowledge package, and backend versions used to produce your artifacts.

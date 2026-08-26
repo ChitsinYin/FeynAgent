@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "feynagent"
 version = "0.1.0"
-description = "Reproducible FeynArts/FeynCalc-native QED benchmark tooling with audited legacy custom backends."
+description = "Reproducible FeynArts/FeynCalc-native QED 2-to-2 tooling plus the locked B04 custom audited benchmark route."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]

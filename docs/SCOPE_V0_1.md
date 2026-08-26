@@ -2,32 +2,36 @@
 
 ## Project Goal
 
-FeynAgent aims to help HEP phenomenology researchers move from natural-language process descriptions and user-supplied Feynman rules to auditable, structured physics specifications, complete tree-level diagrams, diagram-level rule assembly, LaTeX amplitudes, and executable Mathematica/FeynCalc code.
+FeynAgent helps HEP phenomenology researchers move from bounded, reviewed process descriptions to auditable, structured physics specifications, diagram and amplitude artifacts, LaTeX output, executable Mathematica/FeynCalc code, and validation/provenance records.
 
 The tool is not intended to replace human physics judgment. It should make assumptions explicit, preserve provenance, and produce artifacts that a researcher can inspect, approve, and validate.
 
-## Supported Scope
+## Supported Public Scope
 
-v0.1 supports:
+v0.1 supports only:
 
-- Tree-level processes only.
-- `1 -> n` decays and `2 -> 2` scattering.
-- Initial benchmark focus on `2 -> 2` scattering.
-- Scalar, Dirac fermion, vector, and symmetric rank-2 tensor fields at the representation level.
-- A rules-first workflow.
-- User-supplied or pre-registered Feynman rules.
-- Standard QED rules as the first built-in rule set.
-- A custom rule registry with provenance.
-- Explicit convention records.
-- A diagram intermediate representation named `DiagramIR`.
-- Later generation of TikZ-Feynman, LaTeX amplitudes, and FeynCalc code from the same `DiagramIR`.
+- Standard native tree-level QED 2->2 workflows.
+- External QED particles `e-`, `e+`, `mu-`, `mu+`, and `gamma`.
+- The `feynarts_feyncalc_native` backend for the validated standard QED scope.
+- B01, B02, and B03 benchmarked standard-native examples.
+- The single locked custom B04 route `phi phi -> h h`.
+- B04 `model_id = reheating_scalar_gravity_v1`.
+- B04 backend `direct_feyncalc_custom_audited`.
+- B04 execution only with separately supplied audited external knowledge and exact convention/rule audit gates.
+- Explicit convention records, provenance records, and human approval gates.
+- Generated artifacts under `runs/<run_id>/`.
 
 ## Explicit Non-Goals
 
 v0.1 does not support:
 
+- Arbitrary Standard Model process production.
+- QCD production.
+- Arbitrary BSM production.
+- Arbitrary gravity or graviton production beyond the locked B04 route.
 - Loop diagrams.
 - Automatic renormalization.
+- Counterterms or higher-order corrections.
 - Automatic derivation of arbitrary Feynman rules from arbitrary Lagrangians.
 - Full FeynRules integration.
 - Automatic thermal field theory.
@@ -35,9 +39,15 @@ v0.1 does not support:
 - Boltzmann equations.
 - Automatic paper writing.
 - Autonomous long-running Mathematica calculations.
+- Ungated production-heavy execution.
+- B04 M2 execution without separate explicit authorization.
 - Remote or HPC workflows.
 - GUI or web app workflows.
 - Arbitrary model discovery.
+
+## Validated Platform
+
+Full physics E2E validation for the v0.1 release candidate was performed on Windows 11 with the tested Wolfram/FeynCalc/FeynArts toolchain. Passing Python tests on Linux or macOS do not establish full physics E2E validation on those platforms.
 
 ## Human Approval Gates
 
@@ -50,30 +60,17 @@ Human approval is required before:
 - Updating benchmark gold files.
 - Running heavy external symbolic calculations.
 - Treating generated LaTeX, TikZ, or Mathematica code as publishable.
-
-## Day 1 Acceptance Criteria
-
-Day 1 is complete when:
-
-- The repository skeleton exists with `docs`, `schemas`, `src/feynagent`, `rules`, `benchmarks`, `scripts`, `tests`, `runs`, and `reports`.
-- The top-level files `README.md`, `AGENTS.md`, `.gitignore`, and `pyproject.toml` exist.
-- `docs/SCOPE_V0_1.md` records supported scope, non-goals, approval gates, acceptance criteria, and the v0.1 Definition of Done.
-- `docs/ARCHITECTURE.md` defines the conceptual pipeline.
-- `docs/DESIGN_DECISIONS.md` records the initial architectural decisions.
-- Git is initialized if the directory was not already a repository.
-- No dependencies are installed and no physics calculations are attempted.
+- Running B04 M2 or other squared-amplitude calculations outside already approved bounded benchmark-regression requests.
 
 ## v0.1 Definition of Done
 
 v0.1 is done when:
 
-- Structured cards exist for process specification and conventions.
-- A provenance-aware rule registry can load built-in QED rules and user-supplied custom rules.
+- Public documentation states the same validated scope across README, quickstart, release scope, backend strategy, readiness levels, skill instructions, citation metadata, and package metadata.
+- Structured cards exist for process specification, conventions, backend profiles, and execution requests.
 - Candidate processes can be promoted to approved processes only through explicit checks.
-- `DiagramIR` can represent complete tree-level diagrams for the benchmark `2 -> 2` scope.
-- Diagram-level rule assembly is inspectable and reproducible.
-- LaTeX amplitude and FeynCalc code generation are derived from `DiagramIR`.
-- Initial benchmarks have stable gold artifacts and regression tests.
+- Standard-native QED benchmark artifacts and regression tests pass for B01/B02/B03.
+- Locked B04 topology, amplitude, LaTeX, backend dispatch, rule audit, and skill-route checks pass for the single audited custom route.
 - Unsupported requests fail clearly with documented reasons.
 - Heavy algebra remains human-controlled outside the live agent loop.
-
+- The final release date is assigned only at the human release gate.

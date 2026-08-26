@@ -1,0 +1,18 @@
+schema_version: 0.1.0
+example_id: example:b02_compton
+process_id: process:b02_compton
+route: standard_native
+backend: feynarts_feyncalc_native
+expected_channels:
+  - channel: s
+    internal_particle: e-
+    routing: p1+k1
+  - channel: u
+    internal_particle: e-
+    routing: p1-k2
+expected_diagram_count: 2
+expected_massless_m2: '(-2*(s^2 + u^2)*SMP["e"]^4)/(s*u)'
+provenance:
+  evidence_report: reports/DAY4_M2_REGRESSION.md
+  public_runner_manifest: runs/day6_public_runner/20260815_105021_b02_compton_e117f8e7/run_manifest.json
+notes: Expected massless M2 is the bounded benchmark-regression result for the standard native Compton example.

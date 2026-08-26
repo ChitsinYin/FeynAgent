@@ -1,8 +1,8 @@
 cff-version: 1.2.0
-message: "If you use FeynAgent in research, please cite this software and the external physics packages that performed the native calculations."
+message: "If you use FeynAgent in research, please cite this software and the external physics packages or knowledge packages that performed the calculations."
 title: "FeynAgent"
 version: "0.1.0"
-date-released: "2026-08-15"
+# date-released is intentionally omitted during release-candidate preparation; finalize it at the human release gate.
 authors:
   - family-names: "Yin"
     given-names: "Chitsin"
@@ -10,7 +10,10 @@ license: "Apache-2.0"
 abstract: >-
   FeynAgent is a reproducible, deterministic release-candidate workflow for
   public-facing tree-level standard-QED 2-to-2 benchmarks using externally
-  installed FeynArts and FeynCalc as the native diagram and algebra backend.
+  installed FeynArts and FeynCalc as the native diagram and algebra backend,
+  plus the single locked B04 phi phi -> h h custom audited benchmark route
+  for model_id reheating_scalar_gravity_v1 with separately supplied audited
+  external knowledge.
 keywords:
   - high-energy physics
   - QED
@@ -24,7 +27,6 @@ preferred-citation:
     - family-names: "Yin"
       given-names: "Chitsin"
   version: "0.1.0"
-  date-released: "2026-08-15"
   license: "Apache-2.0"
 references:
   - type: article
@@ -46,3 +48,6 @@ references:
   - type: software
     title: "Wolfram Language / Mathematica"
     notes: "Mathematica/Wolfram is an external proprietary dependency; follow Wolfram Research license and citation guidance."
+  - type: generic
+    title: "B04 reheating_scalar_gravity_v1 audited external knowledge package"
+    notes: "Required only for the locked B04 route; cite and access according to the separately supplied package provenance and license terms."

@@ -1,0 +1,26 @@
+schema_version: 0.1.0
+object_id: execution_request:examples/b02_compton_benchmark_regression
+status: approved
+request_id: execution_request:examples/b02_compton_benchmark_regression
+physics_card_id: physics_card:b02_compton
+backend_profile_id: backend_profile:feynarts_sm_qed
+execution_mode: benchmark_regression
+authorized_by: example_user
+authorized_at: '2026-08-26T00:00:00+00:00'
+timeout_policy:
+  kind: fixed_seconds
+  seconds: 180
+allowed_operations:
+  - schema_validation
+  - diagram_generation
+  - amplitude_generation
+  - latex_render
+  - feyncalc_smoke
+  - m2_regression
+  - spin_sums
+  - polarization_sums
+  - heavy_simplification
+metadata:
+  notes: Public example request for bounded B02 benchmark regression only; not production-heavy authorization.
+  created_by: FeynAgent Day 8 public examples audit
+  created_at: '2026-08-26T00:00:00+00:00'

@@ -1,27 +1,27 @@
 # FeynAgent Architecture
 
-## Day-4 Backend Architecture
+## Backend Architecture
 
-Day 4 pivots FeynAgent from a Python-first reimplementation path to a native-backend-first architecture for standard supported sectors.
+FeynAgent uses explicit backend contracts instead of treating every installed model or rule registry entry as production support.
 
-The backend roles are:
+The public v0.1 backend roles are:
 
-- `feynarts_feyncalc_native`: primary production backend for standard QED, SM, and QCD sectors supported by installed FeynArts/FeynCalc model files.
+- `feynarts_feyncalc_native`: primary production backend for validated standard tree-level QED 2->2 with external `e-`, `e+`, `mu-`, `mu+`, and `gamma`.
+- `direct_feyncalc_custom_audited`: executable only for locked B04 `phi phi -> h h`, `model_id = reheating_scalar_gravity_v1`, with separately supplied audited external knowledge.
 - `legacy_custom_backend`: retained Days 1-3 Python topology, AmplitudeIR, LaTeX, and FeynCalc renderer implementation for regression, pedagogy, audit, and fallback.
-- `custom_audited_model`: future path for user-supplied nonstandard interactions; the custom RuleRegistry remains authoritative until an audited native FeynArts-compatible model or adapter exists.
+- `custom_audited_model`: future path for additional user-supplied nonstandard interactions; outside locked B04, custom requests are intake/review only in v0.1.
 
 Standard QED production amplitudes must not be generated from duplicate Python-maintained QED rule formulas when FeynArts/FeynCalc can generate the process natively. The legacy QED RuleRegistry remains a convention-audited reference snapshot and a useful custom-rule template, not the production source for native standard-sector amplitudes.
-
 
 ## Day-5 Contract Separation
 
 Day 5 separates three concerns that were coupled during Days 1-4:
 
 - `PhysicsCard` records backend-neutral physics intent: process, external particles, perturbative order, `model_id`, and `sector`.
-- `BackendProfile` records how an implementation resolves that intent: native FeynArts/FeynCalc model settings or legacy RuleRegistry selection.
+- `BackendProfile` records how an implementation resolves that intent: native FeynArts/FeynCalc model settings, locked custom backend settings, or legacy RuleRegistry selection.
 - `ExecutionRequest` records runtime authorization: structural, amplitude-only, bounded benchmark regression, or production-heavy execution, including who authorized it, when, timeout policy, and allowed operations.
 
-`ExecutionRequest` is not canonical physics truth. It grants permission for a particular run mode. This repairs the Day-4 contradiction where bounded benchmark M2 regression was user-authorized while production `heavy_calculation` remained not requested.
+`ExecutionRequest` is not canonical physics truth. It grants permission for a particular run mode. Benchmark-regression approval is not production-heavy approval, and B04 topology/amplitude approval is not B04 M2 approval.
 
 ## Standard Native Pipeline
 
@@ -35,7 +35,20 @@ PhysicsCard + backend profile
 -> bounded validation or human-approved heavy calculation
 ```
 
-The shared Day-4 QED native profile lives at `profiles/backends/feynarts_sm_qed.yaml`. Benchmark cards reference this profile instead of carrying duplicate backend configuration.
+The shared QED native profile lives at `profiles/backends/feynarts_sm_qed.yaml`. Benchmark cards reference this profile instead of carrying duplicate backend configuration.
+
+## Locked B04 Pipeline
+
+```text
+B04 PhysicsCard + B04 backend profile + registered external knowledge manifest
+-> direct_feyncalc_custom_audited
+-> convention and rule-audit gates
+-> locked topology and per-diagram amplitude artifacts under runs/
+-> LaTeX/render validation
+-> no M2 unless separately authorized
+```
+
+The B04 backend profile lives at `profiles/backends/b04_custom_gravity_audited.yaml`. It resolves only `model_id = reheating_scalar_gravity_v1` and `process:B04_phi_phi_to_h_h`. It is not a general gravity or BSM backend.
 
 ## Legacy Custom Pipeline
 
@@ -48,11 +61,11 @@ PhysicsCard + ConventionCard + RuleRegistry
 -> regression, pedagogy, audit, and fallback only
 ```
 
-The legacy pipeline remains valuable because it records explicit convention handling, external-state mapping, fermion flow, provenance, and renderer divergence checks. It is not the production route for standard QED after Day 4.
+The legacy pipeline remains valuable because it records explicit convention handling, external-state mapping, fermion flow, provenance, and renderer divergence checks. It is not the production route for standard QED after Day 4 and is not authority for arbitrary BSM or gravity.
 
 ## Custom Rule Pipeline
 
-Future nonstandard interactions should use `custom_audited_model`. In that mode, RuleRegistry entries remain authoritative and must retain provenance, convention audit state, and trust status. The preferred implementation target is a FeynArts-compatible model or adapter so custom interactions can use native diagram generation and FeynCalc algebra once reviewed.
+Future nonstandard interactions should use a separately audited custom route. In that mode, RuleRegistry entries must retain provenance, convention audit state, and trust status. Additional production routes require reviewed backend feasibility, benchmark evidence, execution gates, and public documentation updates.
 
 ## Canonical Inputs And Derived Artifacts
 
@@ -69,20 +82,24 @@ JSON Schemas under `schemas/` define the structured contracts currently used by 
 - `RuleRegistry`: provenance-aware rule snapshot for legacy/custom audited paths.
 - `DiagramIR`: legacy tree-level diagram structure with explicit rule bindings.
 - `AmplitudeIR`: derived legacy amplitude structure used to prevent LaTeX/FeynCalc divergence in the custom backend.
-- `BackendProfile`: implementation mapping from backend-neutral theory intent to native package settings or legacy RuleRegistry sources.
+- `BackendProfile`: implementation mapping from backend-neutral theory intent to native package settings, locked custom backend settings, or legacy RuleRegistry sources.
 - `ExecutionRequest`: runtime authorization contract for structural, amplitude-only, benchmark-regression, or production-heavy operations.
 
 Native FeynArts/FeynCalc amplitudes are not reconstructed through the legacy RuleRegistry. They are produced by the installed native model and converted by `FCFAConvert`.
 
 ## Heavy Calculation Boundary
 
-Long-running simplification, spin sums, polarization sums, and squared-amplitude calculations require explicit human authorization. Day-4 M2 regression runs were bounded benchmark checks authorized for QA; production `heavy_calculation` approval remained not requested. This contract mismatch is recorded for Day 5 repair.
+Long-running simplification, spin sums, polarization sums, and squared-amplitude calculations require explicit human authorization. Bounded M2 regression runs are QA evidence, not production-heavy approval. B04 M2 requires separate explicit authorization and must not be inferred from topology or amplitude authorization.
+
+## Validated Platform
+
+Full physics E2E validation for the v0.1 release candidate was performed on Windows 11 with the tested Wolfram/FeynCalc/FeynArts toolchain. Python tests on Linux or macOS are useful software checks, but not full physics E2E validation claims for those platforms.
 
 ## Repository Layout
 
 - `benchmarks/`: benchmark cards, native expected metadata, gold/reference fixtures, and benchmark-local legacy fixtures.
 - `docs/`: architecture, backend strategy, setup, migration notes, and design decisions.
-- `profiles/`: shared backend profiles such as native FeynArts/FeynCalc QED.
+- `profiles/`: shared backend profiles such as native FeynArts/FeynCalc QED and locked B04 custom audited backend.
 - `reports/`: human-readable milestone reports and review-package manifests.
 - `rules/`: legacy/custom RuleRegistry inputs.
 - `runs/`: generated amplitudes, logs, PDFs, M2 outputs, and authoritative evidence runs.
