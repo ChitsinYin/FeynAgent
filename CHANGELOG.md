@@ -8,9 +8,9 @@ All notable public-facing changes to FeynAgent are recorded here.
 
 - Public release documentation now states the same validated v0.1 scope across README, quickstart, release scope, backend strategy, readiness levels, Codex skill instructions, citation metadata, and package metadata.
 - Release-candidate wording now records that full physics E2E validation was performed on Windows 11 with the tested Wolfram/FeynCalc/FeynArts toolchain, without claiming Linux or macOS full physics validation from Python test success alone.
-- Citation metadata omits `date-released` until the human release gate creates the actual GitHub release and tag.
+- Citation metadata records the v0.1.0 release date from the approved public release gate.
 
-## 0.1.0 - release date pending human release gate
+## 0.1.0 - 2026-08-27
 
 ### Added
 
