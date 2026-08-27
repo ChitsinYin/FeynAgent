@@ -15,7 +15,7 @@ if str(SRC) not in sys.path:
 from feynagent import init as init_mod
 from feynagent import runner
 from feynagent.backends.b04_custom import B04CustomBackendError, validate_b04_custom_execution
-from feynagent.custom_knowledge import CONFLICT_REQUIRES_REVIEW, KnowledgeVerification
+from feynagent.custom_knowledge import CONFLICT_REQUIRES_REVIEW, MISSING_KNOWLEDGE, KnowledgeVerification
 from feynagent.dispatch import (
     B04_CUSTOM_BACKEND,
     NATIVE_QED_BACKEND,
@@ -150,6 +150,51 @@ class B04RunnerDispatchTests(unittest.TestCase):
             self.assertEqual(result.manifest["m2_policy"]["status"], "NOT_AUTHORIZED")
             self.assertFalse(result.manifest["m2_policy"]["executed"])
 
+    def test_runner_uses_supplied_b04_repo_when_installed_root_has_no_benchmarks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            installed_root = tmp_path / "venv" / "Lib"
+            installed_root.mkdir(parents=True)
+            request_path = tmp_path / "execution_request.yaml"
+            request_path.write_text(yaml.safe_dump(b04_execution_request(), sort_keys=False), encoding="utf-8", newline="\n")
+            with mock.patch("feynagent.runner.ROOT", installed_root), \
+                 mock.patch("feynagent.runner.probe_environment", return_value=ready_custom_doctor()), \
+                 mock.patch("feynagent.runner.validate_b04_custom_execution", return_value={"status": "PASS"}) as validate, \
+                 mock.patch("feynagent.runner.run_b04_custom_backend", side_effect=fake_custom_backend) as backend:
+                result = runner.run_from_files(
+                    physics_card_path=B04_CARD,
+                    backend_profile_path=B04_PROFILE,
+                    execution_request_path=request_path,
+                    run_root=tmp_path / "runs",
+                )
+            self.assertEqual(result.status, "PASS")
+            self.assertFalse((installed_root / "benchmarks").exists())
+            self.assertEqual(result.manifest["dispatch"]["classification"], "custom_audited")
+            self.assertEqual(validate.call_args.args[0], ROOT)
+            self.assertEqual(backend.call_args.args[0], ROOT)
+
+    def test_runner_reports_missing_b04_knowledge_after_installed_root_dispatch(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            installed_root = tmp_path / "venv" / "Lib"
+            installed_root.mkdir(parents=True)
+            request_path = tmp_path / "execution_request.yaml"
+            request_path.write_text(yaml.safe_dump(b04_execution_request(), sort_keys=False), encoding="utf-8", newline="\n")
+            with mock.patch("feynagent.runner.ROOT", installed_root), \
+                 mock.patch("feynagent.runner.probe_environment", return_value=missing_custom_doctor()), \
+                 mock.patch("feynagent.runner.validate_b04_custom_execution") as validate:
+                result = runner.run_from_files(
+                    physics_card_path=B04_CARD,
+                    backend_profile_path=B04_PROFILE,
+                    execution_request_path=request_path,
+                    run_root=tmp_path / "runs",
+                )
+            self.assertEqual(result.status, "FAIL")
+            self.assertIn("B04 custom knowledge status: MISSING_KNOWLEDGE", result.manifest["failure"]["message"])
+            self.assertNotIn("outside validated", result.manifest["failure"]["message"])
+            self.assertEqual(result.manifest["failure"]["details"]["status"], MISSING_KNOWLEDGE)
+            validate.assert_not_called()
+
 
 def b04_execution_request():
     return {
@@ -174,6 +219,16 @@ def ready_custom_doctor():
         capabilities={
             "checks": {"native_qed_tree_capability": {"status": "PASS"}},
             "custom_models": [{"model_id": "reheating_scalar_gravity_v1", "status": "AVAILABLE"}],
+        },
+    )
+
+
+def missing_custom_doctor():
+    return SimpleNamespace(
+        status="WARNING",
+        capabilities={
+            "checks": {"native_qed_tree_capability": {"status": "PASS"}},
+            "custom_models": [{"model_id": "reheating_scalar_gravity_v1", "status": MISSING_KNOWLEDGE}],
         },
     )
 

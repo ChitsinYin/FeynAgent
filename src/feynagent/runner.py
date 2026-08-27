@@ -26,7 +26,7 @@ from .backends import (
 )
 from .backends.b04_custom import B04CustomBackendError, run_b04_custom_backend, validate_b04_custom_execution
 from .custom_knowledge import AVAILABLE, discover_custom_model_ids
-from .dispatch import B04_CUSTOM_BACKEND, NATIVE_QED_BACKEND, DispatchError, resolve_backend_route
+from .dispatch import B04_CUSTOM_BACKEND, B04_MODEL_ID, B04_PROCESS_ID, NATIVE_QED_BACKEND, DispatchError, resolve_backend_route
 from .init import probe_environment
 
 try:
@@ -123,10 +123,12 @@ def run_from_files(
         _validate_request_links(physics_card, backend_profile, execution_request)
         gates.append(_gate("execution_request_links", "PASS"))
 
+        b04_request_root = _resolve_b04_request_root(physics_card_path, physics_card)
+        benchmark_root = b04_request_root / "benchmarks" if b04_request_root is not None else ROOT / "benchmarks"
         route = resolve_backend_route(
             physics_card,
             backend_profile,
-            custom_model_ids=discover_custom_model_ids(ROOT / "benchmarks"),
+            custom_model_ids=discover_custom_model_ids(benchmark_root),
         )
         gates.append(_gate("backend_dispatch", "PASS", route.as_dict()))
 
@@ -144,10 +146,18 @@ def run_from_files(
             gates.append(_gate("backend_resolution", "PASS", {"backend_id": config.backend_id}))
             gates.append(_gate("native_generation_authorization", "PASS"))
         else:
+            custom_repo_root = b04_request_root
+            if custom_repo_root is None:
+                raise RunnerGateError(
+                    "repository_context",
+                    "B04 repository root could not be resolved from the supplied PhysicsCard path",
+                    {"physics_card_path": str(physics_card_path)},
+                )
             custom_capability = _custom_model_capability(doctor.capabilities, route.model_id)
             if custom_capability.get("status") != AVAILABLE:
-                raise RunnerGateError("doctor_readiness", "B04 custom knowledge capability is not AVAILABLE", custom_capability)
-            custom_gate = validate_b04_custom_execution(ROOT, physics_card, backend_profile, execution_request, route)
+                status = custom_capability.get("status", "UNKNOWN")
+                raise RunnerGateError("doctor_readiness", f"B04 custom knowledge status: {status}", custom_capability)
+            custom_gate = validate_b04_custom_execution(custom_repo_root, physics_card, backend_profile, execution_request, route)
             gates.append(_gate("doctor_readiness", "PASS", {"doctor_status": doctor.status, "route": "custom_audited"}))
             gates.append(_gate("custom_knowledge_and_convention", "PASS", custom_gate))
             gates.append(_gate("backend_resolution", "PASS", {"backend_id": route.backend_id}))
@@ -203,7 +213,7 @@ def run_from_files(
         else:
             try:
                 custom_manifest = run_b04_custom_backend(
-                    ROOT,
+                    custom_repo_root,
                     run_id=run_id,
                     run_dir=run_dir,
                     physics_card=physics_card,
@@ -313,6 +323,22 @@ def _validate_request_links(physics_card: dict[str, Any], backend_profile: dict[
         raise RunnerGateError("execution_request_links", "ExecutionRequest backend_profile_id does not match BackendProfile backend_profile_id")
     if execution_request.get("status") != "approved":
         raise RunnerGateError("execution_request_links", "ExecutionRequest must be approved for the public runner")
+
+
+def _resolve_b04_request_root(physics_card_path: Path, physics_card: dict[str, Any]) -> Path | None:
+    if physics_card.get("model_id") != B04_MODEL_ID or physics_card.get("process_id") != B04_PROCESS_ID:
+        return None
+    resolved_card = physics_card_path.resolve()
+    for parent in (resolved_card.parent, *resolved_card.parents):
+        benchmark_root = parent / "benchmarks"
+        expected_card = benchmark_root / "B04_phi_phi_to_hh" / "physics_card.yaml"
+        if benchmark_root.is_dir() and expected_card.is_file() and expected_card.resolve() == resolved_card:
+            return parent
+    raise RunnerGateError(
+        "repository_context",
+        "B04 repository root could not be resolved from the supplied PhysicsCard path",
+        {"physics_card_path": str(physics_card_path)},
+    )
 
 
 def _validate_native_generation_authorization(execution_request: dict[str, Any]) -> None:
