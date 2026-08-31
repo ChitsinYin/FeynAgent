@@ -1,0 +1,84 @@
+schema_version: 0.2.0
+object_id: physics_card:b05_emu_to_emu_gamma
+status: approved
+process_id: process:b05_emu_to_emu_gamma
+model_id: sm_qed
+sector: qed
+process_type: scattering_2_to_3
+perturbative_order:
+  loop_order: 0
+  restriction: tree_level_only
+coupling_order:
+  mode: explicit
+  orders:
+  - coupling: e
+    power: 3
+particles:
+  incoming:
+  - slot: 1
+    particle_id: e-
+    display_name: electron
+    state_role: incoming
+    momentum_label: p1
+    latex_label: e^{-}
+  - slot: 2
+    particle_id: mu-
+    display_name: muon
+    state_role: incoming
+    momentum_label: p2
+    latex_label: \mu^{-}
+  outgoing:
+  - slot: 3
+    particle_id: e-
+    display_name: electron
+    state_role: outgoing
+    momentum_label: p3
+    latex_label: e^{-}
+  - slot: 4
+    particle_id: mu-
+    display_name: muon
+    state_role: outgoing
+    momentum_label: p4
+    latex_label: \mu^{-}
+  - slot: 5
+    particle_id: gamma
+    display_name: photon
+    state_role: outgoing
+    momentum_label: k
+    latex_label: \gamma
+internal_species_policy:
+  allowed_particle_ids:
+  - e-
+  - mu-
+  - gamma
+requested_outputs:
+- diagram_ir
+- feyncalc_code
+- latex_amplitude
+- validation_report
+approval:
+  topology:
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-31T00:00:00+08:00'
+    notes: Approved for the bounded Day-9 tree-level e- mu- -> e- mu- gamma topology spike.
+  amplitude_generation:
+    status: approved
+    approved_by: user
+    approved_at: '2026-08-31T00:00:00+08:00'
+    notes: Approved for native per-diagram amplitudes, total-amplitude Ward check, and soft structural check.
+  heavy_calculation:
+    status: not_requested
+    notes: Full 2-to-3 M2 simplification, phase space, and cross sections are not authorized.
+metadata:
+  notes: Bounded v0.2 external-leg bremsstrahlung spike; not a general n-body production route.
+  created_by: FeynAgent Day 9
+  created_at: '2026-08-31T00:00:00+08:00'
+presentation:
+  particle_latex_labels:
+  - particle_id: e-
+    latex_label: e^{-}
+  - particle_id: mu-
+    latex_label: \mu^{-}
+  - particle_id: gamma
+    latex_label: \gamma

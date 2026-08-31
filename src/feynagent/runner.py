@@ -18,6 +18,7 @@ from typing import Any
 from .backends import (
     NativeBackendError,
     backend_config_from_dict,
+    native_qed_bremsstrahlung_plan,
     native_qed_channel_plan,
     run_native_qed_backend,
     run_native_qed_m2_generator,
@@ -141,7 +142,7 @@ def run_from_files(
                 raise RunnerGateError("doctor_readiness", "native_qed_tree_capability is not ready", {"doctor_status": doctor.status})
             config = backend_config_from_dict(backend_profile)
             validate_native_qed_request(physics_card, config)
-            _validate_native_generation_authorization(execution_request)
+            _validate_native_generation_authorization(physics_card, execution_request)
             gates.append(_gate("doctor_readiness", "PASS", {"doctor_status": doctor.status, "route": "standard_native"}))
             gates.append(_gate("backend_resolution", "PASS", {"backend_id": config.backend_id}))
             gates.append(_gate("native_generation_authorization", "PASS"))
@@ -341,9 +342,13 @@ def _resolve_b04_request_root(physics_card_path: Path, physics_card: dict[str, A
     )
 
 
-def _validate_native_generation_authorization(execution_request: dict[str, Any]) -> None:
+def _validate_native_generation_authorization(
+    physics_card: dict[str, Any], execution_request: dict[str, Any]
+) -> None:
     allowed = set(execution_request.get("allowed_operations", []))
     required = {"schema_validation", "diagram_generation", "amplitude_generation", "latex_render", "feyncalc_smoke"}
+    if physics_card.get("process_type") == "scattering_2_to_3":
+        required.update({"ward_identity", "soft_limit_check"})
     missing = sorted(required - allowed)
     if missing:
         raise RunnerGateError("native_generation_authorization", "ExecutionRequest is missing native generation operation(s)", {"missing": missing})
@@ -384,28 +389,70 @@ def _build_validation_report(
     native_manifest: dict[str, Any],
     m2_manifest: dict[str, Any],
 ) -> dict[str, Any]:
-    channels = native_qed_channel_plan(physics_card)
     artifact_issues = validate_native_qed_artifacts(run_dir, physics_card)
     amplitudes = native_manifest.get("amplitudes", {})
     m2_status = m2_manifest.get("status")
+    if physics_card.get("process_type") == "scattering_2_to_3":
+        plan = native_qed_bremsstrahlung_plan(physics_card)
+        expected_count = len(plan)
+        topology_key = "classification_count"
+        topology_name = "external_leg_bremsstrahlung_count"
+        expected_metadata = [
+            {
+                "emission_leg": item.emission_leg,
+                "emission_particle": item.emission_particle,
+                "exchanged_virtual_particle": item.exchanged_virtual_particle,
+                "radiating_fermion_routing": item.radiating_fermion_routing,
+                "exchange_routing": item.exchange_routing,
+            }
+            for item in plan
+        ]
+        extra_checks = [
+            {
+                "name": "topology_comparison",
+                "status": amplitudes.get("topology_comparison", {}).get("status", "FAIL"),
+            },
+            {
+                "name": "total_amplitude_ward_identity",
+                "status": amplitudes.get("ward_identity", {}).get("status", "FAIL"),
+                "details": amplitudes.get("ward_identity", {}),
+            },
+            {
+                "name": "soft_photon_structural_limit",
+                "status": amplitudes.get("soft_limit", {}).get("status", "FAIL"),
+                "details": amplitudes.get("soft_limit", {}),
+            },
+        ]
+    else:
+        plan = native_qed_channel_plan(physics_card)
+        expected_count = len(plan)
+        topology_key = "channel_count"
+        topology_name = "channel_count"
+        expected_metadata = [channel.channel for channel in plan]
+        extra_checks = []
     checks = [
-        {"name": "diagram_count", "status": "PASS" if amplitudes.get("diagram_count") == len(channels) else "FAIL"},
-        {"name": "channel_count", "status": "PASS" if amplitudes.get("channel_count") == len(channels) else "FAIL"},
+        {"name": "diagram_count", "status": "PASS" if amplitudes.get("diagram_count") == expected_count else "FAIL"},
+        {"name": topology_name, "status": "PASS" if amplitudes.get(topology_key) == expected_count else "FAIL"},
         {
             "name": "per_diagram_amplitude_count",
-            "status": "PASS" if amplitudes.get("per_diagram_amplitude_count") == len(channels) else "FAIL",
+            "status": "PASS" if amplitudes.get("per_diagram_amplitude_count") == expected_count else "FAIL",
         },
         {"name": "artifact_contract", "status": "PASS" if not artifact_issues else "FAIL", "issues": artifact_issues},
         {"name": "m2_artifact", "status": "PASS" if m2_status in {"PASS", "SCRIPT_GENERATED_ONLY"} else "FAIL", "m2_status": m2_status},
+        *extra_checks,
     ]
-    return {
+    report = {
         "schema_version": "0.1.0",
         "generated_at": _now(),
         "process_id": physics_card.get("process_id"),
-        "expected_channels": [channel.channel for channel in channels],
         "status": "PASS" if all(check["status"] == "PASS" for check in checks) else "FAIL",
         "checks": checks,
     }
+    if physics_card.get("process_type") == "scattering_2_to_3":
+        report["expected_diagram_metadata"] = expected_metadata
+    else:
+        report["expected_channels"] = expected_metadata
+    return report
 
 
 def _hash_output_tree(run_dir: Path) -> dict[str, dict[str, Any]]:

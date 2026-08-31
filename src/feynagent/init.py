@@ -135,6 +135,8 @@ def _probe_wolfram(wolframscript: str | None, timeout: int, feyncalc_dir: str | 
             completed = subprocess.run(
                 [wolframscript, "-script", str(script_path)],
                 text=True,
+                encoding="utf-8",
+                errors="replace",
                 capture_output=True,
                 timeout=timeout,
             )
@@ -206,7 +208,9 @@ def _detect_latex_engine() -> dict[str, Any]:
             continue
         version = "unknown"
         try:
-            completed = subprocess.run([path, "--version"], text=True, capture_output=True, timeout=10)
+            completed = subprocess.run(
+                [path, "--version"], text=True, encoding="utf-8", errors="replace", capture_output=True, timeout=10
+            )
             version = (completed.stdout or completed.stderr).splitlines()[0] if (completed.stdout or completed.stderr) else "unknown"
         except (OSError, subprocess.TimeoutExpired):
             pass

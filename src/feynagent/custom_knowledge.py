@@ -187,10 +187,14 @@ def discover_custom_model_ids(benchmark_root: Path = DEFAULT_BENCHMARK_ROOT) -> 
 
 def classify_physics_card(physics_card: dict[str, Any], *, custom_model_ids: set[str] | None = None) -> str:
     particles = _particle_ids(physics_card)
+    process_type = physics_card.get("process_type")
     if (
         physics_card.get("model_id") == "sm_qed"
         and physics_card.get("sector") == "qed"
-        and physics_card.get("process_type") == "scattering_2_to_2"
+        and (
+            process_type == "scattering_2_to_2"
+            or (process_type == "scattering_2_to_3" and _is_emu_bremsstrahlung_spike(physics_card))
+        )
         and particles.issubset(STANDARD_QED_PARTICLES)
         and physics_card.get("perturbative_order", {}).get("loop_order") == 0
     ):
@@ -198,6 +202,17 @@ def classify_physics_card(physics_card: dict[str, Any], *, custom_model_ids: set
     if custom_model_ids and physics_card.get("model_id") in custom_model_ids:
         return CUSTOM_AUDITED
     return UNSUPPORTED_REQUIRES_REVIEW
+
+
+def _is_emu_bremsstrahlung_spike(physics_card: dict[str, Any]) -> bool:
+    """Recognize only the bounded v0.2 e- mu- -> e- mu- gamma native spike."""
+
+    incoming = sorted(physics_card.get("particles", {}).get("incoming", []), key=lambda leg: leg.get("slot", 0))
+    outgoing = sorted(physics_card.get("particles", {}).get("outgoing", []), key=lambda leg: leg.get("slot", 0))
+    return (
+        [leg.get("particle_id") for leg in incoming] == ["e-", "mu-"]
+        and [leg.get("particle_id") for leg in outgoing] == ["e-", "mu-", "gamma"]
+    )
 
 
 def registered_root_for_model(model_id: str, *, mapping_path: Path = DEFAULT_MAPPING_PATH) -> Path | None:

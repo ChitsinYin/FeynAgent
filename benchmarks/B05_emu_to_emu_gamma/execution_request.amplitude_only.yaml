@@ -1,0 +1,23 @@
+schema_version: 0.1.0
+object_id: execution_request:b05_emu_to_emu_gamma_amplitude_only
+status: approved
+request_id: execution_request:b05_emu_to_emu_gamma_amplitude_only
+physics_card_id: physics_card:b05_emu_to_emu_gamma
+backend_profile_id: backend_profile:feynarts_sm_qed
+execution_mode: amplitude_only
+authorized_by: user
+authorized_at: '2026-08-31T00:00:00+08:00'
+timeout_policy:
+  kind: none
+allowed_operations:
+- schema_validation
+- diagram_generation
+- amplitude_generation
+- latex_render
+- feyncalc_smoke
+- ward_identity
+- soft_limit_check
+metadata:
+  notes: Bounded Day-9 spike. Generate compute_m2.wl but do not execute a 2-to-3 M2 simplification.
+  created_by: FeynAgent Day 9
+  created_at: '2026-08-31T00:00:00+08:00'

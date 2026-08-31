@@ -58,6 +58,15 @@ def classify_request(text: str, *, initialized: bool = True) -> dict[str, Any]:
             ],
             "m2_policy": "separate explicit authorization; never implied by topology/amplitudes",
         }
+    if _is_b05_request(lowered):
+        return {
+            "classification": "standard_native",
+            "reason": "matched the bounded B05 e- mu- -> e- mu- gamma feature spike",
+            "process_id": "process:b05_emu_to_emu_gamma",
+            "backend": "feynarts_feyncalc_native",
+            "production_ready_scope": "bounded B05 2-to-3 spike only",
+            "m2_policy": "generate compute_m2.wl but do not execute full 2-to-3 M2 simplification",
+        }
     if any(term in lowered for term in CUSTOM_TERMS):
         if _has_rule_like_detail(lowered):
             return {
@@ -98,6 +107,11 @@ def _is_b04_request(text: str) -> bool:
     scalar_pair_cue = any(term in normalized for term in ("phi phi", "inflaton pair", "two inflatons", "scalar pair"))
     two_graviton_cue = any(term in normalized for term in ("two gravitons", "graviton pair", "h h"))
     return gravity_cue and scalar_pair_cue and two_graviton_cue
+
+
+def _is_b05_request(text: str) -> bool:
+    normalized = re.sub(r"\s*\+\s*", " ", text)
+    return bool(re.search(r"e-\s+mu-\s*->\s*e-\s+mu-\s+gamma\b", normalized))
 
 
 def search_reference_index(root: Path, query: str) -> list[dict[str, Any]]:

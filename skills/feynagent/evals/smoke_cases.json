@@ -11,6 +11,15 @@
       "expected_classification": "standard_native"
     },
     {
+      "id": "b05_bounded_bremsstrahlung",
+      "request": "Generate e- mu- -> e- mu- gamma at tree level and do not execute full M2 simplification.",
+      "expected_classification": "standard_native",
+      "expected_fields": {
+        "process_id": "process:b05_emu_to_emu_gamma",
+        "production_ready_scope": "bounded B05 2-to-3 spike only"
+      }
+    },
+    {
       "id": "b04_natural_language_custom_route",
       "request": "Generate the audited inflaton-pair annihilation into two gravitons, including topology and per-diagram amplitudes, and report the squared-amplitude policy.",
       "expected_classification": "custom_audited",

@@ -2,13 +2,13 @@
 
 ## Classification
 
-- `standard_native`: validated public v0.1 tree-level QED 2->2 with external `e-`, `e+`, `mu-`, `mu+`, and `gamma`, through `feynarts_feyncalc_native`.
+- `standard_native`: validated public v0.1 tree-level QED 2->2 plus only the bounded B05 `e- mu- -> e- mu- gamma` v0.2 spike, through `feynarts_feyncalc_native`.
 - `custom_audited`: only the locked B04 `phi phi -> h h` route is executable in v0.1, with `model_id = reheating_scalar_gravity_v1`, backend `direct_feyncalc_custom_audited`, and separately supplied audited external knowledge. Other custom requests are intake/review only.
 - `unsupported_requires_review`: request is ambiguous, unsupported, missing rules, or asks for unreviewed assumptions. This includes arbitrary SM, QCD production, arbitrary BSM, arbitrary gravity, loops, renormalization, and ungated production-heavy execution.
 
 ## Standard Native
 
-Use `feynarts_feyncalc_native` only for the validated standard QED 2->2 public scope. Search `.feynagent/reference_index.json` before generation and record matching official example metadata, package versions, and hashes. FeynArts generates diagrams/amplitudes; FCFAConvert converts amplitudes; FeynCalc handles algebra and validation.
+Use `feynarts_feyncalc_native` only for the validated standard QED 2->2 public scope and the exact B05 2->3 spike. Search `.feynagent/reference_index.json` before generation and record matching official example metadata, package versions, and hashes. FeynArts generates diagrams/amplitudes; FCFAConvert converts amplitudes; FeynCalc handles algebra and validation. B05 is amplitude-only: generate `compute_m2.wl` but do not execute a full 2->3 M2 simplification.
 
 Do not maintain duplicate standard QED Feynman-rule formulas as the production source. The QED RuleRegistry is a legacy/custom audit snapshot, not the native standard-sector authority.
 

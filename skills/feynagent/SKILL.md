@@ -1,13 +1,13 @@
 ---
 name: feynagent
-description: "Use FeynAgent for validated tree-level QED 2-to-2 workflows and the single locked B04 scalar-to-two-graviton custom_audited route; includes init/doctor, backend dispatch, and ExecutionRequest gates. Do not treat arbitrary SM, QCD, BSM, or gravity as production-ready."
+description: "Use FeynAgent for validated tree-level QED 2-to-2 workflows, the bounded e- mu- -> e- mu- gamma 2-to-3 spike, and the single locked B04 scalar-to-two-graviton custom_audited route; includes init/doctor, backend dispatch, and ExecutionRequest gates."
 ---
 
 # FeynAgent Skill
 
 Use this skill for two disjoint validated routes:
 
-- `standard_native`: tree-level QED 2->2 with `e-`, `e+`, `mu-`, `mu+`, and `gamma`, through `feynarts_feyncalc_native`.
+- `standard_native`: tree-level QED 2->2 with `e-`, `e+`, `mu-`, `mu+`, and `gamma`, plus only the bounded B05 `e- mu- -> e- mu- gamma` 2->3 spike, through `feynarts_feyncalc_native`.
 - `custom_audited`: only locked B04 `phi phi -> h h`, model `reheating_scalar_gravity_v1`, through `direct_feyncalc_custom_audited`, requiring separately supplied audited external knowledge.
 
 Other custom models may be reviewed as audited-rule intake, but they have no production execution route. Never use standard-QED rules or backend authority for B04.
@@ -19,11 +19,13 @@ Before physics work:
 4. Never silently install Mathematica, FeynCalc, FeynArts, LaTeX, or the B04 external knowledge package.
 
 Classify each request:
-- `standard_native`: validated public v0.1 tree-level QED 2->2 with external `e-`, `e+`, `mu-`, `mu+`, `gamma` through FeynArts/FeynCalc native generation.
+- `standard_native`: validated public v0.1 tree-level QED 2->2 plus the bounded B05 v0.2 spike; no other 2->3 or n-body process is production-ready.
 - `custom_audited`: locked B04 may execute; other explicit custom interactions are intake/review only and are not production-ready.
 - `unsupported_requires_review`: ambiguous, unsupported, or under-specified physics, including arbitrary SM, QCD production, arbitrary BSM, arbitrary gravity, loops, renormalization, or ungated production-heavy execution.
 
 For `standard_native`, search `.feynagent/reference_index.json` first, use FeynArts/FeynCalc native backend, record package versions and example provenance, and do not rebuild standard Feynman rules in Python.
+
+For B05, require the repository PhysicsCard and an approved `amplitude_only` ExecutionRequest with `ward_identity` and `soft_limit_check`. Preserve the four FeynArts/FeynCalc amplitudes separately, define the total from those objects, and generate but never automatically execute the full 2->3 `compute_m2.wl` path.
 
 For B04 execution, use the repository B04 PhysicsCard and `backend_profile:b04_custom_gravity_audited`. Require an explicit approved ExecutionRequest linked to both, with `schema_validation`, `diagram_generation`, `amplitude_generation`, and `latex_render`. The backend must resolve the registered external knowledge package, match `conventions:reheating_scalar_gravity_v1`, and obtain rule audit `PASS` before amplitudes continue.
 

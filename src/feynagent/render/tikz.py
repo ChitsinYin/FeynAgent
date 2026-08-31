@@ -45,6 +45,8 @@ def render_tikz_feynman(
     completed = subprocess.run(
         compile_cmd,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         cwd=output_dir,
         timeout=60,
@@ -408,7 +410,6 @@ def _validate_inputs(
         raise RenderError("PhysicsCard process_id does not match DiagramIR")
     if not convention_card.get("all_momenta_incoming_vertex_convention"):
         raise RenderError("renderer requires explicit all-momenta-incoming convention")
-
 
 
 

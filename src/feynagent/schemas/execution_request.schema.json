@@ -91,6 +91,8 @@
           "amplitude_generation",
           "latex_render",
           "feyncalc_smoke",
+          "ward_identity",
+          "soft_limit_check",
           "m2_regression",
           "spin_sums",
           "polarization_sums",

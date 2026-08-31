@@ -49,6 +49,17 @@ class NativeChannel:
     routing: str
 
 
+@dataclass(frozen=True)
+class NativeBremsstrahlungDiagram:
+    """Expected structural metadata for one external-leg emission diagram."""
+
+    emission_leg: str
+    emission_particle: str
+    radiating_fermion_routing: str
+    exchanged_virtual_particle: str
+    exchange_routing: str
+
+
 OUTPUT_FILES = (
     "native_amplitude.wl",
     "stdout.log",
@@ -69,6 +80,10 @@ OUTPUT_FILES = (
     "amplitudes.json",
     "amplitudes.aux",
     "amplitudes.log",
+    "ward_identity.json",
+    "ward_replaced_total.m",
+    "ward_replaced_total.inputform.txt",
+    "soft_limit.json",
     "run_manifest.json",
 )
 
@@ -143,8 +158,9 @@ def validate_native_qed_request(physics_card: dict[str, Any], config: BackendCon
         raise NativeBackendError("Day-4 native backend requires Restrictions -> QEDOnly")
     if config.insertion_level != "Classes":
         raise NativeBackendError("Day-4 native backend requires InsertionLevel -> Classes")
-    if physics_card.get("process_type") != "scattering_2_to_2":
-        raise NativeBackendError("Day-4 native backend supports only 2 -> 2 scattering")
+    process_type = physics_card.get("process_type")
+    if process_type not in {"scattering_2_to_2", "scattering_2_to_3"}:
+        raise NativeBackendError("native backend supports validated 2 -> 2 scattering and the bounded 2 -> 3 spike")
     perturbative = physics_card.get("perturbative_order", {})
     if perturbative.get("loop_order") != 0 or perturbative.get("restriction") != "tree_level_only":
         raise NativeBackendError("Day-4 native backend supports only tree-level requests")
@@ -153,8 +169,11 @@ def validate_native_qed_request(physics_card: dict[str, Any], config: BackendCon
         raise NativeBackendError("Day-4 native backend supports QED coupling order only")
     incoming = physics_card.get("particles", {}).get("incoming", [])
     outgoing = physics_card.get("particles", {}).get("outgoing", [])
-    if len(incoming) != 2 or len(outgoing) != 2:
-        raise NativeBackendError("Day-4 native backend requires exactly two incoming and two outgoing particles")
+    expected_outgoing = 2 if process_type == "scattering_2_to_2" else 3
+    if len(incoming) != 2 or len(outgoing) != expected_outgoing:
+        raise NativeBackendError(
+            f"native {process_type} requires exactly two incoming and {expected_outgoing} outgoing particles"
+        )
     if not config.particle_to_feynarts:
         raise NativeBackendError("native backend profile must define particle mappings")
     unsupported = [
@@ -164,7 +183,10 @@ def validate_native_qed_request(physics_card: dict[str, Any], config: BackendCon
     ]
     if unsupported:
         raise NativeBackendError(f"unsupported native QED particle(s): {unsupported}")
-    native_qed_channel_plan(physics_card)
+    if process_type == "scattering_2_to_2":
+        native_qed_channel_plan(physics_card)
+    else:
+        native_qed_bremsstrahlung_plan(physics_card)
 
 
 def native_qed_channel_plan(physics_card: dict[str, Any]) -> list[NativeChannel]:
@@ -191,24 +213,84 @@ def native_qed_channel_plan(physics_card: dict[str, Any]) -> list[NativeChannel]
     return channels
 
 
+def native_qed_bremsstrahlung_plan(physics_card: dict[str, Any]) -> list[NativeBremsstrahlungDiagram]:
+    """Describe only e- mu- -> e- mu- gamma external-leg bremsstrahlung."""
+
+    incoming = sorted(physics_card.get("particles", {}).get("incoming", []), key=lambda leg: leg["slot"])
+    outgoing = sorted(physics_card.get("particles", {}).get("outgoing", []), key=lambda leg: leg["slot"])
+    incoming_ids = [leg.get("particle_id") for leg in incoming]
+    outgoing_ids = [leg.get("particle_id") for leg in outgoing]
+    if incoming_ids != ["e-", "mu-"] or outgoing_ids != ["e-", "mu-", "gamma"]:
+        raise NativeBackendError(
+            "native QED 2 -> 3 spike supports exactly e- mu- -> e- mu- gamma in slot order"
+        )
+    p1, p2 = (leg["momentum_label"] for leg in incoming)
+    p3, p4, k = (leg["momentum_label"] for leg in outgoing)
+    return [
+        NativeBremsstrahlungDiagram("incoming:1", "e-", f"{p1}-{k}", "gamma", f"{p2}-{p4}"),
+        NativeBremsstrahlungDiagram("outgoing:3", "e-", f"{p3}+{k}", "gamma", f"{p2}-{p4}"),
+        NativeBremsstrahlungDiagram("incoming:2", "mu-", f"{p2}-{k}", "gamma", f"{p1}-{p3}"),
+        NativeBremsstrahlungDiagram("outgoing:4", "mu-", f"{p4}+{k}", "gamma", f"{p1}-{p3}"),
+    ]
+
+
 def validate_native_qed_artifact_metadata(metadata: dict[str, Any], physics_card: dict[str, Any]) -> list[str]:
     """Return validation issues for native diagram/amplitude artifact metadata."""
 
     issues: list[str] = []
-    expected_channels = native_qed_channel_plan(physics_card)
-    expected_labels = [channel.channel for channel in expected_channels]
     diagrams = metadata.get("diagrams", [])
-    if metadata.get("diagram_count") != len(expected_channels):
-        issues.append("diagram_count does not match expected native QED channels")
-    if metadata.get("channel_count") != len(expected_channels):
-        issues.append("channel_count does not match expected native QED channels")
-    if metadata.get("per_diagram_amplitude_count") != len(expected_channels):
-        issues.append("per_diagram_amplitude_count does not match expected native QED channels")
-    if len(diagrams) != len(expected_channels):
-        issues.append("diagram metadata length does not match expected native QED channels")
-    diagram_labels = [diagram.get("channel") for diagram in diagrams]
-    if diagram_labels != expected_labels:
-        issues.append(f"channel labels {diagram_labels} do not match expected {expected_labels}")
+    process_type = physics_card.get("process_type")
+    if process_type == "scattering_2_to_2":
+        expected_channels = native_qed_channel_plan(physics_card)
+        expected_count = len(expected_channels)
+        expected_labels = [channel.channel for channel in expected_channels]
+        if metadata.get("channel_count") != expected_count:
+            issues.append("channel_count does not match expected native QED channels")
+        diagram_labels = [diagram.get("channel") for diagram in diagrams]
+        if diagram_labels != expected_labels:
+            issues.append(f"channel labels {diagram_labels} do not match expected {expected_labels}")
+        count_flag = "diagram_count_matches_channel_plan"
+    else:
+        expected_plan = native_qed_bremsstrahlung_plan(physics_card)
+        expected_count = len(expected_plan)
+        expected_classes = {
+            (
+                item.emission_leg,
+                item.emission_particle,
+                item.exchanged_virtual_particle,
+                item.radiating_fermion_routing,
+                item.exchange_routing,
+            )
+            for item in expected_plan
+        }
+        observed_classes = {
+            (
+                item.get("emission_leg"),
+                item.get("emission_particle"),
+                item.get("exchanged_virtual_particle"),
+                item.get("radiating_fermion_routing"),
+                item.get("exchange_routing"),
+            )
+            for item in diagrams
+        }
+        if metadata.get("classification_count") != expected_count:
+            issues.append("classification_count does not match expected bremsstrahlung diagrams")
+        if observed_classes != expected_classes:
+            issues.append("diagram classifications do not match the four expected external-leg emissions")
+        topology = metadata.get("topology_comparison", {})
+        if topology.get("status") != "PASS" or topology.get("expected_diagram_count") != expected_count:
+            issues.append("topology comparison against external-leg bremsstrahlung expectation failed")
+        if metadata.get("ward_identity", {}).get("status") != "PASS":
+            issues.append("total-amplitude Ward identity did not pass")
+        if metadata.get("soft_limit", {}).get("status") != "PASS":
+            issues.append("soft-photon structural check did not pass")
+        count_flag = "diagram_count_matches_classification_plan"
+    if metadata.get("diagram_count") != expected_count:
+        issues.append("diagram_count does not match expected native QED topology")
+    if metadata.get("per_diagram_amplitude_count") != expected_count:
+        issues.append("per_diagram_amplitude_count does not match expected native QED topology")
+    if len(diagrams) != expected_count:
+        issues.append("diagram metadata length does not match expected native QED topology")
     expression_ids = [diagram.get("expression_id") for diagram in diagrams]
     if any(not expression_id for expression_id in expression_ids):
         issues.append("every diagram must record an expression_id")
@@ -223,7 +305,7 @@ def validate_native_qed_artifact_metadata(metadata: dict[str, Any], physics_card
         issues.append("total amplitude definition must be the sum of per-diagram amplitudes")
     consistency = metadata.get("consistency", {})
     for key in (
-        "diagram_count_matches_channel_plan",
+        count_flag,
         "diagram_count_matches_per_diagram_amplitudes",
         "total_is_sum_of_per_diagram_amplitudes",
     ):
@@ -239,7 +321,10 @@ def validate_native_qed_artifacts(output_dir: str | Path, physics_card: dict[str
 
     output_path = Path(output_dir)
     issues = []
-    for name in REQUIRED_NATIVE_ARTIFACTS:
+    required = list(REQUIRED_NATIVE_ARTIFACTS)
+    if physics_card.get("process_type") == "scattering_2_to_3":
+        required.extend(["ward_identity.json", "ward_replaced_total.m", "soft_limit.json"])
+    for name in required:
         if not (output_path / name).exists():
             issues.append(f"missing required artifact: {name}")
     metadata_path = output_path / "amplitudes.json"
@@ -260,13 +345,25 @@ def build_native_qed_script(physics_card: dict[str, Any], config: BackendConfig)
     incoming_momenta = [_wl_symbol(leg["momentum_label"]) for leg in incoming_legs]
     outgoing_momenta = [_wl_symbol(leg["momentum_label"]) for leg in outgoing_legs]
     transverse_momenta = [_wl_symbol(leg["momentum_label"]) for leg in incoming_legs + outgoing_legs if leg["particle_id"] == "gamma"]
-    channel_plan = native_qed_channel_plan(physics_card)
-    create_call = _create_topologies_call(config)
+    is_bremsstrahlung = physics_card.get("process_type") == "scattering_2_to_3"
+    channel_plan = [] if is_bremsstrahlung else native_qed_channel_plan(physics_card)
+    bremsstrahlung_plan = native_qed_bremsstrahlung_plan(physics_card) if is_bremsstrahlung else []
+    create_call = _create_topologies_call(config, len(incoming), len(outgoing))
     insert_call = _insert_fields_call(config, incoming, outgoing)
     process_id = physics_card.get("process_id", "process:unknown")
     process_title = _latex_escape(_process_title(incoming_legs, outgoing_legs))
     backend_label = _latex_escape(config.backend_id)
     channel_plan_wl = _channel_plan_wl(channel_plan)
+    bremsstrahlung_plan_wl = _bremsstrahlung_plan_wl(bremsstrahlung_plan)
+    is_bremsstrahlung_wl = "True" if is_bremsstrahlung else "False"
+    emitted_photon_momentum = _wl_symbol(outgoing_legs[-1]["momentum_label"]) if is_bremsstrahlung else "Null"
+    if is_bremsstrahlung:
+        ward_momentum_replacement = (
+            f"{emitted_photon_momentum} -> {incoming_momenta[0]}+{incoming_momenta[1]}-"
+            f"{outgoing_momenta[0]}-{outgoing_momenta[1]}"
+        )
+    else:
+        ward_momentum_replacement = "Nothing"
     transverse_option = ""
     if transverse_momenta:
         transverse_option = f",\n  TransversePolarizationVectors -> {{{', '.join(transverse_momenta)}}}"
@@ -292,12 +389,19 @@ fcAmpPath = FileNameJoin[{{outputDir, "feyncalc_amplitude.m"}}];
 fcTextPath = FileNameJoin[{{outputDir, "feyncalc_amplitude.inputform.txt"}}];
 fcAmpsPath = FileNameJoin[{{outputDir, "feyncalc_amplitudes.m"}}];
 amplitudesTexPath = FileNameJoin[{{outputDir, "amplitudes.tex"}}];
-amplitudesJsonPath = FileNameJoin[{{outputDir, "amplitudes.json"}}];
-summaryPath = FileNameJoin[{{outputDir, "native_summary.json"}}];
+	amplitudesJsonPath = FileNameJoin[{{outputDir, "amplitudes.json"}}];
+	summaryPath = FileNameJoin[{{outputDir, "native_summary.json"}}];
+	wardJsonPath = FileNameJoin[{{outputDir, "ward_identity.json"}}];
+	wardExpressionPath = FileNameJoin[{{outputDir, "ward_replaced_total.m"}}];
+	wardTextPath = FileNameJoin[{{outputDir, "ward_replaced_total.inputform.txt"}}];
+	softJsonPath = FileNameJoin[{{outputDir, "soft_limit.json"}}];
 
 createTopologiesCall = "{_escape_wl_string(create_call)}";
-insertFieldsCall = "{_escape_wl_string(insert_call)}";
-channelPlan = {channel_plan_wl};
+	insertFieldsCall = "{_escape_wl_string(insert_call)}";
+	channelPlan = {channel_plan_wl};
+	bremsstrahlungPlan = {bremsstrahlung_plan_wl};
+	isBremsstrahlungSpike = {is_bremsstrahlung_wl};
+	emittedPhotonMomentum = {emitted_photon_momentum};
 
 Print["FEYNAGENT_NATIVE_BACKEND_BEGIN"];
 Print["WOLFRAM_VERSION=" <> $Version];
@@ -351,6 +455,50 @@ feyncalcDiagramAmplitudes = FCFAConvert[
 feyncalcTotalAmplitude = Plus @@ feyncalcDiagramAmplitudes;
 expressionIds = Table["expr:{_escape_wl_string(process_id)}:diagram:" <> ToString[i], {{i, Length[feyncalcDiagramAmplitudes]}}];
 totalExpressionId = "expr:{_escape_wl_string(process_id)}:total";
+
+routingEquivalentQ[observed_, expected_] := TrueQ[
+  Expand[(observed - expected) /. {ward_momentum_replacement}] === 0 ||
+  Expand[(observed + expected) /. {ward_momentum_replacement}] === 0
+];
+propagatorMomenta[expr_] := Cases[
+  expr,
+  PropagatorDenominator[Momentum[mom_, ___], ___] :> mom,
+  Infinity
+];
+classifyBremsstrahlungDiagram[expr_] := Module[{{matches}},
+  matches = Select[
+    bremsstrahlungPlan,
+    Function[plan,
+      AnyTrue[
+        propagatorMomenta[expr],
+        Function[mom, routingEquivalentQ[mom, plan["radiating_fermion_routing_expression"]]]
+      ] && AnyTrue[
+        propagatorMomenta[expr],
+        Function[mom, routingEquivalentQ[mom, plan["exchange_routing_expression"]]]
+      ]
+    ]
+  ];
+  If[
+    Length[matches] === 1,
+    KeyDrop[First[matches], {{"radiating_fermion_routing_expression", "exchange_routing_expression"}}],
+    <|"classification_status" -> "UNCLASSIFIED", "match_count" -> Length[matches]|>
+  ]
+];
+diagramMetadata = If[
+  isBremsstrahlungSpike,
+  classifyBremsstrahlungDiagram /@ feyncalcDiagramAmplitudes,
+  channelPlan
+];
+diagramLabel[meta_] := If[
+  KeyExistsQ[meta, "channel"],
+  meta["channel"] <> "-channel",
+  "emission from " <> Lookup[meta, "emission_leg", "unclassified"]
+];
+diagramSubscript[meta_, i_] := If[
+  KeyExistsQ[meta, "channel"],
+  meta["channel"],
+  "D" <> ToString[i]
+];
 Put[feyncalcDiagramAmplitudes, fcAmpPath];
 Export[fcTextPath, ToString[feyncalcDiagramAmplitudes, InputForm], "Text"];
 Put[
@@ -361,6 +509,100 @@ Put[
     "total_amplitude" -> feyncalcTotalAmplitude
   |>,
   fcAmpsPath
+];
+
+wardIdentity = <|"status" -> "NOT_APPLICABLE", "scope" -> "total_amplitude"|>;
+softLimit = <|"status" -> "NOT_APPLICABLE"|>;
+If[isBremsstrahlungSpike,
+  wardHadPolarization = ! FreeQ[
+    feyncalcTotalAmplitude,
+    Polarization[emittedPhotonMomentum, -I, ___]
+  ];
+  wardRaw = feyncalcTotalAmplitude /.
+    Polarization[emittedPhotonMomentum, -I, ___] :> emittedPhotonMomentum;
+  wardDiagramTerms = feyncalcDiagramAmplitudes /.
+    Polarization[emittedPhotonMomentum, -I, ___] :> emittedPhotonMomentum;
+  wardTotalMatchesTerms = TrueQ[wardRaw === Plus @@ wardDiagramTerms];
+  wardDiagramTerms = wardDiagramTerms /. {{
+    Momentum[-{incoming_momenta[1]} + {outgoing_momenta[0]} + {outgoing_momenta[1]}] -> Momentum[{incoming_momenta[0]} - {emitted_photon_momentum}],
+    Momentum[{incoming_momenta[1]} - {outgoing_momenta[0]} - {outgoing_momenta[1]}] -> Momentum[-{incoming_momenta[0]} + {emitted_photon_momentum}]
+  }};
+  FCClearScalarProducts[];
+  SP[{emitted_photon_momentum}, {emitted_photon_momentum}] = 0;
+  SP[{incoming_momenta[0]}, {incoming_momenta[0]}] = SMP["m_e"]^2;
+  SP[{incoming_momenta[1]}, {incoming_momenta[1]}] = SMP["m_mu"]^2;
+  SP[{outgoing_momenta[0]}, {outgoing_momenta[0]}] = SMP["m_e"]^2;
+  SP[{outgoing_momenta[1]}, {outgoing_momenta[1]}] = SMP["m_mu"]^2;
+  wardReducedTerms = TimeConstrained[
+    Map[DiracSimplify[Contract[#], DiracEquation -> True] &, wardDiagramTerms],
+    25,
+    $Failed
+  ];
+  canonicalizeWardExchangeIndex[expr_] := expr /. LorentzIndex[_] -> LorentzIndex[wardExchangeIndex];
+  wardIndexCounts = If[
+    wardReducedTerms === $Failed,
+    {{}},
+    Length[DeleteDuplicates[Cases[#, LorentzIndex[index_] :> index, Infinity]]] & /@ wardReducedTerms
+  ];
+  wardPairResults = If[
+    wardReducedTerms === $Failed || !And @@ (# === 1 & /@ wardIndexCounts),
+    <||>,
+    Association@Table[
+      particle -> TimeConstrained[
+        Simplify[
+          DiracSimplify[
+            FeynAmpDenominatorExplicit[
+              Total[
+                canonicalizeWardExchangeIndex /@
+                  Pick[wardReducedTerms, Lookup[diagramMetadata, "emission_particle"], particle]
+              ]
+            ],
+            DiracEquation -> True
+          ]
+        ],
+        20,
+        $Failed
+      ],
+      {{particle, {{"e-", "mu-"}}}}
+    ]
+  ];
+  wardReduced = If[
+    Length[wardPairResults] === 2 && And @@ (TrueQ[# === 0] & /@ Values[wardPairResults]),
+    0,
+    $Failed
+  ];
+  Put[wardReduced, wardExpressionPath];
+  Export[wardTextPath, ToString[wardReduced, InputForm], "Text"];
+  wardIdentity = <|
+    "status" -> If[wardHadPolarization && wardTotalMatchesTerms && TrueQ[wardReduced === 0], "PASS", "FAIL"],
+    "scope" -> "total_amplitude",
+    "replacement" -> ("Polarization[" <> ToString[emittedPhotonMomentum, InputForm] <> ", -I, ...] -> " <> ToString[emittedPhotonMomentum, InputForm]),
+    "momentum_conservation" -> "{_escape_wl_string(ward_momentum_replacement)}",
+    "polarization_found" -> wardHadPolarization,
+    "total_matches_persisted_terms" -> wardTotalMatchesTerms,
+    "reduction" -> "on_shell_pairwise_external_line_cancellation_from_total_terms",
+    "pair_results" -> {{
+      <|"emission_particle" -> "e-", "result" -> ToString[Lookup[wardPairResults, "e-", $Failed], InputForm]|>,
+      <|"emission_particle" -> "mu-", "result" -> ToString[Lookup[wardPairResults, "mu-", $Failed], InputForm]|>
+    }},
+    "result" -> ToString[wardReduced, InputForm],
+    "expression_file" -> "ward_replaced_total.m"
+  |>;
+  Export[wardJsonPath, wardIdentity, "JSON"];
+
+  observedEmissionLegs = Sort[Lookup[diagramMetadata, "emission_leg", "UNCLASSIFIED"]];
+  expectedEmissionLegs = Sort[Lookup[bremsstrahlungPlan, "emission_leg"]];
+  softLimit = <|
+    "status" -> If[observedEmissionLegs === expectedEmissionLegs, "PASS", "FAIL"],
+    "check_kind" -> "structural_external_leg_factorization",
+    "hard_process" -> "e- mu- -> e- mu-",
+    "hard_process_external_state" -> <|"incoming" -> {{"e-", "mu-"}}, "outgoing" -> {{"e-", "mu-"}}|>,
+    "emitted_particle" -> "gamma",
+    "expected_emission_legs" -> expectedEmissionLegs,
+    "observed_emission_legs" -> observedEmissionLegs,
+    "statement" -> "One generated soft-photon attachment exists for each charged external leg of the corresponding 2-to-2 hard process."
+  |>;
+  Export[softJsonPath, softLimit, "JSON"];
 ];
 
 extractPropagators[expr_] := Cases[
@@ -376,9 +618,9 @@ texString[expr_] := StringReplace[ToString[TeXForm[expr]], "^*^{{" -> "^{{* "];
 
 texSections = Table[
   "% expression-id: " <> expressionIds[[i]] <> "\\n" <>
-  "\\\\subsection*{{Diagram " <> ToString[i] <> ": " <> channelPlan[[i, "channel"]] <> "-channel}}\\n" <>
+  "\\\\subsection*{{Diagram " <> ToString[i] <> ": " <> diagramLabel[diagramMetadata[[i]]] <> "}}\\n" <>
   "\\\\begin{{align*}}\\n" <>
-  "\\\\mathcal{{M}}_{{" <> channelPlan[[i, "channel"]] <> "}} &= " <> texString[feyncalcDiagramAmplitudes[[i]]] <> "\\n" <>
+  "\\\\mathcal{{M}}_{{" <> diagramSubscript[diagramMetadata[[i]], i] <> "}} &= " <> texString[feyncalcDiagramAmplitudes[[i]]] <> "\\n" <>
   "\\\\end{{align*}}\\n",
   {{i, Length[feyncalcDiagramAmplitudes]}}
 ];
@@ -402,25 +644,43 @@ amplitudesTex = StringJoin[
 Export[amplitudesTexPath, amplitudesTex, "Text"];
 
 diagramRecords = Table[
-  <|
-    "diagram_id" -> ("native:diagram:" <> ToString[i]),
-    "expression_id" -> expressionIds[[i]],
-    "channel" -> channelPlan[[i, "channel"]],
-    "internal_particle" -> channelPlan[[i, "internal_particle"]],
-    "expected_routing" -> channelPlan[[i, "routing"]],
-    "propagators" -> extractPropagators[feyncalcDiagramAmplitudes[[i]]],
-    "amplitude_file" -> "feyncalc_amplitudes.m",
-    "latex_file" -> "amplitudes.tex"
-  |>,
+  Join[
+    <|
+      "diagram_id" -> ("native:diagram:" <> ToString[i]),
+      "expression_id" -> expressionIds[[i]],
+      "propagators" -> extractPropagators[feyncalcDiagramAmplitudes[[i]]],
+      "amplitude_file" -> "feyncalc_amplitudes.m",
+      "latex_file" -> "amplitudes.tex"
+    |>,
+    If[
+      isBremsstrahlungSpike,
+      diagramMetadata[[i]],
+      <|
+        "channel" -> diagramMetadata[[i, "channel"]],
+        "internal_particle" -> diagramMetadata[[i, "internal_particle"]],
+        "expected_routing" -> diagramMetadata[[i, "routing"]]
+      |>
+    ]
+  ],
   {{i, Length[feyncalcDiagramAmplitudes]}}
 ];
 
-amplitudeMetadata = <|
+consistencyMetadata = <|
+  "diagram_count_matches_per_diagram_amplitudes" -> (diagramCount == Length[feyncalcDiagramAmplitudes]),
+  "total_is_sum_of_per_diagram_amplitudes" -> True,
+  "m2_computed" -> False
+|>;
+consistencyMetadata = If[
+  isBremsstrahlungSpike,
+  Join[consistencyMetadata, <|"diagram_count_matches_classification_plan" -> (diagramCount == Length[bremsstrahlungPlan])|>],
+  Join[consistencyMetadata, <|"diagram_count_matches_channel_plan" -> (diagramCount == Length[channelPlan])|>]
+];
+
+amplitudeMetadata = Join[<|
   "backend_profile_id" -> "{config.backend_profile_id}",
   "backend_id" -> "{config.backend_id}",
   "process_id" -> "{process_id}",
   "diagram_count" -> diagramCount,
-  "channel_count" -> Length[channelPlan],
   "per_diagram_amplitude_count" -> Length[feyncalcDiagramAmplitudes],
   "diagram_rendering_route" -> diagramRenderingRoute,
   "diagram_source" -> "diagram_source.m",
@@ -436,13 +696,21 @@ amplitudeMetadata = <|
     "amplitude_file" -> "feyncalc_amplitudes.m",
     "latex_file" -> "amplitudes.tex"
   |>,
-  "consistency" -> <|
-    "diagram_count_matches_channel_plan" -> (diagramCount == Length[channelPlan]),
-    "diagram_count_matches_per_diagram_amplitudes" -> (diagramCount == Length[feyncalcDiagramAmplitudes]),
-    "total_is_sum_of_per_diagram_amplitudes" -> True,
-    "m2_computed" -> False
-  |>
-|>;
+  "ward_identity" -> wardIdentity,
+  "soft_limit" -> softLimit,
+  "consistency" -> consistencyMetadata
+|>, If[
+  isBremsstrahlungSpike,
+  <|
+    "classification_count" -> Length[bremsstrahlungPlan],
+    "topology_comparison" -> <|
+      "status" -> If[diagramCount == Length[bremsstrahlungPlan] && FreeQ[diagramMetadata, "UNCLASSIFIED"], "PASS", "FAIL"],
+      "expected_diagram_count" -> Length[bremsstrahlungPlan],
+      "expected_topology" -> "four_external_leg_bremsstrahlung_diagrams"
+    |>
+  |>,
+  <|"channel_count" -> Length[channelPlan]|>
+]];
 Export[amplitudesJsonPath, amplitudeMetadata, "JSON"];
 
 summary = <|
@@ -457,7 +725,11 @@ summary = <|
   "create_topologies_call" -> createTopologiesCall,
   "insert_fields_call" -> insertFieldsCall,
   "diagram_count" -> diagramCount,
-  "channel_plan" -> channelPlan,
+  "diagram_metadata_plan" -> If[
+    isBremsstrahlungSpike,
+    KeyDrop[#, {{"radiating_fermion_routing_expression", "exchange_routing_expression"}}] & /@ bremsstrahlungPlan,
+    channelPlan
+  ],
   "diagram_rendering_route" -> diagramRenderingRoute,
   "model" -> "{config.model}",
   "generic_model" -> "{config.generic_model}",
@@ -500,6 +772,8 @@ def run_native_qed_backend(
         [wolframscript, "-script", str(script_path.resolve())],
         cwd=output_path,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         timeout=timeout_seconds,
     )
@@ -514,6 +788,8 @@ def run_native_qed_backend(
             ["lualatex", "-interaction=nonstopmode", "-halt-on-error", "amplitudes.tex"],
             cwd=output_path,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             capture_output=True,
             timeout=timeout_seconds,
         )
@@ -570,14 +846,16 @@ def _map_particle(leg: dict[str, Any], config: BackendConfig) -> str:
     return config.particle_to_feynarts[particle_id]
 
 
-def _create_topologies_call(config: BackendConfig) -> str:
+def _create_topologies_call(config: BackendConfig, incoming_count: int = 2, outgoing_count: int = 2) -> str:
     excluded = ", ".join(config.exclude_topologies)
-    return f"CreateTopologies[0, 2 -> 2, ExcludeTopologies -> {{{excluded}}}]"
+    return f"CreateTopologies[0, {incoming_count} -> {outgoing_count}, ExcludeTopologies -> {{{excluded}}}]"
 
 
 def _insert_fields_call(config: BackendConfig, incoming: list[str], outgoing: list[str]) -> str:
+    incoming_fields = ", ".join(incoming)
+    outgoing_fields = ", ".join(outgoing)
     return (
-        f"InsertFields[topologies, {{{incoming[0]}, {incoming[1]}}} -> {{{outgoing[0]}, {outgoing[1]}}}, "
+        f"InsertFields[topologies, {{{incoming_fields}}} -> {{{outgoing_fields}}}, "
         f"Model -> \"{config.model}\", GenericModel -> \"{config.generic_model}\", "
         f"Restrictions -> {config.restrictions}, InsertionLevel -> {{{config.insertion_level}}}]"
     )
@@ -598,6 +876,28 @@ def _channel_plan_wl(channels: list[NativeChannel]) -> str:
             "|>"
         )
     return "{" + ", ".join(items) + "}"
+
+
+def _bremsstrahlung_plan_wl(diagrams: list[NativeBremsstrahlungDiagram]) -> str:
+    items = []
+    for diagram in diagrams:
+        items.append(
+            "<|"
+            f'"emission_leg" -> "{_escape_wl_string(diagram.emission_leg)}", '
+            f'"emission_particle" -> "{_escape_wl_string(diagram.emission_particle)}", '
+            f'"emitted_particle" -> "gamma", '
+            f'"exchanged_virtual_particle" -> "{_escape_wl_string(diagram.exchanged_virtual_particle)}", '
+            f'"radiating_fermion_routing" -> "{_escape_wl_string(diagram.radiating_fermion_routing)}", '
+            f'"exchange_routing" -> "{_escape_wl_string(diagram.exchange_routing)}", '
+            f'"radiating_fermion_routing_expression" -> {_wl_expression(diagram.radiating_fermion_routing)}, '
+            f'"exchange_routing_expression" -> {_wl_expression(diagram.exchange_routing)}'
+            "|>"
+        )
+    return "{" + ", ".join(items) + "}"
+
+
+def _wl_expression(value: str) -> str:
+    return value.replace("_", "")
 
 
 def _qed_internal_for_pair(first: str, second: str) -> str | None:
@@ -668,6 +968,8 @@ def build_native_qed_m2_script(
     """Build a generic native FeynCalc script for standard-QED 2 -> 2 M2."""
 
     validate_native_qed_request(physics_card, config)
+    if physics_card.get("process_type") == "scattering_2_to_3":
+        return _build_bremsstrahlung_m2_policy_script(physics_card, config)
     incoming_legs = sorted(physics_card["particles"]["incoming"], key=lambda leg: leg["slot"])
     outgoing_legs = sorted(physics_card["particles"]["outgoing"], key=lambda leg: leg["slot"])
     incoming = [_map_particle(leg, config) for leg in incoming_legs]
@@ -678,7 +980,7 @@ def build_native_qed_m2_script(
     transverse_option = ""
     if external_photons:
         transverse_option = f",\n  TransversePolarizationVectors -> {{{', '.join(external_photons)}}}"
-    create_call = _create_topologies_call(config)
+    create_call = _create_topologies_call(config, len(incoming), len(outgoing))
     insert_call = _insert_fields_call(config, incoming, outgoing)
     set_mandelstam_call = _set_mandelstam_call(incoming_legs, outgoing_legs, config)
     mandelstam_mass_sum = _mandelstam_mass_sum(incoming_legs, outgoing_legs, config)
@@ -798,6 +1100,28 @@ Quit[If[status === "PASS", 0, 1]];
 '''
 
 
+def _build_bremsstrahlung_m2_policy_script(physics_card: dict[str, Any], config: BackendConfig) -> str:
+    process_id = physics_card.get("process_id", "process:unknown")
+    return f'''(* FeynAgent bounded native-QED 2 -> 3 M2 policy artifact. *)
+(* source_process_id = "{process_id}" *)
+(* backend_profile_id = "{config.backend_profile_id}" *)
+(* Deliberately non-executing: full 2 -> 3 M2 simplification is outside the v0.2 spike. *)
+(* Per-diagram and total amplitudes are loaded from the exact persisted FeynCalc objects. *)
+
+outDir = DirectoryName[$InputFileName];
+amplitudeObjectsPath = FileNameJoin[{{outDir, "feyncalc_amplitudes.m"}}];
+If[!FileExistsQ[amplitudeObjectsPath], Print["MISSING_AMPLITUDE_OBJECTS"]; Quit[2]];
+amplitudeObjects = Get[amplitudeObjectsPath];
+perDiagramAmplitudes = amplitudeObjects["per_diagram_amplitudes"];
+totalAmplitude = Plus @@ perDiagramAmplitudes;
+samePersistedTotalQ = TrueQ[totalAmplitude === amplitudeObjects["total_amplitude"]];
+Print["FEYNAGENT_2TO3_M2_POLICY=SCRIPT_GENERATED_ONLY"];
+Print["TOTAL_FROM_PERSISTED_DIAGRAMS=" <> ToString[samePersistedTotalQ, InputForm]];
+Print["No spin sums, polarization sums, squaring, phase-space integration, or simplification are executed."];
+Quit[0];
+'''
+
+
 def run_native_qed_m2_generator(
     physics_card: dict[str, Any],
     output_dir: str | Path,
@@ -849,6 +1173,8 @@ def run_native_qed_m2_generator(
         [wolframscript, "-script", str(script_path.resolve())],
         cwd=output_path,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         capture_output=True,
         timeout=timeout_seconds,
     )
@@ -895,6 +1221,15 @@ def _m2_execution_policy(physics_card: dict[str, Any], config: BackendConfig, re
         "execute": False,
         "path": "script_only",
     }
+    if physics_card.get("process_type") == "scattering_2_to_3":
+        if status != "approved" or mode != "amplitude_only":
+            raise NativeBackendError("2 -> 3 spike permits only approved amplitude_only execution")
+        base["path"] = "bounded_2_to_3_script_only"
+        base["reason"] = (
+            "2 -> 3 generates compute_m2.wl as a non-executed policy artifact; "
+            "full M2 simplification is disabled"
+        )
+        return base
     if mode == "amplitude_only":
         base["reason"] = "amplitude_only generates compute_m2.wl but does not execute M2"
         return base

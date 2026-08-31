@@ -4,6 +4,12 @@ All notable public-facing changes to FeynAgent are recorded here.
 
 ## Unreleased
 
+### Added
+
+- Bounded native-QED B05 feature spike for `e- mu- -> e- mu- gamma`, with a strict structured 2-to-3 PhysicsCard path.
+- FeynArts `CreateTopologies[0, 2 -> 3]`, persistent diagrams, per-diagram FeynCalc/LaTeX objects, external-leg emission metadata, a total-amplitude Ward check, and a structural soft check against the B03 hard process.
+- Script-only `compute_m2.wl` policy for B05; automatic full 2-to-3 M2 simplification, phase-space integration, and cross sections remain disabled.
+
 ### Changed
 
 - Public release documentation now states the same validated v0.1 scope across README, quickstart, release scope, backend strategy, readiness levels, Codex skill instructions, citation metadata, and package metadata.

@@ -5,6 +5,8 @@ FeynAgent is a reproducible HEP workflow tool for the public v0.1 validated scop
 - standard native tree-level QED 2-to-2 workflows with external `e-`, `e+`, `mu-`, `mu+`, and `gamma`, using externally installed FeynArts/FeynCalc through `feynarts_feyncalc_native`;
 - the single locked custom B04 benchmark `phi phi -> h h`, `model_id = reheating_scalar_gravity_v1`, through `direct_feyncalc_custom_audited`, requiring separately supplied audited external knowledge.
 
+The unreleased v0.2 feature-spike surface adds exactly one native tree-level QED 2-to-3 benchmark, `e- mu- -> e- mu- gamma` (B05). It is not a general n-body route: it reuses the five standard-QED particle mappings, classifies the four external-leg bremsstrahlung diagrams, checks the total-amplitude Ward identity, performs a structural soft check against B03, and refuses automatic full 2-to-3 M2 simplification.
+
 FeynAgent-owned code and documentation are licensed under Apache-2.0. FeynAgent does not vendor or relicense FeynCalc, FeynArts, Mathematica/Wolfram, their examples, their documentation, or the external B04 knowledge package.
 
 ## Support Matrix
@@ -12,6 +14,7 @@ FeynAgent-owned code and documentation are licensed under Apache-2.0. FeynAgent 
 | Area | v0.1 Status | Notes |
 |---|---:|---|
 | Tree-level QED 2-to-2 | Supported | Validated through B01, B02, and B03. |
+| Bounded QED 2-to-3 spike | Feature-spike validated | Only B05 `e- mu- -> e- mu- gamma`; no general n-body claim. |
 | External particles | Supported | `e-`, `e+`, `mu-`, `mu+`, `gamma`. |
 | Native backend | Supported for standard QED scope | FeynArts/FeynCalc via `feynarts_feyncalc_native`. |
 | Diagrams | Supported | Persistent FeynArts diagram source and `diagrams.pdf`. |
@@ -131,6 +134,8 @@ feyncalc_amplitudes.m
 native_amplitude.wl
 compute_m2.wl
 m2_manifest.json
+ward_identity.json
+soft_limit.json
 validation_report.json
 run_manifest.json
 stdout.log
@@ -144,6 +149,7 @@ The runner also snapshots input files under `runs/<run_id>/inputs/` and records 
 - `examples/B02_compton/`: reproducible public Compton example for users who have already passed `feynagent doctor`, including public inputs, a bounded benchmark-regression `ExecutionRequest`, expected `s`/`u` channels, and the expected massless M2.
 - `examples/B04_locked_scalar_gravity/`: public documentation manifest for the locked B04 `phi phi -> h h` custom audited route. It records IDs, required rules, topology classes, diagram classifications, and reduced benchmark M2 summary without bundling private/source external knowledge.
 - `examples/gallery/`: small curated PDFs with clear publication provenance and SHA256 hashes. It does not copy generated runs wholesale.
+- `benchmarks/B05_emu_to_emu_gamma/`: bounded v0.2 feature-spike inputs and structural expectations; generated amplitudes and PDFs remain under `runs/`.
 
 ## Third-Party Dependency And Citation Notice
 

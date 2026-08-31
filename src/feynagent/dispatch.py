@@ -67,7 +67,9 @@ def resolve_backend_route(
             model_id=model_id,
             process_id=process_id,
             standard_qed_authority=True,
-            production_ready_scope="validated tree-level QED 2-to-2 only",
+            production_ready_scope=(
+                "validated tree-level QED 2-to-2 plus bounded e- mu- -> e- mu- gamma v0.2 spike"
+            ),
         )
 
     if classification == CUSTOM_AUDITED and model_id == B04_MODEL_ID and process_id == B04_PROCESS_ID:

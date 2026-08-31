@@ -50,7 +50,8 @@
       "type": "string",
       "enum": [
         "decay_1_to_n",
-        "scattering_2_to_2"
+        "scattering_2_to_2",
+        "scattering_2_to_3"
       ]
     },
     "perturbative_order": {
@@ -239,6 +240,42 @@
       }
     }
   },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "process_type": {"const": "scattering_2_to_2"}
+        }
+      },
+      "then": {
+        "properties": {
+          "particles": {
+            "properties": {
+              "incoming": {"minItems": 2, "maxItems": 2},
+              "outgoing": {"minItems": 2, "maxItems": 2}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "process_type": {"const": "scattering_2_to_3"}
+        }
+      },
+      "then": {
+        "properties": {
+          "particles": {
+            "properties": {
+              "incoming": {"minItems": 2, "maxItems": 2},
+              "outgoing": {"minItems": 3, "maxItems": 3}
+            }
+          }
+        }
+      }
+    }
+  ],
   "$defs": {
     "object_id": {
       "type": "string",

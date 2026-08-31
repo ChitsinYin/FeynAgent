@@ -9,6 +9,7 @@ resolves:
 capabilities:
   process_types:
   - scattering_2_to_2
+  - scattering_2_to_3
   loop_orders:
   - 0
   operations:
@@ -52,5 +53,6 @@ native:
       external_state_kind: massless_vector
       spin_average_denominator: 2
 metadata:
-  notes: FeynArts SM/Lorentz QEDOnly profile for standard tree-level QED benchmarks;
-    generated artifacts belong under runs/.
+  notes: FeynArts SM/Lorentz QEDOnly profile for validated tree-level QED 2-to-2
+    benchmarks and the bounded e- mu- -> e- mu- gamma v0.2 spike; generated artifacts
+    belong under runs/.
