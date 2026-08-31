@@ -1,5 +1,13 @@
 expected_native_backend: feynarts_feyncalc_native
 backend_profile: ../../profiles/backends/feynarts_sm_qed.yaml
+expected_feynarts_fields:
+  incoming:
+  - F[2,{1}]
+  - F[2,{2}]
+  outgoing:
+  - F[2,{1}]
+  - F[2,{2}]
+  - V[1]
 expected_create_topologies: CreateTopologies[0, 2 -> 3]
 expected_diagram_count: 4
 expected_topology: external_leg_bremsstrahlung
